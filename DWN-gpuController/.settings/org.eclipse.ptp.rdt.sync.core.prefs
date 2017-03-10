@@ -1,0 +1,3 @@
+eclipse.preferences.version=1
+project-sync-config=<?xml version\="1.0" encoding\="UTF-8"?>\n<sync-configs active\="ajay@10.181.100.126">\n<sync-config config-name\="ajay@10.181.100.126" connection-name\="ajay@10.181.100.126" location\="/home/ajay/DWN-gpuController" remote-services-id\="org.eclipse.ptp.remote.RSERemoteServices" sync-on-postbuild\="true" sync-on-prebuild\="true" sync-on-save\="true" sync-provider-id\="org.eclipse.ptp.rdt.sync.git.core.synchronizeService">\n<config-properties com.nvidia.cuda.ide.build.core.Cpu\="x86_64"/>\n</sync-config>\n</sync-configs>
+sync-mode=ACTIVE
