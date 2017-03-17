@@ -1,26 +1,22 @@
 /*
- * unitTestClass.cuh
+ * unitTest.cu
  *
- *  Created on: Mar 8, 2017
+ *  Created on: Mar 15, 2017
  *      Author: control
  */
+#include <iostream>
+#include <cstdio>
+#include <string>
+#include "rapidjson/document.h"
+#include "rapidjson/rapidjson.h"
+#include "rapidjson/filereadstream.h"
 
-#ifndef UNITTESTCLASS_CUH_
-#define UNITTESTCLASS_CUH_
+using namespace std;
 
-
-
-class unitTest{
-public:
-	unitTest(string pathToFile);
-	~unitTest();
-	template<typename T> void checkObjectiveMatR(T *engineR);
-	friend class Engine;
-private:
-	uint_t NX, NU, NV;
-	real_t *matR;
-};
-
+typedef int uint_t;
+typedef float real_t;
+#include "DefinitionHeader.h"
+#include "unitTestHeader.cuh"
 
 unitTest::unitTest(string pathToFile){
 	cout << "allocating memory for the test matrices \n";
@@ -55,9 +51,9 @@ unitTest::unitTest(string pathToFile){
 	fclose(infile);
 }
 
-template<typename T> void unitTest::checkObjectiveMatR(T *engineR){
-	real_t *hostEngineR = new real_t[NV*NV];
-	_CUDA( cudaMemcpy( hostEngineR, engineR, NV*NV*sizeof(real_t), cudaMemcpyDeviceToHost) );
+void unitTest::checkObjectiveMatR(real_t *engineMatR){
+	real_t *hostEngineMatR = new real_t[NV*NV];
+	_CUDA( cudaMemcpy( hostEngineMatR, engineMatR, NV*NV*sizeof(real_t), cudaMemcpyDeviceToHost) );
 	/*
 	for (int iRow = 0; iRow < NV; iRow++){
 		for(int iCol = 0; iCol < NV; iCol++){
@@ -66,14 +62,13 @@ template<typename T> void unitTest::checkObjectiveMatR(T *engineR){
 		cout << "\n";
 	}*/
 	for( int i = 0; i < NV*NV; i++){
-		if(abs(matR[i] - hostEngineR[i]) > 1e-3)
-			cout<< matR[i] << " " << hostEngineR[i] << " " << i << " ";
+		if(abs(matR[i] - hostEngineMatR[i]) > 1e-3)
+			cout<< matR[i] << " " << hostEngineMatR[i] << " " << i << " ";
 	}
-	delete hostEngineR;
+	delete hostEngineMatR;
 }
 
 unitTest::~unitTest(){
 	delete [] matR;
 }
 
-#endif /* UNITTESTCLASS_CUH_ */

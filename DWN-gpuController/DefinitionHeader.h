@@ -36,5 +36,14 @@
 		} \
 		while(0)
 
+#include <iostream>
+#include <cstdio>
+#include <string>
+
+typedef int uint_t;
+typedef float real_t;
+
+using namespace std;
+
 
 #endif /* DEFINITIONHEADER_H_ */

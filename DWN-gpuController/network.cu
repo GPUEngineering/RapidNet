@@ -1,26 +1,22 @@
 /*
- * networkClass.cuh
+ * Network.cu
  *
- *  Created on: Feb 21, 2017
+ *  Created on: Mar 14, 2017
  *      Author: control
  */
+#include <iostream>
+#include <cstdio>
+#include <string>
+#include "rapidjson/document.h"
+#include "rapidjson/rapidjson.h"
+#include "rapidjson/filereadstream.h"
 
-#ifndef NETWORKCLASS_CUH_
-#define NETWORKCLASS_CUH_
+using namespace std;
 
-class DWNnetwork{
-public:
-	DWNnetwork(string pathToFile);
-	~DWNnetwork();
-	friend class Engine;
-	friend class SMPCController;
-private:
-	uint_t NX, NU, ND, NE, NV;
-	real_t *matA, *matB, *matGd, *matE, *matEd, *vecXmin, *vecXmax, *vecXsafe, *vecUmin,
-	*vecUmax, *matL, *matLhat, *matCostW, *vecCostAlpha1, *vecCostAlpha2;
-	real_t *matDiagPrecnd;
+typedef int uint_t;
+typedef float real_t;
 
-};
+#include "networkHeader.cuh"
 
 DWNnetwork::DWNnetwork(string pathToFile){
 	cout << "allocating memory for the network \n";
@@ -124,12 +120,13 @@ DWNnetwork::DWNnetwork(string pathToFile){
 		assert(a.IsArray());
 		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
 			vecCostAlpha1[i] = a[i].GetDouble();
-		vecCostAlpha2 = new real_t[NU];
+		vecCostAlpha2 = new real_t[NU*N];
 		a = jsonDocument["costAlpha2"];
 		assert(a.IsArray());
 		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
 			vecCostAlpha2[i] = a[i].GetDouble();
 		matDiagPrecnd = new real_t[(NU + 2*NX) * N];
+		//cout << "allocating memory matDiagPrecnd " << N <<"\n";
 		a = jsonDocument["matDiagPrecnd"];
 		assert(a.IsArray());
 		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
@@ -158,4 +155,3 @@ DWNnetwork::~DWNnetwork(){
 	delete [] matDiagPrecnd;
 	cout << "freeing the memory of the network \n";
 }
-#endif /* NETWORKCLASS_CUH_ */

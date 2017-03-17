@@ -1,29 +1,25 @@
 /*
- * forecastClass.cuh
+ * forecast.cu
  *
- *  Created on: Feb 23, 2017
+ *  Created on: Mar 14, 2017
  *      Author: control
  */
+#include <iostream>
+#include <cstdio>
+#include <string>
+#include "rapidjson/document.h"
+#include "rapidjson/rapidjson.h"
+#include "rapidjson/filereadstream.h"
 
-#ifndef FORECASTCLASS_CUH_
-#define FORECASTCLASS_CUH_
+using namespace std;
 
-//TODO forecast function, dHat variable allocation
-class Forecastor{
-public:
-	Forecastor( string pathToFile );
-	~Forecastor();
-	friend class Engine;
-	friend class SMPCController;
-private:
-	uint_t N, K, N_NODES, N_CHILDREN_TOT, N_NONLEAF_NODES, DIM_NODE;
-	uint_t *stages, *nodesPerStage, *nodesPerStageCumul, *leaves, *children,
-	*ancestor, *nChildren, *nChildrenCumul;
-	real_t *probNode, *valueNode, *dHat;
-};
+typedef int uint_t;
+typedef float real_t;
+#include "forecastHeader.cuh"
 
 
-Forecastor::Forecastor(string pathToFile){
+
+Forecaster::Forecaster(string pathToFile){
 	cout << "allocating memory for the forecaster \n";
 	const char* fileName = pathToFile.c_str();
 	rapidjson::Document jsonDocument;
@@ -116,19 +112,17 @@ Forecastor::Forecastor(string pathToFile){
 	fclose(infile);
 }
 
-Forecastor::~Forecastor(){
+Forecaster::~Forecaster(){
 	delete [] stages;
 	delete [] nodesPerStage;
 	delete [] nodesPerStageCumul;
 	delete [] leaves;
 	delete [] children;
 	delete [] ancestor;
-	delete [] nChildren;
+	delete [] nChildren;/**/
 	delete [] nChildrenCumul;
 	delete [] probNode;
 	delete [] valueNode;
 	delete [] dHat;
-	cout << "freeing the memory of the forecastor \n";
+	cout << "freeing the memory of the forecaster \n";
 }
-
-#endif /* FORECASTCLASS_CUH_ */

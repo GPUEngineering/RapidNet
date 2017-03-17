@@ -7,29 +7,18 @@
  * this software and related documentation outside the terms of the EULA
  * is strictly prohibited.
  */
-#include <iostream>
-#include <cstdio>
-#include <string>
 #include <cuda_device_runtime_api.h>
 #include "cuda_runtime.h"
 #include "cublas_v2.h"
 #include "rapidjson/document.h"
 #include "rapidjson/rapidjson.h"
+
 #include "rapidjson/filereadstream.h"
 
-
-//using namespace rapidjson;
-using namespace std;
-
-typedef int uint_t;
-typedef float real_t;
-
 #include "DefinitionHeader.h"
-#include "networkClass.cuh"
-#include "forecastClass.cuh"
-#include "unitTestClass.cuh"
-#include "EngineClass.cuh"
-#include "SMPControllerClass.cuh"
+#include "SMPControllerHeader.cuh"
+//#include "cudaKernal.cu"
+//#include "SMPControllerClass.cuh"
 
 /*
 __global__ void increment ( int* dev_a, int p, int N){
@@ -43,49 +32,22 @@ int main(void){
 	cudaRuntimeGetVersion(&runtimeVersion);
 	_CUDA(cudaDriverGetVersion(&driverVersion));
 	cout << runtimeVersion << " " << driverVersion << endl;
-	string pathToNetworkFile = "../network.json";
-	string pathToForecastFile = "../forecastor.json";
-	string pathToTestfile = "../testVariables.json";
+	string pathToNetworkFile = "../dataFiles/network.json";
+	string pathToForecastFile = "../dataFiles/forecastor.json";
+	string pathToTestfile = "../dataFiles/testVariables.json";
 	DWNnetwork myNetwork( pathToNetworkFile );
-	Forecastor myForecastor( pathToForecastFile );
+	Forecaster myForecaster( pathToForecastFile );
 	unitTest myTestor( pathToTestfile );
-	Engine myEngine(&myNetwork, &myForecastor, &myTestor);
+	Engine myEngine(&myNetwork, &myForecaster, &myTestor);
 	SMPCController myController( &myEngine);
-	//myEngine.testStupidFunction();
 	myEngine.initialiseForecastDevice();
 	myEngine.initialiseSystemDevice();
-	//myEngine.testPrecondtioningFunciton();
 	myEngine.factorStep();
+	myController.solveStep();
+	//myEngine.testStupidFunction();
+	//myEngine.testPrecondtioningFunciton();
+
 	//myEngine.testInverse();
-	/*
-	int *a, *b ;
-	int *dev_a ;
-	int N = 10 ;
-
-	a = new int[N] ;
-	b = new int[N] ;
-
-
-	for (int i = 0; i < N ; i ++){
-		a[i] = i;
-	}
-
-
-	cudaMalloc((void**)&dev_a, N * sizeof(int) );
-
-	cudaMemcpy(dev_a, a , N*sizeof(int), cudaMemcpyHostToDevice);
-	increment<<<1,N+3>>>(dev_a, 4, N);
-	cudaMemcpy(b, dev_a, N*sizeof(int), cudaMemcpyDeviceToHost);
-
-	for (int i = 0 ; i < N ; i++){
-		cout << a[i] << b[i]<<endl;
-	}
-	cout <<"Hello from the remote !!"<<endl;
-
-	cudaFree(dev_a);
-	delete [] a;
-	delete [] b;
-	*/
 	cout << "bye bye \n" << endl;
 	return 0;
 }
