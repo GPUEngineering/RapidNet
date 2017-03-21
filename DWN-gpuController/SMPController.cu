@@ -387,6 +387,12 @@ void SMPCController::algorithmApg(){
 	//dualUpdate(devVecUpdatePsi, devPtrVecAcceleratedPsi, devPtrVecPrimalPsi, devVecDualPsi, stepSize, nodes*nu);
 }
 
+void SMPCController::controllerSmpc(){
+	ptrMyEngine->updateStateControl();
+	ptrMyEngine->eliminateInputDistubanceCoupling();
+	algorithmApg();
+}
+
 SMPCController::~SMPCController(){
 	cout << "removing the memory of the controller" << endl;
 	_CUDA( cudaFree(devVecX) );
