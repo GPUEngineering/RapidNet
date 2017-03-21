@@ -5,11 +5,20 @@
  *      Author: Ajay Kumar Samparthirao
  */
 
+/*TODO Rename cudaKernalHeader into DWNCudaKernels */
+/* IT IS 'KERNEL', NOT 'KERNAL' */
+/*TODO Add documentation */
+
 #ifndef CUDAKERNALHEADER_CUH_
 #define CUDAKERNALHEADER_CUH_
 
-__global__ void preconditionSystem(real_t *matF, real_t *matG, real_t *dualDiagPrcnd, real_t *scaleVec,
-		uint_t nx, uint_t nu){
+__global__ void preconditionSystem(
+		real_t *matF, 
+		real_t *matG, 
+		real_t *dualDiagPrcnd, 
+		real_t *scaleVec,
+		uint_t nx, 
+		uint_t nu){
 	//int tid = blockIdx.x * blockDim.x + threadIdx.x;
 	int currentThread = threadIdx.x;
 	int currentBlock  = blockIdx.x;
@@ -43,8 +52,13 @@ __global__ void preconditionSystem(real_t *matF, real_t *matG, real_t *dualDiagP
 	}
 }
 
-__global__ void calculateDiffUhat(real_t *devDeltaUhat, real_t *devUhat, real_t *prevUhat, uint_t *devTreeAncestor,
-		uint_t nu, uint_t nodes){
+__global__ void calculateDiffUhat(
+		real_t *devDeltaUhat, 
+		real_t *devUhat, 
+		real_t *prevUhat, 
+		uint_t *devTreeAncestor,
+		uint_t nu, 
+		uint_t nodes){
 	int tid = blockIdx.x * blockDim.x + threadIdx.x;
 	int currentBlock = blockIdx.x;
 	int currentThread = threadIdx.x;
@@ -123,7 +137,7 @@ __global__  void solveSumChildren(real_t *src, real_t *dst, uint_t *devTreeNumCh
 	}
 }
 
-
+/*TODO kernal ---> kernel */
 __global__ void kernalDualExtrapolationStep(real_t *vecDualW, real_t *vecPrevDual, real_t *vecCurrentDual,
 		real_t alpha, int size){
 	int tid = blockIdx.x*blockDim.x + threadIdx.x;

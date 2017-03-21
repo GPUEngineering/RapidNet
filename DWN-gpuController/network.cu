@@ -2,7 +2,7 @@
  * Network.cu
  *
  *  Created on: Mar 14, 2017
- *      Author: control
+ *      Author: Ajay K. Sampathirao, P. Sopasakis
  */
 #include <iostream>
 #include <cstdio>
@@ -13,6 +13,7 @@
 
 using namespace std;
 
+/*TODO These type definitions should be removed! */
 typedef int uint_t;
 typedef float real_t;
 
@@ -32,7 +33,9 @@ DWNnetwork::DWNnetwork(string pathToFile){
 		char* readBuffer = new char[65536];
 		rapidjson::FileReadStream networkJsonStream(infile, readBuffer, sizeof(readBuffer));
 		jsonDocument.ParseStream(networkJsonStream);
+		/*TODO change it into: `jsonDocument[VARNAME_NX]` and use #define VARNAME_NX "nx" */
 		a = jsonDocument["nx"];
+		/*TODO Do not use assert - instead, throw an Exception */
 		assert(a.IsArray());
 		NX = (uint_t) a[0].GetDouble();
 		a = jsonDocument["nu"];
