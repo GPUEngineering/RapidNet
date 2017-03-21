@@ -125,12 +125,39 @@ DWNnetwork::DWNnetwork(string pathToFile){
 		assert(a.IsArray());
 		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
 			vecCostAlpha2[i] = a[i].GetDouble();
+		a = jsonDocument["penaltyStateX"];
+		penaltyStateX = a[0].GetDouble();
+		a = jsonDocument["penaltySafetyX"];
+		penaltySafetyX = a[0].GetDouble();
 		matDiagPrecnd = new real_t[(NU + 2*NX) * N];
 		//cout << "allocating memory matDiagPrecnd " << N <<"\n";
 		a = jsonDocument["matDiagPrecnd"];
 		assert(a.IsArray());
 		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
 			matDiagPrecnd[i] = a[i].GetDouble();
+		currentX = new real_t[NX];
+		a = jsonDocument["currentX"];
+		assert(a.IsArray());
+		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
+			currentX[i] = a[i].GetDouble();
+		prevUhat = new real_t[NU];
+		a = jsonDocument["prevUhat"];
+		assert(a.IsArray());
+		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
+			prevUhat[i] = a[i].GetDouble();
+		prevU = new real_t[NU];
+		a = jsonDocument["prevU"];
+		assert(a.IsArray());
+		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
+			prevU[i] = a[i].GetDouble();
+		prevV = new real_t[NV];
+		a = jsonDocument["prevV"];
+		assert(a.IsArray());
+		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
+			prevV[i] = a[i].GetDouble();
+		a = jsonDocument["stepSize"];
+		assert(a.IsArray());
+		STEP_SIZE = a[0].GetDouble();
 		delete [] readBuffer;
 	}
 	fclose(infile);

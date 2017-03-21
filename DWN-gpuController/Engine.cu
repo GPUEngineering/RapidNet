@@ -11,8 +11,8 @@ typedef int uint_t;
 typedef float real_t;
 
 #include "DefinitionHeader.h"
-#include "cudaKernalHeader.cuh"
 #include "EngineHeader.cuh"
+#include "cudaKernalHeader.cuh"
 
 Engine::Engine(DWNnetwork *myNetwork, Forecaster *myForecaster, unitTest *myTestor){
 	cout << "allocating memory for the engine \n";
@@ -126,7 +126,6 @@ void Engine::allocateSystemDevice(){
 	uint_t nx = ptrMyNetwork->NX;
 	uint_t nu = ptrMyNetwork->NU;
 	uint_t nv = ptrMyNetwork->NV;
-	uint_t ne = ptrMyNetwork->NE;
 	uint_t nd = ptrMyNetwork->ND;
 	uint_t nodes = ptrMyForecaster->N_NODES;
 	uint_t ns = ptrMyForecaster->K;
@@ -138,12 +137,13 @@ void Engine::allocateSystemDevice(){
 	_CUDA( cudaMalloc((void**)&devSysXmin, nodes*nx*sizeof(real_t)) );
 	_CUDA( cudaMalloc((void**)&devSysXmax, nodes*nx*sizeof(real_t)) );
 	_CUDA( cudaMalloc((void**)&devSysXs, nodes*nx*sizeof(real_t)) );
+	_CUDA( cudaMalloc((void**)&devSysXsUpper, nodes*nx*sizeof(real_t)) );
 	_CUDA( cudaMalloc((void**)&devSysUmin, nodes*nu*sizeof(real_t)) );
 	_CUDA( cudaMalloc((void**)&devSysUmax, nodes*nu*sizeof(real_t)) );
 	_CUDA( cudaMalloc((void**)&devSysCostW, nodes*nv*nv*sizeof(real_t)) );
-	_CUDA( cudaMalloc((void**)&devCurrentState, nx*sizeof(real_t)) );
-	_CUDA( cudaMalloc((void**)&devPreviousControl, nu*sizeof(real_t)) );
-	_CUDA( cudaMalloc((void**)&devPreviousUhat, nu*sizeof(real_t)) );
+	_CUDA( cudaMalloc((void**)&devVecCurrentState, nx*sizeof(real_t)) );
+	_CUDA( cudaMalloc((void**)&devVecPreviousControl, nu*sizeof(real_t)) );
+	_CUDA( cudaMalloc((void**)&devVecPreviousUhat, nu*sizeof(real_t)) );
 
 	_CUDA( cudaMalloc((void**)&devPtrSysMatB, nodes*sizeof(real_t*)) );
 	_CUDA( cudaMalloc((void**)&devPtrSysMatL, nodes*sizeof(real_t*)) );
@@ -203,6 +203,8 @@ void Engine::initialiseSystemDevice(){
 	//real_t *x = new real_t[2*nodes*nu*nu];
 	//real_t **y = new real_t*[nodes];
 
+	//devSysXsUpper
+	_CUDA( cudaMemSet(devSysXsUpper, 2^8-1, nx*nodes*sizeof(real_t)) );
 	_CUDA( cudaMalloc((void**)&devMatDiagPrcnd, N*(2*nx + nu)*sizeof(real_t)) );
 	_CUDA( cudaMemcpy(devMatDiagPrcnd, ptrMyNetwork->matDiagPrecnd, N*(2*nx + nu)*sizeof(real_t), cudaMemcpyHostToDevice) );
 	for (int iScen = 0; iScen < ns; iScen++){
@@ -282,7 +284,6 @@ void  Engine::factorStep(){
 	real_t scale[2] = {-0.5, 1};
 	real_t alpha = 1.0;
 	real_t beta = 0.0;
-	real_t negAlpha = -1.0;
 	uint_t iStageCumulNodes, iStageNodes;
 	real_t *devMatBbar, *devMatGbar;
 	real_t **devPtrMatBbar, **devPtrMatGbar, **ptrMatBbar, **ptrMatGbar;
@@ -422,7 +423,7 @@ void Engine::eliminateInputDistubanceCoupling(){
 	_CUBLAS( cublasSgemm_v2(handle, CUBLAS_OP_N, CUBLAS_OP_N, nu, nv, nu, &alpha, (const float*) devSysCostW, nu,
 			(const float*)devSysMatL, nu, &beta, devMatRhat, nu));
 	// Beta
-	calculateDiffUhat<<<nodes, nu>>>(devVecDeltaUhat, devVecUhat, devPreviousUhat, devTreeAncestor, nu, nodes);
+	calculateDiffUhat<<<nodes, nu>>>(devVecDeltaUhat, devVecUhat, devVecPreviousUhat, devTreeAncestor, nu, nodes);
 	calculateZeta<<<nodes, nu>>>(devVecZeta, devVecDeltaUhat, devTreeProb, devTreeNumChildrenCumul, nu, numNonleafNodes, nodes);
 	alpha = 2;
 	_CUBLAS( cublasSgemm_v2(handle, CUBLAS_OP_T, CUBLAS_OP_N, nv, nodes, nu, &alpha, (const float *) devMatRhat, nu,
@@ -452,10 +453,15 @@ void Engine::eliminateInputDistubanceCoupling(){
 	_CUDA(cudaFree(devVecZeta));
 }
 
+void Engine::updateStateControl(){
+	_CUDA( cudaMemcpy(devVecPreviousControl, ptrMyNetwork->prevU, ptrMyNetwork->NU*sizeof(real_t), cudaMemcpyHostToDevice) );
+	_CUDA( cudaMemcpy(devVecPreviousUhat, ptrMyNetwork->prevUhat, ptrMyNetwork->NU*sizeof(real_t), cudaMemcpyHostToDevice) );
+	_CUDA( cudaMemcpy(devVecCurrentState, ptrMyNetwork->currentX, ptrMyNetwork->NX*sizeof(real_t), cudaMemcpyHostToDevice) );
+}
+
 void Engine::testStupidFunction(){
 	real_t *a, *b;
 	a = new real_t [ptrMyForecaster->N_NODES];
-	b = new real_t [ptrMyForecaster->N_NODES];
 	testGPUAdd<<<2, 2>>>(devMatF , devMatG, 2);
 	/*
 	for (int i = 0; i<ptrmyForecaster->N_NODES; i++)
@@ -622,11 +628,12 @@ void Engine::deallocateSystemDevice(){
 	_CUDA( cudaFree(devSysXmin) );
 	_CUDA( cudaFree(devSysXmax) );
 	_CUDA( cudaFree(devSysXs) );
+	_CUDA( cudaFree(devSysXsUpper) );
 	_CUDA( cudaFree(devSysUmin) );
 	_CUDA( cudaFree(devSysUmax) );
-	_CUDA( cudaFree(devCurrentState));
-	_CUDA( cudaFree(devPreviousControl));
-	_CUDA( cudaFree(devPreviousUhat));
+	_CUDA( cudaFree(devVecCurrentState));
+	_CUDA( cudaFree(devVecPreviousControl));
+	_CUDA( cudaFree(devVecPreviousUhat));
 
 	_CUDA( cudaFree(devPtrSysMatB) );
 	_CUDA( cudaFree(devPtrSysMatL) );

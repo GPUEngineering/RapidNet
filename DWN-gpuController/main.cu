@@ -12,11 +12,12 @@
 #include "cublas_v2.h"
 #include "rapidjson/document.h"
 #include "rapidjson/rapidjson.h"
-
 #include "rapidjson/filereadstream.h"
 
 #include "DefinitionHeader.h"
 #include "SMPControllerHeader.cuh"
+//#include "cudaKernalHeader.cuh"
+//#include "EngineHeader.cuh"
 //#include "cudaKernal.cu"
 //#include "SMPControllerClass.cuh"
 
@@ -43,7 +44,7 @@ int main(void){
 	myEngine.initialiseForecastDevice();
 	myEngine.initialiseSystemDevice();
 	myEngine.factorStep();
-	myController.solveStep();
+	//myController.solveStep();
 	//myEngine.testStupidFunction();
 	//myEngine.testPrecondtioningFunciton();
 

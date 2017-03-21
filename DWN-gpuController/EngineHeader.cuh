@@ -12,6 +12,7 @@
 #include "networkHeader.cuh"
 #include "forecastHeader.cuh"
 #include "unitTestHeader.cuh"
+//#include "cudaKernalHeader.cuh"
 
 class Engine{
 public:
@@ -23,6 +24,7 @@ public:
 	void factorStep();
 	void updateDistubance();
 	void eliminateInputDistubanceCoupling();
+	void updateStateControl();
 	//void invertMat(real_t** src, real_t** dst, uint_t n, uint_t batchSize);
 	void inverseBatchMat(float** src, float** dst, int n, int batchSize);
 	void testInverse();
@@ -39,9 +41,9 @@ private:
 	// network
 	real_t *devSysMatB, *devSysMatF, *devSysMatG, *devSysMatL, *devSysMatLhat;
 	real_t **devPtrSysMatB, **devPtrSysMatF, **devPtrSysMatG, **devPtrSysMatL, **devPtrSysMatLhat;
-	real_t *devPreviousControl, *devCurrentState, *devPreviousUhat;
+	real_t *devVecPreviousControl, *devVecCurrentState, *devVecPreviousUhat;
 	// network constraints
-	real_t *devSysXmin, *devSysXmax, *devSysXs, *devSysUmin, *devSysUmax;
+	real_t *devSysXmin, *devSysXmax, *devSysXs, *devSysXsUpper, *devSysUmin, *devSysUmax;
 	// cost function
 	real_t *devSysCostW;
 	real_t **devPtrSysCostW;
@@ -57,7 +59,5 @@ private:
 	real_t *devVecUhat, *devVecBeta, *devVecE;
 	cublasHandle_t handle;
 };
-
-
 
 #endif /* ENGINE_CUH_ */

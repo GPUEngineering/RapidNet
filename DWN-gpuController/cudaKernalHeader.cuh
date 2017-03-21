@@ -87,48 +87,95 @@ __global__ void calculateZeta(real_t *devZeta, real_t *devDeltaUhat, real_t *dev
 }
 
 
-__global__ void summation_children(real_t *x, real_t *y, uint_t* DEV_CONST_TREE_NODES_PER_STAGE
-		,uint_t* DEV_CONSTANT_TREE_NUM_CHILDREN,uint_t* DEV_CONSTANT_TREE_NODES_PER_STAGE_CUMUL
-		,uint_t* DEV_CONSTANT_TREE_N_CHILDREN_CUMUL,uint_t dim,uint_t stage){
+__global__ void solveChildNodesUpdate(real_t *src, real_t *dst, uint_t *devTreeAncestor,uint_t iStageCumulNodes, uint_t dim){
 
-	int tid=blockIdx.x*blockDim.x+threadIdx.x;
-	int relative_node=tid/dim;
-	int relative_parent_node=tid-relative_node*dim;
-	int no_nodes=DEV_CONST_TREE_NODES_PER_STAGE[stage];
-	int node_before=0;
-	int off_set=0;
-	if(tid<no_nodes*dim){
-		if(stage>0){
-			node_before=DEV_CONSTANT_TREE_NODES_PER_STAGE_CUMUL[stage];
-			off_set=(DEV_CONSTANT_TREE_N_CHILDREN_CUMUL[node_before+relative_node-1]-DEV_CONSTANT_TREE_N_CHILDREN_CUMUL[node_before-1])*dim;
+	int tid = blockDim.x*blockIdx.x + threadIdx.x;
+	int relativeNode = tid/dim;
+	int dimElement = tid - relativeNode*dim;
+	int previousAncestor = devTreeAncestor[iStageCumulNodes];
+	int ancestor = devTreeAncestor[iStageCumulNodes + relativeNode];
+	dst[tid] = src[(ancestor-previousAncestor)*dim + dimElement] + dst[tid];
+
+}
+
+__global__  void solveSumChildren(real_t *src, real_t *dst, uint_t *devTreeNumChildren, uint_t *devTreeNumChildCumul,
+		  uint_t iStageCumulNodes, uint_t iStageNodes, uint_t iStage, uint_t dim){
+	int tid = blockIdx.x*blockDim.x + threadIdx.x;
+	int relativeNode = tid/dim;
+	int relativeParentNode = tid - relativeNode*dim;
+	int offset = 0;
+	int numChild = 0;
+	if( tid < iStageNodes*dim){
+		if(iStage > 0){
+			offset = (devTreeNumChildCumul[iStageCumulNodes+relativeNode-1] - devTreeNumChildCumul[iStageCumulNodes-1])*dim;
+			numChild = devTreeNumChildren[iStageCumulNodes + relativeNode];
+		}else{
+			numChild = devTreeNumChildren[relativeNode];
 		}
-		int no_child=DEV_CONSTANT_TREE_NUM_CHILDREN[node_before+relative_node];
-		if(no_child>1){
-			for(int i=0;i<no_child-1;i++){
-				if(i==0)
-					y[tid]=x[off_set+relative_parent_node]+x[off_set+relative_parent_node+dim];
-				if(i>0)
-					y[tid]=y[tid]+x[off_set+relative_parent_node+(i+1)*dim];
+		if( numChild > 1){
+			for(int iChild = 0; iChild < numChild-1; iChild++){
+				if(iChild == 0)
+					dst[tid] = src[offset + relativeParentNode] + src[offset + relativeParentNode + dim];
 			}
 		}else{
-			//printf("%d %d %d %f \n",no_child,dim,relative_node,relative_parent_node,x[tid]);
-			y[tid]=x[off_set+relative_parent_node];
+			dst[tid] = src[offset + relativeParentNode];
 		}
 	}
 }
 
-template<typename T>__global__ void child_nodes_update(T *x,T *y,uint_t* DEV_CONSTANT_TREE_NODES_PER_STAGE_CUMUL,
-		uint_t* DEV_CONSTANT_TREE_ANCESTOR,int dim,int stage){
 
-	int tid =blockDim.x*blockIdx.x+threadIdx.x;
-	int relative_node=tid/dim;
-	int dim_element=tid-relative_node*dim;
-	int node_before=DEV_CONSTANT_TREE_NODES_PER_STAGE_CUMUL[stage+1];
-	int pre_ancestor=DEV_CONSTANT_TREE_ANCESTOR[node_before];
-	int ancestor=DEV_CONSTANT_TREE_ANCESTOR[node_before+relative_node];
-	y[tid]=x[(ancestor-pre_ancestor)*dim+dim_element]+y[tid];
-	//y[(ancestor-1)*dim+tid]=y[(ancestor-1)*dim+tid]+x[bid];
+__global__ void kernalDualExtrapolationStep(real_t *vecDualW, real_t *vecPrevDual, real_t *vecCurrentDual,
+		real_t alpha, int size){
+	int tid = blockIdx.x*blockDim.x + threadIdx.x;
+	if( tid < size){
+		vecDualW[tid] = vecCurrentDual[tid] + alpha*(vecCurrentDual[tid] - vecPrevDual[tid]);
+		vecCurrentDual[tid] = vecPrevDual[tid];
+		//accelerated_dual[tid]=dual_k_1[tid]+alpha*(dual_k_1[tid]-dual_k[tid]);
+		//dual_k[tid]=dual_k_1[tid];
+	}
+}
 
+
+
+
+__global__ void projectionBox(real_t *vecX, real_t *lowerbound, real_t *upperbound, int dim, int offset, int size){
+	int tid = blockIdx.x*blockDim.x + threadIdx.x;
+	int idVecX = blockIdx.x*dim + threadIdx.x - offset;
+	if( tid < size){
+		if(vecX[idVecX] < lowerbound[tid])
+			vecX[idVecX] = lowerbound[tid];
+		else if( vecX[idVecX] > upperbound[tid])
+			vecX[idVecX] = upperbound[tid];
+	}
+}
+
+__global__ void shuffleVector(real_t *dst, real_t *src, int dimVec, int numVec, int numBlocks){
+	int tid = blockIdx.x*blockDim.x + threadIdx.x;
+	int dimBin = dimVec*numVec;
+	if(tid < numBlocks*dimBin){
+		int binId = tid/dimBin;
+		int offsetBin = tid - binId*dimBin;
+		int vecId = offsetBin/dimVec;
+		int elemId = offsetBin - vecId*dimVec;
+		int shuffleVecId = vecId*(numBlocks*dimVec) + binId*dimVec + elemId;
+		dst[shuffleVecId] = src[tid];
+	}
+}
+
+__global__ void additionVectorOffset(real_t *dst, real_t *src, real_t scale, int dim, int offset, int size){
+	int tid = blockIdx.x*blockDim.x + threadIdx.x;
+	int idVecX = blockIdx.x*dim + threadIdx.x - offset;
+	if(tid < size){
+		dst[idVecX] = dst[idVecX] +scale*src[idVecX];
+	}
+}
+
+__global__ void kernalDualUpdate(real_t *vecDualY, real_t *vecDualW, real_t *vecHX, real_t *vecZ,
+		float stepSize, int size){
+	int tid = blockIdx.x*blockDim.x + threadIdx.x;
+	if(tid < size){
+		vecDualY[tid] = vecDualW[tid] + stepSize*( vecHX[tid]-vecZ[tid] );
+	}
 }
 
 __global__ void testGPUAdd(real_t *matF, real_t *matG, uint_t k){
@@ -137,13 +184,47 @@ __global__ void testGPUAdd(real_t *matF, real_t *matG, uint_t k){
 	matF[tid] = k*matG[tid];
 }
 
+__global__ void projectionControl(real_t *vecU, real_t *lowerbound, real_t *upperbound, int size){
+	int tid = blockIdx.x*blockDim.x + threadIdx.x;
+	if(tid < size){
+		if(vecU[tid] < lowerbound[tid]){
+			vecU[tid] = lowerbound[tid];
+		}else if(vecU[tid] > upperbound[tid]){
+			vecU[tid] = upperbound[tid];
+		}
+	}
+}
+
+__global__ void projection_state(real_t *x, real_t *lb, real_t *ub, real_t *safety_level, int size){
+	int tid=blockIdx.x*blockDim.x+threadIdx.x;
+	int tid_blck=threadIdx.x;
+	int tid_box=blockIdx.x*NX;
+	if(tid<size){
+		if(tid_blck<NX){
+			tid_box=tid_box+tid_blck;
+			if(x[tid]<lb[tid_box]){
+				x[tid]=lb[tid_box];
+			}else if(x[tid]>ub[tid_box]){
+				x[tid]=ub[tid_box];
+			}
+		}else{
+			tid_box=tid_box+tid_blck-NX;
+			if(x[tid]<safety_level[tid_box]){
+				x[tid]=safety_level[tid_box];
+			}
+		}
+	}
+}
 
 
-__global__ void preconditionSystem(real_t *matF, real_t *matG, real_t *dualDiagPrcnd, real_t *scaleVec,
+/*__global__ void preconditionSystem(real_t *matF, real_t *matG, real_t *dualDiagPrcnd, real_t *scaleVec,
 		uint_t nx, uint_t nu);
 __global__ void calculateDiffUhat(real_t *devDeltaUhat, real_t *devUhat, real_t *prevUhat, uint_t *devTreeAncestor,
 		uint_t nu, uint_t nodes);
 __global__ void calculateZeta(real_t *devZeta, real_t *devDeltaUhat, real_t *devTreeProb, uint_t *devNumChildCuml,
 		uint_t nu, uint_t numNonleafNodes, uint_t nodes);
-__global__ void testGPUAdd(real_t *matF, real_t *matG, uint_t k);
+__global__  void solveSumChildren(real_t *src, real_t *dst, uint_t *devTreeNumChildren, uint_t *devTreeNumChildCumul,
+		  uint_t iStageCumulNodes, uint_t iStageNodes, uint_t iStage, uint_t dim);
+__global__ void solveChildNodesUpdate(real_t *src, real_t *dst, uint_t *devTreeAncestor,uint_t nextStageCumulNodes, uint_t dim);
+__global__ void testGPUAdd(real_t *matF, real_t *matG, uint_t k);*/
 #endif /* CUDAKERNALHEADER_CUH_ */
