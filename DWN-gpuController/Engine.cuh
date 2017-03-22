@@ -10,10 +10,11 @@
 #ifndef ENGINE_CUH_
 #define ENGINE_CUH_
 
-#include "DefinitionHeader.h"
-#include "networkHeader.cuh"
-#include "forecastHeader.cuh"
+#include "Configuration.h"
+#include "DwnNetwork.cuh"
+#include "Forecaster.cuh"
 #include "unitTestHeader.cuh"
+#include "Utilities.cuh"
 
 /*TODO IF A METHOD IS NOT TO BE INVOKED FROM THE OUTSIDE OF THIS CLASS, MAKE IT PRIVATE */
 /*TODO INTRODUCE GETTERS FOR THOSE FIELDS WHICH NEED TO BE ACCESSIBLE FROM THE OUTSIDE */
@@ -32,7 +33,7 @@ public:
 	 *TODO remove `unitTest` from here
 	 */
 	Engine(
-		DWNnetwork *network,
+	    DwnNetwork *network,
 		Forecaster *forecaster,
 		unitTest *ptrMyTestor);
 
@@ -116,7 +117,7 @@ public:
 	void testStupidFunction();
 
 	/*TODO REMOVE Friendship*/
-	friend class SMPCController;
+	friend class SmpcController;
 
 	/**
 	 * Destructor
@@ -127,7 +128,7 @@ private:
 	/**
 	 *
 	 */
-	DWNnetwork *ptrMyNetwork;
+	DwnNetwork *ptrMyNetwork;
 	/**
 	 *
 	 */

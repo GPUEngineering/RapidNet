@@ -15,7 +15,7 @@ using namespace std;
 
 typedef int uint_t;
 typedef float real_t;
-#include "DefinitionHeader.h"
+#include "Configuration.h"
 #include "unitTestHeader.cuh"
 
 unitTest::unitTest(string pathToFile){

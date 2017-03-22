@@ -4,21 +4,17 @@
 #include "rapidjson/document.h"
 #include "rapidjson/rapidjson.h"
 #include "rapidjson/filereadstream.h"
-#include "DefinitionHeader.h"
-#include "EngineHeader.cuh"
-#include "cudaKernalHeader.cuh"
-
-using namespace std;
+#include "Configuration.h"
+#include "Engine.cuh"
+//#include "cudaKernelHeader.cuh"
 
 /*TODO REMOVE these type definitions from here - they are already defined in
 		   DefinitionHeader.cuh (don't forget to rename DefinitionHeader.cuh into
 		   Configuration.cuh.) */
-typedef int uint_t;
-typedef float real_t;
 
 
 
-Engine::Engine(DWNnetwork *myNetwork, Forecaster *myForecaster, unitTest *myTestor){
+Engine::Engine(DwnNetwork *myNetwork, Forecaster *myForecaster, unitTest *myTestor){
 	cout << "allocating memory for the engine \n";
 	ptrMyNetwork = myNetwork;
 	ptrMyForecaster = myForecaster;
@@ -26,7 +22,7 @@ Engine::Engine(DWNnetwork *myNetwork, Forecaster *myForecaster, unitTest *myTest
 	uint_t nx = ptrMyNetwork->NX;
 	uint_t nu = ptrMyNetwork->NU;
 	uint_t nv = ptrMyNetwork->NV;
-	uint_t nodes = ptrMyForecaster->N_NODES;
+	uint_t nodes = ptrMyForecaster->nNodes;
 	allocateSystemDevice();
 	allocateForecastDevice();
 	cublasCreate(&handle);
@@ -91,11 +87,11 @@ Engine::Engine(DWNnetwork *myNetwork, Forecaster *myForecaster, unitTest *myTest
 }
 
 void Engine::allocateForecastDevice(){
-	uint_t nodes = ptrMyForecaster->N_NODES;
+	uint_t nodes = ptrMyForecaster->nNodes;
 	uint_t N = ptrMyForecaster->N;
 	uint_t K = ptrMyForecaster->K;
 	uint_t ND = ptrMyNetwork->ND;
-	uint_t N_NONLEAF_NODES = ptrMyForecaster->N_NONLEAF_NODES;
+	uint_t N_NONLEAF_NODES = ptrMyForecaster->nNonleafNodes;
 	_CUDA( cudaMalloc((void**)&devTreeStages, nodes*sizeof(uint_t)) );
 	_CUDA( cudaMalloc((void**)&devTreeNodesPerStage, (N + 1)*sizeof(uint_t)) );
 	_CUDA( cudaMalloc((void**)&devTreeNodesPerStageCumul, (N + 2)*sizeof(uint_t)) );
@@ -109,11 +105,11 @@ void Engine::allocateForecastDevice(){
 }
 
 void Engine::initialiseForecastDevice(){
-	uint_t nodes = ptrMyForecaster->N_NODES;
+	uint_t nodes = ptrMyForecaster->nNodes;
 	uint_t N = ptrMyForecaster->N;
 	uint_t K = ptrMyForecaster->K;
 	uint_t ND = ptrMyNetwork->ND;
-	uint_t N_NONLEAF_NODES = ptrMyForecaster->N_NONLEAF_NODES;
+	uint_t N_NONLEAF_NODES = ptrMyForecaster->nNonleafNodes;
 	_CUDA( cudaMemcpy(devTreeStages, ptrMyForecaster->stages, nodes*sizeof(uint_t), cudaMemcpyHostToDevice) );
 	_CUDA( cudaMemcpy(devTreeNodesPerStage, ptrMyForecaster->nodesPerStage, (N + 1)*sizeof(uint_t), cudaMemcpyHostToDevice) );
 	_CUDA( cudaMemcpy(devTreeNodesPerStageCumul, ptrMyForecaster->nodesPerStageCumul, (N + 2)*sizeof(uint_t), cudaMemcpyHostToDevice) );
@@ -131,7 +127,7 @@ void Engine::allocateSystemDevice(){
 	uint_t nu = ptrMyNetwork->NU;
 	uint_t nv = ptrMyNetwork->NV;
 	uint_t nd = ptrMyNetwork->ND;
-	uint_t nodes = ptrMyForecaster->N_NODES;
+	uint_t nodes = ptrMyForecaster->nNodes;
 	uint_t ns = ptrMyForecaster->K;
 	_CUDA( cudaMalloc((void**)&devSysMatB, ns*nx*nu*sizeof(real_t)) );
 	_CUDA( cudaMalloc((void**)&devSysMatL, ns*nv*nu*sizeof(real_t)) );
@@ -192,23 +188,20 @@ void Engine::allocateSystemDevice(){
 }
 
 void Engine::initialiseSystemDevice(){
-	uint_t nodes = ptrMyForecaster->N_NODES;
+	uint_t nodes = ptrMyForecaster->nNodes;
 	uint_t nx = ptrMyNetwork->NX;
 	uint_t nu = ptrMyNetwork->NU;
 	uint_t nv = ptrMyNetwork->NV;
 	uint_t ns = ptrMyForecaster->K;
-	uint_t nd = ptrMyForecaster->DIM_NODE;
+	uint_t nd = ptrMyForecaster->dimDemand;
 	uint_t N = ptrMyForecaster->N;
 	uint_t numBlock, prevNodes;
 	uint_t matFIdx, matGIdx;
 	real_t *devMatDiagPrcnd;
 	real_t *devCostMatW, *devMatvariable;
 	real_t alpha = 1, beta = 0;
-	//real_t *x = new real_t[2*nodes*nu*nu];
-	//real_t **y = new real_t*[nodes];
 
 	//devSysXsUpper
-	_CUDA( cudaMemSet(devSysXsUpper, 2^8-1, nx*nodes*sizeof(real_t)) );
 	_CUDA( cudaMalloc((void**)&devMatDiagPrcnd, N*(2*nx + nu)*sizeof(real_t)) );
 	_CUDA( cudaMemcpy(devMatDiagPrcnd, ptrMyNetwork->matDiagPrecnd, N*(2*nx + nu)*sizeof(real_t), cudaMemcpyHostToDevice) );
 	for (int iScen = 0; iScen < ns; iScen++){
@@ -279,6 +272,10 @@ void Engine::initialiseSystemDevice(){
 		_CUBLAS( cublasSscal_v2(handle, nu,&ptrMyForecaster->probNode[iNodes], &devSysUmin[iNodes*nu], 1) );
 		_CUBLAS( cublasSscal_v2(handle, nv*nv, &ptrMyForecaster->probNode[iNodes], &devSysCostW[iNodes*nv*nv], 1) );
 	}
+	//_CUDA(cudaMemcpy(devSysXsUpper, devSysXmax, nx*nodes*sizeof(real_t), cudaMemcpyDeviceToDevice));
+	uint_t scaleMax = pow(2, 7) - 1;
+	_CUDA( cudaMemset(devSysXsUpper, scaleMax, nx*nodes*sizeof(real_t)) );
+	//_CUBLAS(cublasSscal_v2(handle, nx*nodes, &scaleMax, devSysXsUpper, 1));
 	_CUDA( cudaFree(devMatDiagPrcnd) );
 	_CUDA( cudaFree(devMatvariable) );
 	_CUDA( cudaFree(devCostMatW) );
@@ -357,8 +354,8 @@ void Engine::eliminateInputDistubanceCoupling(){
 	uint_t nv = ptrMyNetwork->NV;
 	uint_t nd = ptrMyNetwork->ND;
 	uint_t N =  ptrMyForecaster->N;
-	uint_t nodes = ptrMyForecaster->N_NODES;
-	uint_t numNonleafNodes = ptrMyForecaster->N_NONLEAF_NODES;
+	uint_t nodes = ptrMyForecaster->nNodes;
+	uint_t numNonleafNodes = ptrMyForecaster->nNonleafNodes;
 	real_t alpha = 1, beta = 0;
 	real_t *devMatGd;
 	real_t **devPtrMatGd, **devPtrVecE, **devPtrVecDemand;
@@ -464,21 +461,12 @@ void Engine::updateStateControl(){
 }
 
 void Engine::testStupidFunction(){
-	real_t *a, *b;
-	a = new real_t [ptrMyForecaster->N_NODES];
-	testGPUAdd<<<2, 2>>>(devMatF , devMatG, 2);
-	/*
-	for (int i = 0; i<ptrmyForecaster->N_NODES; i++)
-		a[i] = (real_t) 2 * i;
-	_CUDA(cudaMemcpy(devMatPhi,a, ptrmyForecaster->N_NODES*sizeof(real_t), cudaMemcpyHostToDevice));
-	_CUDA(cudaMemcpy(b, devMatPhi, ptrmyForecaster->N_NODES*sizeof(real_t), cudaMemcpyDeviceToHost));
-	 */
-	_CUDA( cudaMemcpy(a, devMatF, 4*sizeof(real_t), cudaMemcpyDeviceToHost) );
-	_CUDA( cudaMemcpy(b, devMatG, 4*sizeof(real_t), cudaMemcpyDeviceToHost) );
-	for (int i = 0; i < 4; i++)
-		cout <<  a[i] << " " << b[i] << " ";
-	delete [] a;
-	delete [] b;
+	real_t maxUpperbound = 0;
+	uint_t nx = ptrMyNetwork->NX;
+	_CUBLAS( cublasSnrm2_v2(handle, 1, devSysXsUpper, 1, &maxUpperbound) );
+	cout<< maxUpperbound << endl;
+	_CUBLAS( cublasSnrm2_v2(handle, nx, devSysXmax, 1, &maxUpperbound) );
+	cout<< maxUpperbound << endl;
 }
 
 void Engine::inverseBatchMat(float** src, float** dst, int n, int batchSize){

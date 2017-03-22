@@ -1,17 +1,15 @@
 /*
- * cudaKernalHeader.cuh
+ * cudaKernal.cu
  *
  *  Created on: Mar 14, 2017
- *      Author: Ajay Kumar Samparthirao
+ *      Author: control
  */
 
-/*TODO Rename cudaKernalHeader into DWNCudaKernels */
-/* IT IS 'KERNEL', NOT 'KERNAL' */
-/*TODO Add documentation */
-
-#ifndef CUDAKERNALHEADER_CUH_
-#define CUDAKERNALHEADER_CUH_
-
+/*TODO It seems that there is no need for this file... */
+#include <cuda_device_runtime_api.h>
+#include "cuda_runtime.h"
+#include "Configuration.h"
+#include "Utilities.cuh"
 /**
  *
  * @param matF
@@ -373,50 +371,4 @@ __global__ void projectionControl(
 	}
 }
 
-/**
- *
- * @param x
- * @param lb
- * @param ub
- * @param safety_level
- * @param size
- */
- /*TODO int size --> uint_t size */
-__global__ void projection_state(
-			real_t *x,
-			real_t *lb,
-			real_t *ub,
-			real_t *safety_level,
-			int size){
-	int tid=blockIdx.x*blockDim.x+threadIdx.x;
-	int tid_blck=threadIdx.x;
-	int tid_box=blockIdx.x*NX;
-	if(tid<size){
-		if(tid_blck<NX){
-			tid_box=tid_box+tid_blck;
-			if(x[tid]<lb[tid_box]){
-				x[tid]=lb[tid_box];
-			}else if(x[tid]>ub[tid_box]){
-				x[tid]=ub[tid_box];
-			}
-		}else{
-			tid_box=tid_box+tid_blck-NX;
-			if(x[tid]<safety_level[tid_box]){
-				x[tid]=safety_level[tid_box];
-			}
-		}
-	}
-}
 
-
-/*__global__ void preconditionSystem(real_t *matF, real_t *matG, real_t *dualDiagPrcnd, real_t *scaleVec,
-		uint_t nx, uint_t nu);
-__global__ void calculateDiffUhat(real_t *devDeltaUhat, real_t *devUhat, real_t *prevUhat, uint_t *devTreeAncestor,
-		uint_t nu, uint_t nodes);
-__global__ void calculateZeta(real_t *devZeta, real_t *devDeltaUhat, real_t *devTreeProb, uint_t *devNumChildCuml,
-		uint_t nu, uint_t numNonleafNodes, uint_t nodes);
-__global__  void solveSumChildren(real_t *src, real_t *dst, uint_t *devTreeNumChildren, uint_t *devTreeNumChildCumul,
-		  uint_t iStageCumulNodes, uint_t iStageNodes, uint_t iStage, uint_t dim);
-__global__ void solveChildNodesUpdate(real_t *src, real_t *dst, uint_t *devTreeAncestor,uint_t nextStageCumulNodes, uint_t dim);
-__global__ void testGPUAdd(real_t *matF, real_t *matG, uint_t k);*/
-#endif /* CUDAKERNALHEADER_CUH_ */

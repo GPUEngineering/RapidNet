@@ -5,8 +5,8 @@
 #include "rapidjson/rapidjson.h"
 #include "rapidjson/filereadstream.h"
 
-#include "DefinitionHeader.h"
-#include "SMPControllerHeader.cuh"
+#include "Configuration.h"
+#include "SmpcController.cuh"
 //#include "cudaKernalHeader.cuh"
 //#include "EngineHeader.cuh"
 //#include "cudaKernal.cu"
@@ -27,14 +27,14 @@ int main(void){
 	string pathToNetworkFile = "../dataFiles/network.json";
 	string pathToForecastFile = "../dataFiles/forecastor.json";
 	string pathToTestfile = "../dataFiles/testVariables.json";
-	DWNnetwork myNetwork( pathToNetworkFile );
+	DwnNetwork myNetwork( pathToNetworkFile );
 	Forecaster myForecaster( pathToForecastFile );
-	unitTest myTestor( pathToTestfile );
-	Engine myEngine(&myNetwork, &myForecaster, &myTestor);
-	SMPCController myController( &myEngine);
-	myEngine.initialiseForecastDevice();
-	myEngine.initialiseSystemDevice();
-	myEngine.factorStep();
+	//unitTest myTestor( pathToTestfile );
+	//Engine myEngine(&myNetwork, &myForecaster, &myTestor);
+	//SMPCController myController( &myEngine);
+	//myEngine.initialiseForecastDevice();
+	//myEngine.initialiseSystemDevice();
+	//myEngine.factorStep();
 	//myController.solveStep();
 	//myEngine.testStupidFunction();
 	//myEngine.testPrecondtioningFunciton();
