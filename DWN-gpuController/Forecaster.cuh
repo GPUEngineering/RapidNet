@@ -1,8 +1,21 @@
 /*
- * Forecaster.cuh
+ *    GPU-accelerated scenario-based stochastic MPC for the operational
+ *    management of drinking water networks.
+ *    Copyright (C) 2017 Ajay. K. Sampathirao and P. Sopasakis
  *
- *  Created on: Feb 23, 2017
- *      Author: Ajay K. Sampathirao, P. Sopasakis
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 2.1 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ *    You should have received a copy of the GNU Lesser General Public
+ *    License along with this library; if not, write to the Free Software
+ *    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
 #ifndef FORECASTCLASS_CUH_
@@ -35,22 +48,22 @@
  * error with respect to the actual values. In scenario-based MPC,
  * the error is represented with a scenario tree.
  *
- * A forecaster class contains
- *    - nominal water demands
- *    - nominal electricity prices
- *    - scenario tree used to represent the error in the predictions
- *      - nodes at a stage
- *      - children of a node
- *      - ancestor of a node
- *      - probability of a node
- *      - value of a node
+ * A forecaster class contains:
+ *   - nominal water demands
+ *     - nominal electricity prices
+ *     - scenario tree used to represent the error in the predictions
+ *       - nodes at a stage
+ *       - children of a node
+ *       - ancestor of a node
+ *       - probability of a node
+ *       - value of a node
  */
 class Forecaster{
 
 public:
 
 	/*
-	 *  Constructor of a DWN entity from a given JSON file
+	 *  Constructor of a DWN entity from a given JSON file.
 	 *
  	 * @param pathToFile filename of a JSON file containing
 	 * 		     a representation of the scenario tree.
@@ -58,7 +71,7 @@ public:
 	Forecaster(
 		string pathToFile);
 	/**
-	 *
+	 * Default destructor.
 	 */
 	~Forecaster();
 
@@ -79,7 +92,7 @@ private:
 	/**
 	 * Total number of nodes.
 	 */
-	uint_t nNodes; /*TODO Fields should not be all-caps, but camelCase.*/
+	uint_t nNodes;
 	/**
 	 * Total number of children.
 	 */
