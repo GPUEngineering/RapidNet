@@ -2,7 +2,7 @@
  * SMPControllerClass.cuh
  *
  *  Created on: Mar 1, 2017
- *      Author: control
+ *  Author: Ajay K. Sampathirao, Pantelis Sopasakis
  */
 
 #ifndef SMPCONTROLLERCLASS_CUH_
@@ -11,34 +11,198 @@
 #include "DefinitionHeader.h"
 #include "Engine.cuh"
 
-class SMPCController{
+class SMPCController {
 public:
+	/**
+	 * Construct a new Controller with a given engine.
+	 */
 	SMPCController(Engine *myEngine);
+	/**
+	 *
+	 */
 	void dualExtrapolationStep(real_t lambda);
+	/**
+	 *
+	 */
+	/*TODO solveStep should be private - nobody will need to compute a dual
+	       gradient outside this class. This is an SMPC controller and its main
+				 purpose is to compute control actions. */
 	void solveStep();
+	/**
+	 *
+	 */
 	void proximalFunG();
+	/**
+	 *
+	 */
 	void dualUpdate();
+	/**
+	 *
+	 */
 	void algorithmApg();
+	/**
+	 *
+	 */
 	void controllerSmpc();
+	/**
+	 *
+	 */
 	~SMPCController();
 private:
+	/**
+	 * Pointer to an Engine object.
+	 * The Engine is responsible for the factor step.
+	 */
 	Engine* ptrMyEngine;
-	real_t *devVecX, *devVecU, *devVecV, *devVecXi, *devVecPsi, *devVecAcceleratedXi, *devVecAcceleratedPsi,
-	*devVecPrimalXi, *devVecPrimalPsi, *devVecDualXi, *devVecDualPsi, *devVecUpdateXi, *devVecUpdatePsi;
-	real_t **devPtrVecX, **devPtrVecU, **devPtrVecV, **devPtrVecAcceleratedPsi, **devPtrVecAcceleratedXi,
-	**devPtrVecPrimalPsi, **devPtrVecPrimalXi;
+	/**
+	 *
+	 */
+	real_t *devVecX;
+	/**
+	 *
+	 */
+	real_t *devVecU;
+	/**
+	 *
+	 */
+	real_t *devVecV;
+	/**
+	 *
+	 */
+	real_t *devVecXi;
+	/**
+	 *
+	 */
+	real_t *devVecPsi;
+	/**
+	 *
+	 */
+	real_t *devVecAcceleratedXi;
+	/**
+	 *
+	 */
+	real_t *devVecAcceleratedPsi;
+	/**
+	 *
+	 */
+	real_t *devVecPrimalXi;
+	/**
+	 *
+	 */
+	real_t *devVecPrimalPsi;
+	/**
+	 *
+	 */
+	real_t *devVecDualXi;
+	/**
+	 *
+	 */
+	real_t *devVecDualPsi;
+	/**
+	 *
+	 */
+	real_t *devVecUpdateXi;
+	/**
+	 *
+	 */
+	real_t *devVecUpdatePsi;
+	/**
+	 *
+	 */
+	real_t **devPtrVecX;
+	/**
+	 *
+	 */
+	real_t **devPtrVecU;
+	/**
+	 *
+	 */
+	real_t **devPtrVecV;
+	/**
+	 *
+	 */
+	real_t **devPtrVecAcceleratedPsi;
+	/**
+	 *
+	 */
+	real_t **devPtrVecAcceleratedXi;
+	/**
+	 *
+	 */
+	real_t **devPtrVecPrimalPsi;
+	/**
+	 *
+	 */
+	real_t **devPtrVecPrimalXi;
+	/**
+	 *
+	 */
 	real_t *devPrimalInfeasibilty;
-	real_t *devVecQ, *devVecR;
-	real_t **devPtrVecQ, **devPtrVecR;
-	uint_t MAX_ITERATIONS;
+	/**
+	 *
+	 */
+	real_t *devVecQ;
+	/**
+	 *
+	 */
+	real_t *devVecR;
+	/**
+	 *
+	 */
+	real_t **devPtrVecQ;
+	/**
+	 *
+	 */
+	real_t **devPtrVecR;
+	/**
+	 *
+	 */
 	real_t stepSize;
+	/**
+	 * Maximum number of iterations
+	 * Default: 500
+	 */
+	uint_t MAX_ITERATIONS  = 500;
 };
 
-__global__  void solveSumChildren(real_t *src, real_t *dst, uint_t *devTreeNumChildren, uint_t *devTreeNumChildCumul,
-		  uint_t iStageCumulNodes, uint_t iStageNodes, uint_t iStage, uint_t dim);
-__global__ void solveChildNodesUpdate(real_t *src, real_t *dst, uint_t *devTreeAncestor,uint_t nextStageCumulNodes, uint_t dim);
-__global__ void additionVectorOffset(real_t *dst, real_t *src, real_t scale, int dim, int offset, int size);
-__global__ void shuffleVector(real_t *dst, real_t *src, int dimVec, int numVec, int numBlocks);
-__global__ void projectionBox(real_t *vecX, real_t *lowerbound, real_t *upperbound, int dim, int offset, int size);
+/*TODO The definition of `solveSumChildren` is here, while the implementation
+			 is found in cudaKernalHeader.cuh. This declaration should be moved
+			 to cudaKernalHeader.cuh. */
+/**
+ * Kernel function `solveSumChildren`
+ *
+ * @param src
+ * @param dst
+ * @param devTreeNumChildren
+ * @param devTreeNumChildCumul
+ * @param iStageCumulNodes
+ * @param iStageNodes
+ * @param dim
+ */
+__global__  void solveSumChildren(
+		real_t *src,
+		real_t *dst,
+		uint_t *devTreeNumChildren,
+		uint_t *devTreeNumChildCumul,
+		uint_t iStageCumulNodes,
+		uint_t iStageNodes,
+		uint_t iStage,
+		uint_t dim);
+
+/**
+ * Kernel function `solveChildNodesUpdate`
+ *
+ * @param src
+ * @param dst
+ * @param devTreeAncestor
+ * @param nextStageCumulNodes
+ * @param dim
+ */
+__global__ void solveChildNodesUpdate(
+		real_t *src,
+		real_t *dst,
+		uint_t *devTreeAncestor,
+		uint_t nextStageCumulNodes,
+		uint_t dim);
 
 #endif /* SMPCONTROLLERCLASS_CUH_ */

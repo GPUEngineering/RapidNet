@@ -4,11 +4,15 @@
 #include "rapidjson/document.h"
 #include "rapidjson/rapidjson.h"
 #include "rapidjson/filereadstream.h"
-
-
 #include "DefinitionHeader.h"
 #include "Engine.cuh"
 #include "cudaKernelHeader.cuh"
+
+/*TODO REMOVE these type definitions from here - they are already defined in
+		   DefinitionHeader.cuh (don't forget to rename DefinitionHeader.cuh into
+		   Configuration.cuh.) */
+
+
 
 Engine::Engine(DWNnetwork *myNetwork, Forecaster *myForecaster, unitTest *myTestor){
 	cout << "allocating memory for the engine \n";

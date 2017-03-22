@@ -2,7 +2,7 @@
  * forecast.cu
  *
  *  Created on: Mar 14, 2017
- *      Author: control
+ *      Author: Ajay K. Sampathirao, P. Sopasakis
  */
 #include <iostream>
 #include <cstdio>
@@ -11,11 +11,14 @@
 #include "rapidjson/rapidjson.h"
 #include "rapidjson/filereadstream.h"
 
+/*TODO Remove these type definitions - they should be in Configuration.h */
 
+/*TODO Move this #include up, together with the other #includes */
+/*TODO Rename forecastHeader.cuh into Forecaster.cuh */
 #include "Forecaster.cuh"
 
 Forecaster::Forecaster(string pathToFile){
-	cout << "allocating memory for the forecaster \n";
+	cout << "allocating memory for the forecaster \n"; /*TODO Remove prints */
 	const char* fileName = pathToFile.c_str();
 	rapidjson::Document jsonDocument;
 	rapidjson::Value a;
@@ -25,10 +28,13 @@ Forecaster::Forecaster(string pathToFile){
 		cerr << "Error in opening the file " <<__LINE__ << fileName << endl;
 		exit(100);
 	}else{
-		char* readBuffer = new char[65536];
+		char* readBuffer = new char[65536]; /*TODO Make sure this is a good practice */
 		rapidjson::FileReadStream networkJsonStream( infile, readBuffer, sizeof(readBuffer) );
 		jsonDocument.ParseStream( networkJsonStream );
+		/*TODO Do not hard-code variable names */
 		a = jsonDocument["N"];
+		/*TODO Do you check whether there is such a node in the JSON file? */
+		/*TODO Do not use `assert` - throw EXCEPTIONS instead */
 		assert( a.IsArray() );
 		N = (uint_t) a[0].GetDouble();
 		a = jsonDocument["K"];
@@ -119,5 +125,5 @@ Forecaster::~Forecaster(){
 	delete [] probNode;
 	delete [] valueNode;
 	delete [] dHat;
-	cout << "freeing the memory of the forecaster \n";
+	cout << "freeing the memory of the forecaster \n"; /*TODO Remove prints */
 }
