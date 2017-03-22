@@ -1,14 +1,38 @@
 /*
- * DefinitionHeader.h
+ *    GPU-accelerated scenario-based stochastic MPC for the operational
+ *    management of drinking water networks.
+ *    Copyright (C) 2017 Ajay. K. Sampathirao and P. Sopasakis
  *
- *  Created on: Mar 1, 2017
- *      Author: control
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 2.1 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ *    You should have received a copy of the GNU Lesser General Public
+ *    License along with this library; if not, write to the Free Software
+ *    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
 #ifndef DEFINITIONHEADER_H_
 #define DEFINITIONHEADER_H_
 
+#include <iostream>
+#include <cstdio>
+#include <string>
 
+typedef int uint_t;
+typedef float real_t;
+
+using namespace std;
+
+/**
+ * Handler for CUDA calls.
+ */
 #define _CUDA(call) \
 		do \
 		{ \
@@ -22,6 +46,9 @@
 		} \
 		while (0)
 
+/**
+ * Handler for CUBLAS calls.
+ */
 #define _CUBLAS(call) \
 		do \
 		{ \
@@ -36,6 +63,10 @@
 		} \
 		while(0)
 
+/**
+ * Assert that a condition holds; throw an std:logic_error if the condition is
+ * not satisfied.
+ */
 #define _ASSERT(cond)\
 	do \
 	{\
@@ -46,14 +77,6 @@
 		}\
 	}\
 	while (0)
-#include <iostream>
-#include <cstdio>
-#include <string>
-
-typedef int uint_t;
-typedef float real_t;
-
-using namespace std;
 
 
 #endif /* DEFINITIONHEADER_H_ */
