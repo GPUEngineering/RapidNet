@@ -6,7 +6,7 @@
 #include "rapidjson/filereadstream.h"
 
 #include "DefinitionHeader.h"
-#include "SMPController.cuh"
+#include "SmpcController.cuh"
 //#include "cudaKernalHeader.cuh"
 //#include "EngineHeader.cuh"
 //#include "cudaKernal.cu"
@@ -27,7 +27,7 @@ int main(void){
 	string pathToNetworkFile = "../dataFiles/network.json";
 	string pathToForecastFile = "../dataFiles/forecastor.json";
 	string pathToTestfile = "../dataFiles/testVariables.json";
-	DWNnetwork myNetwork( pathToNetworkFile );
+	DwnNetwork myNetwork( pathToNetworkFile );
 	Forecaster myForecaster( pathToForecastFile );
 	//unitTest myTestor( pathToTestfile );
 	//Engine myEngine(&myNetwork, &myForecaster, &myTestor);

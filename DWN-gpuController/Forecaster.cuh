@@ -66,7 +66,7 @@ public:
 	friend class Engine;
 
 	/*TODO REMOVE Friendship */
-	friend class SMPCController;
+	friend class SmpcController;
 private:
 	/**
 	 *  Prediction horizon

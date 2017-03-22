@@ -12,9 +12,9 @@
 #include "rapidjson/filereadstream.h"
 
 
-#include "DWNnetwork.cuh"
+#include "DwnNetwork.cuh"
 
-DWNnetwork::DWNnetwork(string pathToFile){
+DwnNetwork::DwnNetwork(string pathToFile){
 	cout << "allocating memory for the network \n";
 	const char* fileName = pathToFile.c_str();
 	rapidjson::Document jsonDocument;
@@ -156,7 +156,7 @@ DWNnetwork::DWNnetwork(string pathToFile){
 	fclose(infile);
 }
 
-DWNnetwork::~DWNnetwork(){
+DwnNetwork::~DwnNetwork(){
 	delete [] matA;
 	delete [] matB;
 	delete [] matGd;

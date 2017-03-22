@@ -11,7 +11,7 @@
 #define ENGINE_CUH_
 
 #include "DefinitionHeader.h"
-#include "DWNnetwork.cuh"
+#include "DwnNetwork.cuh"
 #include "Forecaster.cuh"
 #include "unitTestHeader.cuh"
 #include "cudaKernelHeader.cuh"
@@ -33,7 +33,7 @@ public:
 	 *TODO remove `unitTest` from here
 	 */
 	Engine(
-		DWNnetwork *network,
+	    DwnNetwork *network,
 		Forecaster *forecaster,
 		unitTest *ptrMyTestor);
 
@@ -117,7 +117,7 @@ public:
 	void testStupidFunction();
 
 	/*TODO REMOVE Friendship*/
-	friend class SMPCController;
+	friend class SmpcController;
 
 	/**
 	 * Destructor
@@ -128,7 +128,7 @@ private:
 	/**
 	 *
 	 */
-	DWNnetwork *ptrMyNetwork;
+	DwnNetwork *ptrMyNetwork;
 	/**
 	 *
 	 */

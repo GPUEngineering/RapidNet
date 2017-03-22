@@ -8,10 +8,10 @@
 #include "cuda_runtime.h"
 #include "cublas_v2.h"
 
-#include "SMPController.cuh"
+#include "SmpcController.cuh"
 //#include "cudaKernalHeader.cuh"
 
-SMPCController::SMPCController(Engine *myEngine){
+SmpcController::SmpcController(Engine *myEngine){
 	cout << "Allocation of controller memory" << endl;
 	ptrMyEngine = myEngine;
 	uint_t nx = ptrMyEngine->ptrMyNetwork->NX;
@@ -102,7 +102,7 @@ SMPCController::SMPCController(Engine *myEngine){
 	delete [] ptrVecPrimalPsi;
 }
 
-void SMPCController::dualExtrapolationStep(real_t lambda){
+void SmpcController::dualExtrapolationStep(real_t lambda){
 	uint_t nodes = ptrMyEngine->ptrMyForecaster->nNodes;
 	uint_t nx = ptrMyEngine->ptrMyNetwork->NX;
 	uint_t nu = ptrMyEngine->ptrMyNetwork->NU;
@@ -121,9 +121,9 @@ void SMPCController::dualExtrapolationStep(real_t lambda){
 	_CUDA(cudaMemcpy(devVecPsi, devVecUpdatePsi, nu*nodes*sizeof(real_t), cudaMemcpyDeviceToDevice));
 }
 
-void SMPCController::solveStep(){
+void SmpcController::solveStep(){
 
-	DWNnetwork *ptrMyNetwork = ptrMyEngine->ptrMyNetwork;
+	DwnNetwork *ptrMyNetwork = ptrMyEngine->ptrMyNetwork;
 	Forecaster *ptrMyForecaster = ptrMyEngine->ptrMyForecaster;
 	real_t *devTempVecR, *devTempVecQ;
 	uint_t nx = ptrMyNetwork->NX;
@@ -284,8 +284,8 @@ void SMPCController::solveStep(){
 	//free(y_c);
 }
 
-void SMPCController::proximalFunG(){
-	DWNnetwork *ptrMyNetwork = ptrMyEngine->ptrMyNetwork;
+void SmpcController::proximalFunG(){
+	DwnNetwork *ptrMyNetwork = ptrMyEngine->ptrMyNetwork;
 	uint_t nodes = ptrMyEngine->ptrMyForecaster->nNodes;
 	uint_t nx = ptrMyEngine->ptrMyNetwork->NX;
 	uint_t nu = ptrMyEngine->ptrMyNetwork->NU;
@@ -335,7 +335,7 @@ void SMPCController::proximalFunG(){
 	ptrMyNetwork = NULL;
 }
 
-void SMPCController::dualUpdate(){
+void SmpcController::dualUpdate(){
 	uint_t nodes = ptrMyEngine->ptrMyForecaster->nNodes;
 	uint_t nx = ptrMyEngine->ptrMyNetwork->NX;
 	uint_t nu = ptrMyEngine->ptrMyNetwork->NU;
@@ -353,7 +353,7 @@ void SMPCController::dualUpdate(){
 }
 
 
-void SMPCController::algorithmApg(){
+void SmpcController::algorithmApg(){
 	uint_t nodes = ptrMyEngine->ptrMyForecaster->nNodes;
 	uint_t nx = ptrMyEngine->ptrMyNetwork->NX;
 	uint_t nu = ptrMyEngine->ptrMyNetwork->NU;
@@ -386,13 +386,13 @@ void SMPCController::algorithmApg(){
 	//dualUpdate(devVecUpdatePsi, devPtrVecAcceleratedPsi, devPtrVecPrimalPsi, devVecDualPsi, stepSize, nodes*nu);
 }
 
-void SMPCController::controllerSmpc(){
+void SmpcController::controllerSmpc(){
 	ptrMyEngine->updateStateControl();
 	ptrMyEngine->eliminateInputDistubanceCoupling();
 	algorithmApg();
 }
 
-SMPCController::~SMPCController(){
+SmpcController::~SmpcController(){
 	cout << "removing the memory of the controller" << endl;
 	_CUDA( cudaFree(devVecX) );
 	_CUDA( cudaFree(devVecU) );

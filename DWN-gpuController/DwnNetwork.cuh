@@ -44,7 +44,7 @@
 /**
  *
  */
-class DWNnetwork{
+class DwnNetwork{
 public:
 
 	/**
@@ -53,18 +53,18 @@ public:
  	 * @param pathToFile filename of a JSON file containing
 	 * 		     a representation of the DWN.
 	 */
-	DWNnetwork(
+	DwnNetwork(
 		string pathToFile);
 	/**
 	 * Destructor of the DWN entity that removes it from the CPU
  	 */
-	~DWNnetwork();
+	~DwnNetwork();
 
 	/*TODO REMOVE Friendship */
 	friend class Engine;
 
 	/*TODO REMOVE Friendship */
-	friend class SMPCController;
+	friend class SmpcController;
 
 private:
 

@@ -12,12 +12,12 @@
 #include "Engine.cuh"
 //#include "cudaKernelHeader.cuh"
 
-class SMPCController {
+class SmpcController {
 public:
 	/**
 	 * Construct a new Controller with a given engine.
 	 */
-	SMPCController(Engine *myEngine);
+	SmpcController(Engine *myEngine);
 	/**
 	 *
 	 */
@@ -48,7 +48,7 @@ public:
 	/**
 	 *
 	 */
-	~SMPCController();
+	~SmpcController();
 private:
 	/**
 	 * Pointer to an Engine object.
