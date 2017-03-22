@@ -24,7 +24,7 @@
 #define VARNAME_PROB_NODE "probNode"
 #define VARNAME_VALUE_NODE "valueNode"
 #define VARNAME_DHAT "dHat"
-#include "DefinitionHeader.h"
+#include "Configuration.h"
 
 
 

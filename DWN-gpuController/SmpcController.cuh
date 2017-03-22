@@ -8,7 +8,7 @@
 #ifndef SMPCONTROLLERCLASS_CUH_
 #define SMPCONTROLLERCLASS_CUH_
 
-#include "DefinitionHeader.h"
+#include "Configuration.h"
 #include "Engine.cuh"
 //#include "cudaKernelHeader.cuh"
 

@@ -4,7 +4,7 @@
 #include "rapidjson/document.h"
 #include "rapidjson/rapidjson.h"
 #include "rapidjson/filereadstream.h"
-#include "DefinitionHeader.h"
+#include "Configuration.h"
 #include "Engine.cuh"
 //#include "cudaKernelHeader.cuh"
 

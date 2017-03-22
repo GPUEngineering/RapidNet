@@ -8,8 +8,8 @@
 /*TODO It seems that there is no need for this file... */
 #include <cuda_device_runtime_api.h>
 #include "cuda_runtime.h"
-#include "DefinitionHeader.h"
-#include "cudaKernelHeader.cuh"
+#include "Configuration.h"
+#include "Utilities.cuh"
 /**
  *
  * @param matF

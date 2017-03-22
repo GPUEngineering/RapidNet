@@ -10,11 +10,11 @@
 #ifndef ENGINE_CUH_
 #define ENGINE_CUH_
 
-#include "DefinitionHeader.h"
+#include "Configuration.h"
 #include "DwnNetwork.cuh"
 #include "Forecaster.cuh"
 #include "unitTestHeader.cuh"
-#include "cudaKernelHeader.cuh"
+#include "Utilities.cuh"
 
 /*TODO IF A METHOD IS NOT TO BE INVOKED FROM THE OUTSIDE OF THIS CLASS, MAKE IT PRIVATE */
 /*TODO INTRODUCE GETTERS FOR THOSE FIELDS WHICH NEED TO BE ACCESSIBLE FROM THE OUTSIDE */

@@ -5,7 +5,7 @@
 #include "rapidjson/rapidjson.h"
 #include "rapidjson/filereadstream.h"
 
-#include "DefinitionHeader.h"
+#include "Configuration.h"
 #include "SmpcController.cuh"
 //#include "cudaKernalHeader.cuh"
 //#include "EngineHeader.cuh"

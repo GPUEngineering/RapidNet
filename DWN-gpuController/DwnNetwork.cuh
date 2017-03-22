@@ -35,7 +35,7 @@
 #define VARNAME_PREV_UHAT "prevUhat"
 #define VARNAME_PREV_U "prevU"
 #define VARNAME_PREV_V "prevV"
-#include "DefinitionHeader.h"
+#include "Configuration.h"
 
 
 /*TODO Document this class */
