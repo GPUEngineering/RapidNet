@@ -30,7 +30,7 @@ public:
 	 *
  	 */
 	~DWNnetwork();
-	
+
 	/*TODO REMOVE Friendship */
 	friend class Engine;
 
@@ -40,71 +40,72 @@ public:
 private:
 
 	/**
-	 *
+	 * Number of tanks
  	 */
 	uint_t NX;
 	/**
-	 *
+	 * Number of actuators
  	 */
 	uint_t NU;
 	/**
-	 *
+	 * Number of demand nodes
  	 */
 	uint_t ND;
 	/**
-	 *
+	 * Number of mixing nodes
  	 */
 	uint_t NE;
 	/**
-	 *
+	 * ?
  	 */
 	uint_t NV;
 	/**
-	 *
+	 * Matrix A of the system dynamics.
+	 * Typically this is equal to the identity.
  	 */
 	real_t *matA;
 	/**
-	 *
+	 * Matrix B of the system dynamics.
  	 */
 	real_t *matB;
 	/**
-	 *
+	 * Matrix Gd of the system dynamics.
  	 */
 	real_t *matGd;
 	/**
-	 *
+	 * Matrix E of the input-disturbance coupling.
  	 */
 	real_t *matE;
 	/**
-	 *
+	 * Matrix Ed of the input-disturbance coupling.
  	 */
 	real_t *matEd;
 	/**
-	 *
+	 * Minimum allowed volume of water in each tank.
  	 */
 	real_t *vecXmin;
 	/**
-	 *
+	 * Maximum allowed volume of water in each tank.
  	 */
 	real_t *vecXmax;
 	/**
-	 *
+	 * Vector of safety volumes of water in each tank.
  	 */
 	real_t *vecXsafe;
 	/**
-	 *
+	 * Lower bounds on actuator signals.
  	 */
 	real_t *vecUmin;
 	/**
-	 *
+	 * Upper bounds on actuator signals.
  	 */
 	real_t *vecUmax;
 	/**
-	 *
+	 * ?
  	 */
 	real_t *matL;
 	/**
-	 *
+	 * ?
  	 */
 	real_t *matLhat;
 	/**
@@ -118,9 +119,10 @@ private:
 	/**
 	 *
  	 */
+	/*TODO alpha1 and alpha2 are not parameters of the DWN; they are costs. */
 	real_t *vecCostAlpha2;
 	/**
-	 *
+	 * ?
  	 */
 	real_t penaltyStateX;
 	/**
@@ -128,7 +130,7 @@ private:
  	 */
 	real_t penaltySafetyX;
 	/**
-	 *TODO REMOVE 
+	 *TODO REMOVE
  	 */
 	real_t *matDiagPrecnd;
 	/**
@@ -144,7 +146,7 @@ private:
  	 */
 	real_t *prevV;
 	/**
-	 *
+	 *TODO SHOULD THIS BE HERE?
  	 */
 	real_t *prevU;
 

@@ -4,15 +4,19 @@
 #include "rapidjson/document.h"
 #include "rapidjson/rapidjson.h"
 #include "rapidjson/filereadstream.h"
-
-using namespace std;
-
-typedef int uint_t;
-typedef float real_t;
-
 #include "DefinitionHeader.h"
 #include "EngineHeader.cuh"
 #include "cudaKernalHeader.cuh"
+
+using namespace std;
+
+/*TODO REMOVE these type definitions from here - they are already defined in
+		   DefinitionHeader.cuh (don't forget to rename DefinitionHeader.cuh into
+		   Configuration.cuh.) */
+typedef int uint_t;
+typedef float real_t;
+
+
 
 Engine::Engine(DWNnetwork *myNetwork, Forecaster *myForecaster, unitTest *myTestor){
 	cout << "allocating memory for the engine \n";

@@ -32,28 +32,32 @@ public:
 	 *TODO remove `unitTest` from here
 	 */
 	Engine(
-		DWNnetwork *network, 
-		Forecaster *forecaster, 
+		DWNnetwork *network,
+		Forecaster *forecaster,
 		unitTest *ptrMyTestor);
 
 	/**
 	 *
 	 */
+	 /*TODO It seems to me that this method should become private */
 	void allocateForecastDevice();
 
 	/**
 	 *
 	 */
+	 /*TODO It seems to me that this method should become private */
 	void allocateSystemDevice();
 
 	/**
 	 *
 	 */
+	 /*TODO It seems to me that this method should become private */
 	void initialiseForecastDevice();
 
 	/**
 	 *
 	 */
+	 /*TODO It seems to me that this method should become private */
 	void initialiseSystemDevice();
 
 	/**
@@ -73,42 +77,47 @@ public:
 
 	/**
 	 *
-	 */		
+	 */
 	void updateStateControl();
 
 	/**
-	 *
+	 * @param src
+	 * @param dst
+	 * @param n
+	 * @param batchSize
 	 */
+	/*TODO float** --> real_t ** */
+	/*TODO int --> uint_t */
 	void inverseBatchMat(
-		float** src, 
-		float** dst, 
-		int n, 
+		float** src,
+		float** dst,
+		int n,
 		int batchSize);
 
-	/**
-	 *TODO There should be no test methods in classes
-	 */
+	/*TODO There should be no test methods in classes */
 	void testInverse();
 
-	/**
-	 *
-	 */
+	/*TODO There should be no test methods in classes */
 	void testPrecondtioningFunciton();
 
 	/**
 	 *
 	 */
+	/*TODO It seems to me that this method should become private */
 	void deallocateForecastDevice();
 
 	/**
 	 *
 	 */
+	/*TODO It seems to me that this method should become private */
 	void deallocateSystemDevice();
 
 	/*TODO REMOVE */
 	void testStupidFunction();
-	/*TODO REMOVE */
+
+	/*TODO REMOVE Friendship*/
 	friend class SMPCController;
+
 	/**
 	 * Destructor
 	 */
@@ -181,7 +190,7 @@ private:
 	 *
 	 */
 	real_t  *devVecPreviousUhat;
-	
+
 
 
 
@@ -190,7 +199,7 @@ private:
 	/**
 	 *
 	 */
-	real_t *devSysXmin; 
+	real_t *devSysXmin;
 	/**
 	 *
 	 */
@@ -225,13 +234,13 @@ private:
 	 *
 	 */
 	real_t **devPtrSysCostW;
-	
+
 
 	/* --- FORECASTER --- */
-	
+
 	/**
 	 *
-	 */	
+	 */
 	uint_t *devTreeStages;
 	/**
 	 *
@@ -248,7 +257,7 @@ private:
 	/**
 	 *
 	 */
-	uint_t *devTreeNumChildren; 
+	uint_t *devTreeNumChildren;
 	/**
 	 *
 	 */

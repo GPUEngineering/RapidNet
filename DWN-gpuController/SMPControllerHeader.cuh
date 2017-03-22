@@ -24,6 +24,9 @@ public:
 	/**
 	 *
 	 */
+	/*TODO solveStep should be private - nobody will need to compute a dual
+	       gradient outside this class. This is an SMPC controller and its main
+				 purpose is to compute control actions. */
 	void solveStep();
 	/**
 	 *
@@ -48,7 +51,7 @@ public:
 private:
 	/**
 	 * Pointer to an Engine object.
-	 * The Engine is responsible for the factor step. 
+	 * The Engine is responsible for the factor step.
 	 */
 	Engine* ptrMyEngine;
 	/**
@@ -162,10 +165,13 @@ private:
 	uint_t MAX_ITERATIONS  = 500;
 };
 
+/*TODO The definition of `solveSumChildren` is here, while the implementation
+			 is found in cudaKernalHeader.cuh. This declaration should be moved
+			 to cudaKernalHeader.cuh. */
 /**
  * Kernel function `solveSumChildren`
  *
- * @param src 
+ * @param src
  * @param dst
  * @param devTreeNumChildren
  * @param devTreeNumChildCumul
@@ -174,29 +180,29 @@ private:
  * @param dim
  */
 __global__  void solveSumChildren(
-		real_t *src, 
-		real_t *dst, 
-		uint_t *devTreeNumChildren, 
+		real_t *src,
+		real_t *dst,
+		uint_t *devTreeNumChildren,
 		uint_t *devTreeNumChildCumul,
-		uint_t iStageCumulNodes, 
-		uint_t iStageNodes, 
-		uint_t iStage, 
+		uint_t iStageCumulNodes,
+		uint_t iStageNodes,
+		uint_t iStage,
 		uint_t dim);
 
 /**
  * Kernel function `solveChildNodesUpdate`
  *
- * @param src 
+ * @param src
  * @param dst
  * @param devTreeAncestor
  * @param nextStageCumulNodes
  * @param dim
  */
 __global__ void solveChildNodesUpdate(
-		real_t *src, 
-		real_t *dst, 
+		real_t *src,
+		real_t *dst,
 		uint_t *devTreeAncestor,
-		uint_t nextStageCumulNodes, 
+		uint_t nextStageCumulNodes,
 		uint_t dim);
 
 
