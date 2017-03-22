@@ -7,9 +7,37 @@
 
 #ifndef NETWORKCLASS_CUH_
 #define NETWORKCLASS_CUH_
+#define VARNAME_NX "nx"
+#define VARNAME_NU "nu"
+#define VARNAME_ND "nd"
+#define VARNAME_NE "ne"
+#define VARNAME_NV "nv"
+#define VARNAME_N  "N"
+#define VARNAME_A  "matA"
+#define VARNAME_B  "matB"
+#define VARNAME_GD "matGd"
+#define VARNAME_E  "matE"
+#define VARNAME_ED "matEd"
+#define VARNAME_L  "matL"
+#define VARNAME_LHAT "matLhat"
+#define VARNAME_XMIN "vecXmin"
+#define VARNAME_XMAX "vecXmax"
+#define VARNAME_XSAFE "vecXsafe"
+#define VARNAME_UMIN "vecUmin"
+#define VARNAME_UMAX "vecUmax"
+#define VARNAME_COSTW "costW"
+#define VARNAME_ALPHA1 "costAlpha1"
+#define VARNAME_ALPHA2 "costAlpha2"
+#define VARNAME_PENALITY_X "penaltyStateX"
+#define VARNAME_PENALITY_XS "penaltySafetyX"
+#define VARNAME_DIAG_PRCND "matDiagPrecnd"
+#define VARNAME_CURRENT_X "currentX"
+#define VARNAME_PREV_UHAT "prevUhat"
+#define VARNAME_PREV_U "prevU"
+#define VARNAME_PREV_V "prevV"
 #include "DefinitionHeader.h"
 
-/*TODO Rename this file into DWNNetwork.cuh */
+
 /*TODO Document this class */
 /*TODO Implement getters */
 
@@ -28,7 +56,7 @@ public:
 	DWNnetwork(
 		string pathToFile);
 	/**
-	 *
+	 * Destructor of the DWN entity that removes it from the CPU
  	 */
 	~DWNnetwork();
 
@@ -57,7 +85,7 @@ private:
  	 */
 	uint_t NE;
 	/**
-	 * ?
+	 *
  	 */
 	uint_t NV;
 	/**

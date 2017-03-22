@@ -10,6 +10,7 @@
 
 #include "DefinitionHeader.h"
 #include "Engine.cuh"
+//#include "cudaKernelHeader.cuh"
 
 class SMPCController {
 public:
@@ -162,47 +163,9 @@ private:
 	 * Maximum number of iterations
 	 * Default: 500
 	 */
-	uint_t MAX_ITERATIONS  = 500;
+	uint_t MAX_ITERATIONS;
 };
 
-/*TODO The definition of `solveSumChildren` is here, while the implementation
-			 is found in cudaKernalHeader.cuh. This declaration should be moved
-			 to cudaKernalHeader.cuh. */
-/**
- * Kernel function `solveSumChildren`
- *
- * @param src
- * @param dst
- * @param devTreeNumChildren
- * @param devTreeNumChildCumul
- * @param iStageCumulNodes
- * @param iStageNodes
- * @param dim
- */
-__global__  void solveSumChildren(
-		real_t *src,
-		real_t *dst,
-		uint_t *devTreeNumChildren,
-		uint_t *devTreeNumChildCumul,
-		uint_t iStageCumulNodes,
-		uint_t iStageNodes,
-		uint_t iStage,
-		uint_t dim);
 
-/**
- * Kernel function `solveChildNodesUpdate`
- *
- * @param src
- * @param dst
- * @param devTreeAncestor
- * @param nextStageCumulNodes
- * @param dim
- */
-__global__ void solveChildNodesUpdate(
-		real_t *src,
-		real_t *dst,
-		uint_t *devTreeAncestor,
-		uint_t nextStageCumulNodes,
-		uint_t dim);
 
 #endif /* SMPCONTROLLERCLASS_CUH_ */

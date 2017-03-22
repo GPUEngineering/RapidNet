@@ -18,7 +18,7 @@ SMPCController::SMPCController(Engine *myEngine){
 	uint_t nu = ptrMyEngine->ptrMyNetwork->NU;
 	uint_t nv = ptrMyEngine->ptrMyNetwork->NV;
 	uint_t ns = ptrMyEngine->ptrMyForecaster->K;
-	uint_t nodes = ptrMyEngine->ptrMyForecaster->N_NODES;
+	uint_t nodes = ptrMyEngine->ptrMyForecaster->nNodes;
 	MAX_ITERATIONS  = 500;
 	stepSize = 1e-4;
 
@@ -103,7 +103,7 @@ SMPCController::SMPCController(Engine *myEngine){
 }
 
 void SMPCController::dualExtrapolationStep(real_t lambda){
-	uint_t nodes = ptrMyEngine->ptrMyForecaster->N_NODES;
+	uint_t nodes = ptrMyEngine->ptrMyForecaster->nNodes;
 	uint_t nx = ptrMyEngine->ptrMyNetwork->NX;
 	uint_t nu = ptrMyEngine->ptrMyNetwork->NU;
 	float alpha;
@@ -131,7 +131,7 @@ void SMPCController::solveStep(){
 	uint_t nv = ptrMyNetwork->NV;
 	uint_t ns = ptrMyForecaster->K;
 	uint_t N =  ptrMyForecaster->N;
-	uint_t nodes = ptrMyForecaster->N_NODES;
+	uint_t nodes = ptrMyForecaster->nNodes;
 	uint_t iStageCumulNodes, iStageNodes, prevStageNodes, prevStageCumulNodes;
 	real_t scale[2] = {-0.5, 1};
 	real_t alpha = 1;
@@ -286,8 +286,7 @@ void SMPCController::solveStep(){
 
 void SMPCController::proximalFunG(){
 	DWNnetwork *ptrMyNetwork = ptrMyEngine->ptrMyNetwork;
-	Forecaster *ptrMyForecaster = ptrMyEngine->ptrMyForecaster;
-	uint_t nodes = ptrMyEngine->ptrMyForecaster->N_NODES;
+	uint_t nodes = ptrMyEngine->ptrMyForecaster->nNodes;
 	uint_t nx = ptrMyEngine->ptrMyNetwork->NX;
 	uint_t nu = ptrMyEngine->ptrMyNetwork->NU;
 	real_t alpha = 1;
@@ -334,11 +333,10 @@ void SMPCController::proximalFunG(){
 	devSuffleVecXi = NULL;
 	devVecDiffXi = NULL;
 	ptrMyNetwork = NULL;
-	ptrMyForecaster = NULL;
 }
 
 void SMPCController::dualUpdate(){
-	uint_t nodes = ptrMyEngine->ptrMyForecaster->N_NODES;
+	uint_t nodes = ptrMyEngine->ptrMyForecaster->nNodes;
 	uint_t nx = ptrMyEngine->ptrMyNetwork->NX;
 	uint_t nu = ptrMyEngine->ptrMyNetwork->NU;
 	real_t negAlpha = -1;
@@ -356,7 +354,7 @@ void SMPCController::dualUpdate(){
 
 
 void SMPCController::algorithmApg(){
-	uint_t nodes = ptrMyEngine->ptrMyForecaster->N_NODES;
+	uint_t nodes = ptrMyEngine->ptrMyForecaster->nNodes;
 	uint_t nx = ptrMyEngine->ptrMyNetwork->NX;
 	uint_t nu = ptrMyEngine->ptrMyNetwork->NU;
 	_CUDA( cudaMemset(devVecXi, 0, 2*nx*nodes*sizeof(real_t)) );

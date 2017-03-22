@@ -14,6 +14,7 @@
 #include "DWNnetwork.cuh"
 #include "Forecaster.cuh"
 #include "unitTestHeader.cuh"
+#include "cudaKernelHeader.cuh"
 
 /*TODO IF A METHOD IS NOT TO BE INVOKED FROM THE OUTSIDE OF THIS CLASS, MAKE IT PRIVATE */
 /*TODO INTRODUCE GETTERS FOR THOSE FIELDS WHICH NEED TO BE ACCESSIBLE FROM THE OUTSIDE */

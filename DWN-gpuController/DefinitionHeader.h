@@ -36,6 +36,16 @@
 		} \
 		while(0)
 
+#define _ASSERT(cond)\
+	do \
+	{\
+		if(!(cond))\
+		{ \
+			cerr << " Error: \nFile = " << __FILE__ << "\nLine = " <<__LINE__ << "\n"; \
+			exit(EXIT_FAILURE);\
+		}\
+	}\
+	while (0)
 #include <iostream>
 #include <cstdio>
 #include <string>

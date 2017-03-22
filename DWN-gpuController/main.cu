@@ -29,14 +29,14 @@ int main(void){
 	string pathToTestfile = "../dataFiles/testVariables.json";
 	DWNnetwork myNetwork( pathToNetworkFile );
 	Forecaster myForecaster( pathToForecastFile );
-	unitTest myTestor( pathToTestfile );
-	Engine myEngine(&myNetwork, &myForecaster, &myTestor);
-	SMPCController myController( &myEngine);
-	myEngine.initialiseForecastDevice();
-	myEngine.initialiseSystemDevice();
-	myEngine.factorStep();
+	//unitTest myTestor( pathToTestfile );
+	//Engine myEngine(&myNetwork, &myForecaster, &myTestor);
+	//SMPCController myController( &myEngine);
+	//myEngine.initialiseForecastDevice();
+	//myEngine.initialiseSystemDevice();
+	//myEngine.factorStep();
 	//myController.solveStep();
-	myEngine.testStupidFunction();
+	//myEngine.testStupidFunction();
 	//myEngine.testPrecondtioningFunciton();
 
 	//myEngine.testInverse();
