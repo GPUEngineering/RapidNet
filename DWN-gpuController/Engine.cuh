@@ -9,8 +9,8 @@
 #define ENGINE_CUH_
 
 #include "DefinitionHeader.h"
-#include "networkHeader.cuh"
-#include "forecastHeader.cuh"
+#include "DWNnetwork.cuh"
+#include "Forecaster.cuh"
 #include "unitTestHeader.cuh"
 //#include "cudaKernalHeader.cuh"
 

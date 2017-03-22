@@ -7,6 +7,7 @@
 
 #ifndef NETWORKCLASS_CUH_
 #define NETWORKCLASS_CUH_
+#include "DefinitionHeader.h"
 
 class DWNnetwork{
 public:
@@ -25,7 +26,6 @@ private:
 	real_t *prevUhat;
 	real_t *prevV;
 	real_t *prevU;
-	real_t STEP_SIZE;
 
 };
 #endif /* NETWORKCLASS_CUH_ */

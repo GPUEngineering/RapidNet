@@ -195,6 +195,7 @@ __global__ void projectionControl(real_t *vecU, real_t *lowerbound, real_t *uppe
 	}
 }
 
+/*
 __global__ void projection_state(real_t *x, real_t *lb, real_t *ub, real_t *safety_level, int size){
 	int tid=blockIdx.x*blockDim.x+threadIdx.x;
 	int tid_blck=threadIdx.x;
@@ -217,7 +218,7 @@ __global__ void projection_state(real_t *x, real_t *lb, real_t *ub, real_t *safe
 }
 
 
-/*__global__ void preconditionSystem(real_t *matF, real_t *matG, real_t *dualDiagPrcnd, real_t *scaleVec,
+__global__ void preconditionSystem(real_t *matF, real_t *matG, real_t *dualDiagPrcnd, real_t *scaleVec,
 		uint_t nx, uint_t nu);
 __global__ void calculateDiffUhat(real_t *devDeltaUhat, real_t *devUhat, real_t *prevUhat, uint_t *devTreeAncestor,
 		uint_t nu, uint_t nodes);

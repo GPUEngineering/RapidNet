@@ -11,13 +11,8 @@
 #include "rapidjson/rapidjson.h"
 #include "rapidjson/filereadstream.h"
 
-using namespace std;
 
-typedef int uint_t;
-typedef float real_t;
-#include "forecastHeader.cuh"
-
-
+#include "Forecaster.cuh"
 
 Forecaster::Forecaster(string pathToFile){
 	cout << "allocating memory for the forecaster \n";

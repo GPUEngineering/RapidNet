@@ -8,7 +8,7 @@
 #include "cuda_runtime.h"
 #include "cublas_v2.h"
 
-#include "SMPControllerHeader.cuh"
+#include "SMPController.cuh"
 //#include "cudaKernalHeader.cuh"
 
 SMPCController::SMPCController(Engine *myEngine){
@@ -19,8 +19,9 @@ SMPCController::SMPCController(Engine *myEngine){
 	uint_t nv = ptrMyEngine->ptrMyNetwork->NV;
 	uint_t ns = ptrMyEngine->ptrMyForecaster->K;
 	uint_t nodes = ptrMyEngine->ptrMyForecaster->N_NODES;
+	MAX_ITERATIONS  = 500;
+	stepSize = 1e-4;
 
-	stepSize = ptrMyEngine->ptrMyNetwork->STEP_SIZE;
 	_CUDA( cudaMalloc((void**)&devVecX, nx*nodes*sizeof(real_t)) );
 	_CUDA( cudaMalloc((void**)&devVecU, nu*nodes*sizeof(real_t)) );
 	_CUDA( cudaMalloc((void**)&devVecV, nv*nodes*sizeof(real_t)) );
@@ -286,9 +287,9 @@ void SMPCController::solveStep(){
 void SMPCController::proximalFunG(){
 	DWNnetwork *ptrMyNetwork = ptrMyEngine->ptrMyNetwork;
 	Forecaster *ptrMyForecaster = ptrMyEngine->ptrMyForecaster;
-	real_t nodes = ptrMyEngine->ptrMyForecaster->N_NODES;
-	real_t nx = ptrMyEngine->ptrMyNetwork->NX;
-	real_t nu = ptrMyEngine->ptrMyNetwork->NU;
+	uint_t nodes = ptrMyEngine->ptrMyForecaster->N_NODES;
+	uint_t nx = ptrMyEngine->ptrMyNetwork->NX;
+	uint_t nu = ptrMyEngine->ptrMyNetwork->NU;
 	real_t alpha = 1;
 	real_t negAlpha = -1;
 	real_t beta = 0;
@@ -337,9 +338,9 @@ void SMPCController::proximalFunG(){
 }
 
 void SMPCController::dualUpdate(){
-	real_t nodes = ptrMyEngine->ptrMyForecaster->N_NODES;
-	real_t nx = ptrMyEngine->ptrMyNetwork->NX;
-	real_t nu = ptrMyEngine->ptrMyNetwork->NU;
+	uint_t nodes = ptrMyEngine->ptrMyForecaster->N_NODES;
+	uint_t nx = ptrMyEngine->ptrMyNetwork->NX;
+	uint_t nu = ptrMyEngine->ptrMyNetwork->NU;
 	real_t negAlpha = -1;
 	//Hx - z
 	_CUDA(cudaMemcpy(devPrimalInfeasibilty, devVecPrimalXi, 2*nx*nodes*sizeof(real_t), cudaMemcpyDeviceToDevice));
@@ -355,6 +356,9 @@ void SMPCController::dualUpdate(){
 
 
 void SMPCController::algorithmApg(){
+	uint_t nodes = ptrMyEngine->ptrMyForecaster->N_NODES;
+	uint_t nx = ptrMyEngine->ptrMyNetwork->NX;
+	uint_t nu = ptrMyEngine->ptrMyNetwork->NU;
 	_CUDA( cudaMemset(devVecXi, 0, 2*nx*nodes*sizeof(real_t)) );
 	_CUDA( cudaMemset(devVecPsi, 0, nu*nodes*sizeof(real_t)) );
 	_CUDA( cudaMemset(devVecAcceleratedXi, 0, 2*nx*nodes*sizeof(real_t)) );
@@ -368,9 +372,6 @@ void SMPCController::algorithmApg(){
 
 	real_t theta[2] = {1, 1};
 	real_t lambda;
-	real_t nodes = ptrMyEngine->ptrMyForecaster->N_NODES;
-	real_t nx = ptrMyEngine->ptrMyNetwork->NX;
-	real_t nu = ptrMyEngine->ptrMyNetwork->NU;
 
 	for (int iter = 0; iter < MAX_ITERATIONS; iter++){
 		lambda = theta[1]*(1/theta[0] - 1);
@@ -378,7 +379,7 @@ void SMPCController::algorithmApg(){
 		solveStep();
 		proximalFunG();
 		dualUpdate();
-		theta[1] = 0.5*(sqrt(theta[0]^4 + 4*theta[0]) - theta[0]^2);
+		theta[1] = 0.5*(sqrt(pow(theta[0], 4) + 4*theta[0]) - pow(theta[0], 2));
 	}
 
 	//dualExtrapolationStep(devPtrVecAcceleratedXi, devVecXi, devVecUpdateXi, lambda, 2*nx*nodes);

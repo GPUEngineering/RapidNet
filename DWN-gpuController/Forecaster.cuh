@@ -7,6 +7,7 @@
 
 #ifndef FORECASTCLASS_CUH_
 #define FORECASTCLASS_CUH_
+#include "DefinitionHeader.h"
 
 //TODO forecast function, dHat variable allocation
 class Forecaster{

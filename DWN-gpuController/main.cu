@@ -15,7 +15,7 @@
 #include "rapidjson/filereadstream.h"
 
 #include "DefinitionHeader.h"
-#include "SMPControllerHeader.cuh"
+#include "SMPController.cuh"
 //#include "cudaKernalHeader.cuh"
 //#include "EngineHeader.cuh"
 //#include "cudaKernal.cu"
@@ -45,7 +45,7 @@ int main(void){
 	myEngine.initialiseSystemDevice();
 	myEngine.factorStep();
 	//myController.solveStep();
-	//myEngine.testStupidFunction();
+	myEngine.testStupidFunction();
 	//myEngine.testPrecondtioningFunciton();
 
 	//myEngine.testInverse();

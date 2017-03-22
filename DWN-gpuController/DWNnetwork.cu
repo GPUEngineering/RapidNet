@@ -11,12 +11,8 @@
 #include "rapidjson/rapidjson.h"
 #include "rapidjson/filereadstream.h"
 
-using namespace std;
 
-typedef int uint_t;
-typedef float real_t;
-
-#include "networkHeader.cuh"
+#include "DWNnetwork.cuh"
 
 DWNnetwork::DWNnetwork(string pathToFile){
 	cout << "allocating memory for the network \n";
@@ -155,9 +151,6 @@ DWNnetwork::DWNnetwork(string pathToFile){
 		assert(a.IsArray());
 		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
 			prevV[i] = a[i].GetDouble();
-		a = jsonDocument["stepSize"];
-		assert(a.IsArray());
-		STEP_SIZE = a[0].GetDouble();
 		delete [] readBuffer;
 	}
 	fclose(infile);
