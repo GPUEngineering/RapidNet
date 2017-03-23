@@ -1,13 +1,22 @@
 Stochastic MPC for DWN
 ===
 
-Conceptual ER diagram
+
+About
 -------------
 
-![ER](https://cloud.githubusercontent.com/assets/125415/24244126/e9702340-0fbd-11e7-8853-968d007b5b65.png)
+A few words about this project
 
-
-Flow of information
+Highlights:
+ 
+  * Efficient operating management of drinking water networks
+  * Fast Stochastic Model Predictive Control
+  * Parallelization  on NVIDIA Graphics Processing Units (GPU)
+  * 
+  
+  
+Getting started  
 -------------
 
-![workflow](https://cloud.githubusercontent.com/assets/125415/24216079/31ca1016-0f3b-11e7-9f64-b9fa4272ade5.png)
+Links to documentation...
+
