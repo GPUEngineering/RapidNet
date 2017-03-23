@@ -36,11 +36,10 @@ public:
 	 */
 	void dualExtrapolationStep(real_t lambda);
 	/**
-	 *
+	 * @todo solveStep should be private - nobody will need to compute a dual
+ 	 *      gradient outside this class. This is an SMPC controller and its main
+ 	 *		 purpose is to compute control actions.
 	 */
-	/*TODO solveStep should be private - nobody will need to compute a dual
-	       gradient outside this class. This is an SMPC controller and its main
-				 purpose is to compute control actions. */
 	void solveStep();
 	/**
 	 *
@@ -173,7 +172,7 @@ private:
 	 */
 	real_t stepSize;
 	/**
-	 * Maximum number of iterations
+	 * Maximum number of iterations.
 	 * Default: 500
 	 */
 	uint_t MAX_ITERATIONS;

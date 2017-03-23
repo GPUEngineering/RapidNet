@@ -57,6 +57,10 @@
  *       - ancestor of a node
  *       - probability of a node
  *       - value of a node
+ *
+ * @todo remove print statements
+ * @todo sanity check (check that the given file is well formed)
+ * @todo new char[65536]: is this good practice?
  */
 class Forecaster{
 

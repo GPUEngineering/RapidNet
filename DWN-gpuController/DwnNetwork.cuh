@@ -51,11 +51,10 @@
 #include "Configuration.h"
 
 
-/*TODO Document this class */
-/*TODO Implement getters */
-
 /**
- *
+ * @todo Document this class
+ * @todo Implement getters
+ * @todo REMOVE Friendships
  */
 class DwnNetwork{
 public:
@@ -73,11 +72,9 @@ public:
  	 */
 	~DwnNetwork();
 
-	/*TODO REMOVE Friendship */
-	friend class Engine;
+	friend class Engine; /*TODO REMOVE Friendship */
 
-	/*TODO REMOVE Friendship */
-	friend class SmpcController;
+	friend class SmpcController; /*TODO REMOVE Friendship */
 
 private:
 
@@ -161,7 +158,7 @@ private:
 	/**
 	 *
  	 */
-	/*TODO alpha1 and alpha2 are not parameters of the DWN; they are costs. */
+	/* @todo alpha1 and alpha2 are not parameters of the DWN; they are costs. */
 	real_t *vecCostAlpha2;
 	/**
 	 * ?
@@ -172,11 +169,11 @@ private:
  	 */
 	real_t penaltySafetyX;
 	/**
-	 *TODO REMOVE
+	 * @todo REMOVE
  	 */
 	real_t *matDiagPrecnd;
 	/**
-	 *TODO SHOULD THIS BE HERE?
+	 * @todo SHOULD THIS BE HERE?
  	 */
 	real_t *currentX;
 	/**
@@ -188,11 +185,10 @@ private:
  	 */
 	real_t *prevV;
 	/**
-	 *TODO SHOULD THIS BE HERE?
+	 * @todo SHOULD THIS BE HERE?
  	 */
 	real_t *prevU;
 
-	/*TODO the step size should not be here */
 
 };
 #endif /* NETWORKCLASS_CUH_ */

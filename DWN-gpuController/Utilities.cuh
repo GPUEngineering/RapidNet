@@ -114,15 +114,13 @@ __global__  void solveSumChildren(
 			uint_t iStage,
 			uint_t dim);
 /**
- *
+ * @todo change int into uint_t
  * @param vecDualW
  * @param vecPrevDual
  * @param vecCurrentDual
  * @param alpha
  * @param size
  */
-
-/*TODO int size --> uint_t size */
 __global__ void kernelDualExtrapolationStep(
 			real_t *vecDualW,
 			real_t *vecPrevDual,
@@ -133,7 +131,7 @@ __global__ void kernelDualExtrapolationStep(
 
 
 /**
- *
+ * @todo change int into uint_t
  * @param vecX
  * @param lowerbound
  * @param upperbound
@@ -141,9 +139,6 @@ __global__ void kernelDualExtrapolationStep(
  * @param offset
  * @param size
  */
-/*TODO int dim --> uint_t dim */
-/*TODO int offset --> uint_t offset */
-/*TODO int size --> uint_t size */
 __global__ void projectionBox(
 			real_t *vecX,
 			real_t *lowerbound,
@@ -154,16 +149,13 @@ __global__ void projectionBox(
 
 
 /**
- *
+ * @todo change int into uint_t
  * @param dst
  * @param src
  * @param dimVec
  * @param numVec
  * @param numBlocks
  */
-/*TODO int dimVec --> uint_t dimVec */
-/*TODO int numVec --> uint_t numVec */
-/*TODO int numBlocks --> uint_t numBlocks */
 __global__ void shuffleVector(
 				real_t *dst,
 				real_t *src,
@@ -171,6 +163,7 @@ __global__ void shuffleVector(
 				int numVec,
 				int numBlocks);
 /**
+ * @todo int change to: uint_t
  *
  * @param dst
  * @param src
@@ -179,9 +172,6 @@ __global__ void shuffleVector(
  * @param offset
  * @param size
  */
- /*TODO int dim --> uint_t dim */
- /*TODO int offset --> uint_t offset */
- /*TODO int size --> uint_t size */
 __global__ void additionVectorOffset(
 			real_t *dst,
 			real_t *src,
@@ -191,7 +181,7 @@ __global__ void additionVectorOffset(
 			int size);
 
 /**
- *
+ * @todo int change to: uint_t
  * @param vecDualY
  * @param vecDualW
  * @param vecHX
@@ -199,10 +189,6 @@ __global__ void additionVectorOffset(
  * @param stepSize
  * @param size
  */
-
-/*TODO int dim --> uint_t dim */
-/*TODO int stepSize --> uint_t stepSize */
-/*TODO int size --> uint_t size */
 __global__ void kernelDualUpdate(
 			real_t *vecDualY,
 			real_t *vecDualW,
@@ -211,20 +197,21 @@ __global__ void kernelDualUpdate(
 			float stepSize,
 			int size);
 
-/*TODO remove this test - there shouldn't be any tests here */
+/**
+ * @todo remove this method
+ */
 __global__ void testGPUAdd(
 			real_t *matF,
 			real_t *matG,
 			uint_t k);
 
 /**
- *
+ * @todo change int into uint_t
  * @param vecU
  * @param lowerbound
  * @param upperbound
  * @param size
  */
- /*TODO int size --> uint_t size */
 __global__ void projectionControl(
 			real_t *vecU,
 			real_t *lowerbound,
@@ -232,16 +219,4 @@ __global__ void projectionControl(
 			int size);
 
 
-
-
-/*__global__ void preconditionSystem(real_t *matF, real_t *matG, real_t *dualDiagPrcnd, real_t *scaleVec,
-		uint_t nx, uint_t nu);
-__global__ void calculateDiffUhat(real_t *devDeltaUhat, real_t *devUhat, real_t *prevUhat, uint_t *devTreeAncestor,
-		uint_t nu, uint_t nodes);
-__global__ void calculateZeta(real_t *devZeta, real_t *devDeltaUhat, real_t *devTreeProb, uint_t *devNumChildCuml,
-		uint_t nu, uint_t numNonleafNodes, uint_t nodes);
-__global__  void solveSumChildren(real_t *src, real_t *dst, uint_t *devTreeNumChildren, uint_t *devTreeNumChildCumul,
-		  uint_t iStageCumulNodes, uint_t iStageNodes, uint_t iStage, uint_t dim);
-__global__ void solveChildNodesUpdate(real_t *src, real_t *dst, uint_t *devTreeAncestor,uint_t nextStageCumulNodes, uint_t dim);
-__global__ void testGPUAdd(real_t *matF, real_t *matG, uint_t k);*/
 #endif /* CUDAKERNELHEADER_CUH_ */
