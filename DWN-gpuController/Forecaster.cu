@@ -41,82 +41,25 @@ Forecaster::Forecaster(string pathToFile){
 		char* readBuffer = new char[65536]; /*TODO Make sure this is a good practice */
 		rapidjson::FileReadStream networkJsonStream( infile, readBuffer, sizeof(readBuffer) );
 		jsonDocument.ParseStream( networkJsonStream );
-		/*TODO Do not hard-code variable names */
 		a = jsonDocument[VARNAME_N];
-		/*TODO Do you check whether there is such a node in the JSON file? */
-		/*TODO Do not use `assert` - throw EXCEPTIONS instead */
 		_ASSERT( a.IsArray() );
-		N = (uint_t) a[0].GetDouble();
-		a = jsonDocument[VARNAME_K];
-		_ASSERT( a.IsArray() );
-		K = (uint_t) a[0].GetDouble();
-		a = jsonDocument[VARNAME_NODES];
-		_ASSERT( a.IsArray() );
-		nNodes = (uint_t) a[0].GetDouble();
-		a = jsonDocument[VARNAME_NUM_NONLEAF];
-		_ASSERT(a.IsArray());
-		nNonleafNodes = (uint_t) a[0].GetDouble();
-		a = jsonDocument[VARNAME_NUM_CHILD_TOT];
-		_ASSERT( a.IsArray() );
-		nChildrenTot = (uint_t) a[0].GetDouble();
-		a = jsonDocument[VARNAME_DIM_NODE];
+		nPredHorizon = (uint_t) a[0].GetDouble();
+		a = jsonDocument[VARNAME_DIM_DEMAND];
 		_ASSERT( a.IsArray() );
 		dimDemand = (uint_t) a[0].GetDouble();
-		stages = new uint_t[nNodes];
-		a = jsonDocument[VARNAME_STAGES];
+		a = jsonDocument[VARNAME_DIM_PRICE];
 		_ASSERT( a.IsArray() );
-		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
-			stages[i] = (uint_t) a[i].GetDouble();
-		nodesPerStage = new uint_t[N];
-		a = jsonDocument[VARNAME_NODES_PER_STAGE];
-		_ASSERT( a.IsArray() );
-		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
-			nodesPerStage[i] = (uint_t) a[i].GetDouble();
-		nodesPerStageCumul = new uint_t[N+1];
-		a = jsonDocument[VARNAME_NODES_PER_STAGE_CUMUL];
-		_ASSERT( a.IsArray() );
-		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
-			nodesPerStageCumul[i] = (uint_t) a[i].GetDouble();
-		leaves = new uint_t[K];
-		a = jsonDocument[VARNAME_LEAVES];
-		_ASSERT( a.IsArray() );
-		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
-			leaves[i] = (uint_t) a[i].GetDouble();
-		children = new uint_t[nChildrenTot];
-		a = jsonDocument[VARNAME_CHILDREN];
-		_ASSERT( a.IsArray() );
-		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
-			children[i] = (uint_t) a[i].GetDouble();
-		ancestor = new uint_t[nNodes];
-		a = jsonDocument[VARNAME_ANCESTOR];
-		_ASSERT( a.IsArray() );
-		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
-			ancestor[i] = (uint_t) a[i].GetDouble();
-		nChildren = new uint_t[nNonleafNodes];
-		a = jsonDocument[VARNAME_NUM_CHILDREN];
-		_ASSERT( a.IsArray() );
-		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
-			nChildren[i] = (uint_t) a[i].GetDouble();
-		nChildrenCumul = new uint_t[nNodes];
-		a = jsonDocument[VARNAME_NUM_CHILD_CUMUL];
-		_ASSERT( a.IsArray() );
-		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
-			nChildrenCumul[i] = (uint_t) a[i].GetDouble();
-		probNode = new real_t[nNodes];
-		a = jsonDocument[VARNAME_PROB_NODE];
-		_ASSERT( a.IsArray() );
-		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
-			probNode[i] = a[i].GetDouble();
-		valueNode = new real_t[nNodes * dimDemand];
-		a = jsonDocument[VARNAME_VALUE_NODE];
-		_ASSERT( a.IsArray() );
-		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
-			valueNode[i] = a[i].GetDouble();
-		dHat = new real_t[dimDemand * N];
+		dimPrices = (uint_t) a[0].GetDouble();
+		dHat = new real_t[dimDemand * nPredHorizon];
 		a = jsonDocument[VARNAME_DHAT];
 		_ASSERT( a.IsArray() );
 		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
 			dHat[i] = a[i].GetDouble();
+		alphaHat = new real_t[dimPrices * nPredHorizon];
+		a = jsonDocument[VARNAME_DHAT];
+		_ASSERT( a.IsArray() );
+		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
+			alphaHat[i] = a[i].GetDouble();
 		delete [] readBuffer;
 		readBuffer = NULL;
 	}
@@ -124,28 +67,30 @@ Forecaster::Forecaster(string pathToFile){
 	infile = NULL;
 }
 
+uint_t Forecaster::getPredHorizon(){
+	return nPredHorizon;
+}
+
+uint_t Forecaster::getDimDemand(){
+	return dimDemand;
+}
+
+uint_t Forecaster::getDimPrice(){
+	return dimPrices;
+}
+
+real_t* Forecaster::getNominalDemand(){
+	return dHat;
+}
+
+real_t* Forecaster::getNomialPrices(){
+	return alphaHat;
+}
+
 Forecaster::~Forecaster(){
-	delete [] stages;
-	delete [] nodesPerStage;
-	delete [] nodesPerStageCumul;
-	delete [] leaves;
-	delete [] children;
-	delete [] ancestor;
-	delete [] nChildren;/**/
-	delete [] nChildrenCumul;
-	delete [] probNode;
-	delete [] valueNode;
 	delete [] dHat;
-	stages = NULL;
-	nodesPerStage = NULL;
-	nodesPerStageCumul = NULL;
-	leaves = NULL;
-	children = NULL;
-	ancestor = NULL;
-	nChildren = NULL;
-	nChildrenCumul = NULL;
-	probNode = NULL;
-	valueNode = NULL;
+	delete [] alphaHat;
 	dHat = NULL;
+	alphaHat = NULL;
 	cout << "freeing the memory of the forecaster \n"; /*TODO Remove prints */
 }

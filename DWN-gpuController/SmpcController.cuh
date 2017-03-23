@@ -25,6 +25,7 @@
 #include "Engine.cuh"
 //#include "cudaKernelHeader.cuh"
 
+
 class SmpcController {
 public:
 	/**
