@@ -25,6 +25,7 @@ int main(void){
 	_CUDA(cudaDriverGetVersion(&driverVersion));
 	cout << runtimeVersion << " " << driverVersion << endl;
 	string pathToNetworkFile = "../dataFiles/network.json";
+	string pathToForecastFile = "../dataFiles/scenarioTree.json";
 	string pathToForecastFile = "../dataFiles/forecastor.json";
 	string pathToTestfile = "../dataFiles/testVariables.json";
 	DwnNetwork myNetwork( pathToNetworkFile );
