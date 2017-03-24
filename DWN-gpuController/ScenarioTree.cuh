@@ -64,6 +64,86 @@ public:
 	ScenarioTree(string pathToFileName);
 
 	/*
+	 * Return the prediction horizon
+	 */
+	uint_t getPredHorizon();
+
+	/*
+	 * Return the number of scenarios (leaves)
+	 */
+	uint_t getNumScenarios();
+
+	/*
+	 * Return the number of nodes
+	 */
+	uint_t getNumNodes();
+
+	/*
+	 * Return the number of children
+	 */
+	uint_t getNumChildrenTot();
+
+	/*
+	 * Return the number of number of non leaf nodes
+	 */
+	uint_t getNumNonleafNodes();
+
+	/*
+	 * Return the pointer to the array representing the stages of the
+	 * node
+	 */
+	uint_t* getStageNodes();
+
+	/*
+	 * Return the pointer to the array for the nodes at each stage
+	 */
+	uint_t* getNodesPerStage();
+
+	/*
+	 * Return the pointer to the cumulative nodes at each stage
+	 */
+	uint_t* getNodesPerStageCumul();
+
+	/*
+	 * Return the pointer to the array for the list of leaves
+	 */
+	uint_t* getLeaveArray();
+
+	/*
+	 * Return the pointer to the array of children
+	 */
+	uint_t* getChildArray();
+
+	/*
+	 * Return the pointer to the array of ancestors
+	 */
+	uint_t* getAncestorArray();
+
+	/*
+	 * Return the pointer to the array of number of children at each node
+	 */
+	uint_t* getNumChildren();
+
+	/*
+	 * Return the pointer to the array of number of children at the past node
+	 */
+	uint_t* getNumChildrenCumul();
+
+	/*
+	 * Return the pointer to the array of probabilities of the node
+	 */
+	real_t* getProbArray();
+
+	/*
+	 * Return the pointer to the array of the error in demand at every node
+	 */
+	real_t* getErrorDemandArray();
+
+	/*
+	 * Return the pointer to the array of the error in prices at every node
+	 */
+	real_t* getErrorPriceArray();
+	/*
 	 * Default destructor.
 	 */
 	~ScenarioTree();
@@ -92,7 +172,7 @@ private:
 	/**
 	 * Vector of length nNodes and represents at stage of each node
 	 */
-	uint_t *stages;
+	uint_t *stageArray;
 	/**
 	 * Vector of length N and represents how many nodes at given stage.
 	 */
@@ -104,29 +184,29 @@ private:
 	/**
 	 * Vector of length K and contains the indexes of the leaf nodes.
 	 */
-	uint_t *leaves;
+	uint_t *leaveArray;
 	/**
 	 * Indices of the children nodes for each node.
 	 */
-	uint_t *children;
+	uint_t *childArray;
 	/**
 	 * Vector of length nNodes and contain the index of the ancestor of the node
 	 * with root node having the index zero
 	 */
-	uint_t *ancestor;
+	uint_t *ancestorArray;
 	/**
 	 * Vector of length nNonLeafNodes and contain the number of children of
 	 * each node.
 	 */
-	uint_t *nChildren;
+	uint_t *nChildArray;
 	/**
 	 * Vector of length nNonLeafNodes and contain the sum of past children at node
 	 */
-	uint_t *nChildrenCumul;
+	uint_t *nChildCumulArray;
 	/**
 	 * Probability of a node.
 	 */
-	real_t *probNode;
+	real_t *probNodeArray;
 	/**
 	 * Dimension of the demand
 	 */
@@ -138,11 +218,11 @@ private:
 	/**
 	 * Demand error at a node.
 	 */
-	real_t *valueDemandNode;
+	real_t *errorDemandArray;
 	/**
 	 * Price error at a node
 	 */
-	real_t *valuePriceNode;
+	real_t *errorPriceArray;
 };
 
 
