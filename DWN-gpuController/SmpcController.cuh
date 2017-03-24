@@ -25,41 +25,48 @@
 #include "Engine.cuh"
 //#include "cudaKernelHeader.cuh"
 
-
+/**
+ * GPU-based stochastic model predictive controller.
+ */
 class SmpcController {
 public:
 	/**
 	 * Construct a new Controller with a given engine.
+	 * @param myEngine An instance of Engine.
 	 */
 	SmpcController(Engine *myEngine);
 	/**
-	 *
+	 * Performs the dual extrapolation step with given parameter.
+	 * @param extrapolation parameter.
 	 */
 	void dualExtrapolationStep(real_t lambda);
 	/**
 	 * @todo solveStep should be private - nobody will need to compute a dual
- 	 *      gradient outside this class. This is an SMPC controller and its main
- 	 *		 purpose is to compute control actions.
+ 	 *       gradient outside this class. This is an SMPC controller and its main
+ 	 *		   purpose is to compute control actions.
 	 */
 	void solveStep();
 	/**
-	 *
+	 * Computes the proximal operator of g at the current point and updates
+	 * (...)
 	 */
 	void proximalFunG();
 	/**
-	 *
+	 * Performs the update of the dual vector.
 	 */
 	void dualUpdate();
 	/**
-	 *
+	 * This method executes the APG algorithm.
 	 */
 	void algorithmApg();
 	/**
-	 *
+	 * Invoke the SMPC controller on the current state of the network.
+	 * This method invokes #updateStateControl, eliminateInputDistubanceCoupling
+	 * and finally #algorithmApg.
 	 */
 	void controllerSmpc();
 	/**
-	 *
+	 * Destructor. Frees allocated memory.
 	 */
 	~SmpcController();
 private:
