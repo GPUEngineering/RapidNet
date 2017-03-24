@@ -27,7 +27,6 @@
 #include "Configuration.h"
 #include "Engine.cuh"
 
-/*TODO remove `unitTest *myTestor` */
 Engine::Engine(DwnNetwork *myNetwork, Forecaster *myForecaster, unitTest *myTestor){
 	cout << "allocating memory for the engine \n";
 	ptrMyNetwork = myNetwork;

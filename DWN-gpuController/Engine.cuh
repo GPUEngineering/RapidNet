@@ -42,7 +42,7 @@ public:
 	 *
 	 * @param network
 	 * @param forecaster
-	 *TODO remove `unitTest` from here
+	 * @todo remove `unitTest` from here
 	 */
 	Engine(
 	    DwnNetwork *network,
@@ -50,50 +50,47 @@ public:
 		  unitTest *ptrMyTestor);
 
 	/**
-	 *
+	 * @todo It seems to me that this method should become private
 	 */
-	 /*TODO It seems to me that this method should become private */
 	void allocateForecastDevice();
 
 	/**
-	 *
+	 * @todo It seems to me that this method should become private
 	 */
-	 /*TODO It seems to me that this method should become private */
 	void allocateSystemDevice();
 
 	/**
-	 *
+	 * @todo It seems to me that this method should become private
 	 */
-	 /*TODO It seems to me that this method should become private */
 	void initialiseForecastDevice();
 
 	/**
-	 *
+	 * @todo It seems to me that this method should become private
 	 */
-	 /*TODO It seems to me that this method should become private */
 	void initialiseSystemDevice();
 
 	/**
-	 *
+	 * @todo It seems to me that this method should become private
 	 */
 	void factorStep();
 
 	/**
-	 *
+	 * @todo explain how this works - does it read from a file?
 	 */
 	void updateDistubance();
 
 	/**
-	 *
+	 * @todo It seems to me that this method should become private
 	 */
 	void eliminateInputDistubanceCoupling();
 
 	/**
-	 *
+	 * ?
 	 */
 	void updateStateControl();
 
 	/**
+	 *
 	 * @param src
 	 * @param dst
 	 * @param n
@@ -107,28 +104,34 @@ public:
 		int n,
 		int batchSize);
 
-	/*TODO There should be no test methods in classes */
+	/**
+	 * @todo There should be no test methods in classes
+	 */
 	void testInverse();
 
-	/*TODO There should be no test methods in classes */
+	/**
+	 * @todo There should be no test methods in classes
+	 */
 	void testPrecondtioningFunciton();
 
 	/**
-	 *
 	 */
-	/*TODO It seems to me that this method should become private */
+	 * @todo make private
 	void deallocateForecastDevice();
 
 	/**
-	 *
+	 * @todo make private
 	 */
-	/*TODO It seems to me that this method should become private */
 	void deallocateSystemDevice();
 
-	/*TODO REMOVE */
+	/**
+	 * @todo remove method
+	 */
 	void testStupidFunction();
 
-	/*TODO REMOVE Friendship*/
+	/**
+	 * @todo remove Friendship
+	 */
 	friend class SmpcController;
 
 	/**

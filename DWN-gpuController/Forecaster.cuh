@@ -34,7 +34,17 @@
  *
  * A forecaster class contains:
  *   - nominal water demands
- *   - nominal electricity prices
+ *     - nominal electricity prices
+ *     - scenario tree used to represent the error in the predictions
+ *       - nodes at a stage
+ *       - children of a node
+ *       - ancestor of a node
+ *       - probability of a node
+ *       - value of a node
+ *       - nominal electricity prices
+ * @todo remove print statements
+ * @todo sanity check (check that the given file is well formed)
+ * @todo new char[65536]: is this good practice?
  */
 class Forecaster{
 

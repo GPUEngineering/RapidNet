@@ -58,7 +58,6 @@
  * water network can be represented with a mass-conservation equation. All
  * physical components in the network should be operated in their physical limits given
  * as constraints on the system.
- *
  * The DwnNetwork class represent the the drinking water model. This class includes
  *      - number of tanks
  *      - number of pumps and valves
@@ -160,11 +159,9 @@ public:
  	 */
 	~DwnNetwork();
 
-	/*TODO REMOVE Friendship */
-	friend class Engine;
+	friend class Engine; /*TODO REMOVE Friendship */
 
-	/*TODO REMOVE Friendship */
-	friend class SmpcController;
+	friend class SmpcController; /*TODO REMOVE Friendship */
 
 private:
 
