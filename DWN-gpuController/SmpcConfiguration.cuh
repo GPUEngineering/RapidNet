@@ -27,21 +27,9 @@
 #define VARNAME_NE "ne"
 #define VARNAME_NV "nv"
 #define VARNAME_N  "N"
-#define VARNAME_A  "matA"
-#define VARNAME_B  "matB"
-#define VARNAME_GD "matGd"
-#define VARNAME_E  "matE"
-#define VARNAME_ED "matEd"
 #define VARNAME_L  "matL"
 #define VARNAME_LHAT "matLhat"
-#define VARNAME_XMIN "vecXmin"
-#define VARNAME_XMAX "vecXmax"
-#define VARNAME_XSAFE "vecXsafe"
-#define VARNAME_UMIN "vecUmin"
-#define VARNAME_UMAX "vecUmax"
 #define VARNAME_COSTW "costW"
-#define VARNAME_ALPHA1 "costAlpha1"
-#define VARNAME_ALPHA2 "costAlpha2"
 #define VARNAME_PENALITY_X "penaltyStateX"
 #define VARNAME_PENALITY_XS "penaltySafetyX"
 #define VARNAME_DIAG_PRCND "matDiagPrecnd"
@@ -62,6 +50,20 @@ public:
 	 * 		     configuration.
 	 */
 	SmpcConfiguration(string pathToFile);
+
+	real_t* getMatL();
+
+	real_t* getMatLhat();
+
+	real_t* getCostW();
+
+	real_t* getCurrentX();
+
+	real_t* getPrevU();
+
+	real_t* getPrevUhat();
+
+	real_t* getPrevV();
 
 	/**
 	 * Default destructor to free the memory

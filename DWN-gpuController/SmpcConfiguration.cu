@@ -21,7 +21,7 @@
 #include "SmpcConfiguration.cuh"
 
 
-DwnNetwork::DwnNetwork(string pathToFile){
+SmpcConfiguration::SmpcConfiguration(string pathToFile){
 	cout << "allocating memory for the network \n";
 	const char* fileName = pathToFile.c_str();
 	rapidjson::Document jsonDocument;
@@ -53,31 +53,6 @@ DwnNetwork::DwnNetwork(string pathToFile){
 		a = jsonDocument[VARNAME_N];
 		_ASSERT(a.IsArray());
 		uint_t N = (uint_t) a[0].GetDouble();
-		matA = new real_t[NX * NX];
-		a = jsonDocument[VARNAME_A];
-		_ASSERT(a.IsArray());
-		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
-			matA[i] = a[i].GetDouble();
-		matB = new real_t[NX * NU];
-		a = jsonDocument[VARNAME_B];
-		_ASSERT(a.IsArray());
-		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
-			matB[i] = a[i].GetDouble();
-		matGd = new real_t[NX * ND];
-		a = jsonDocument[VARNAME_GD];
-		_ASSERT(a.IsArray());
-		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
-			matGd[i] = a[i].GetDouble();
-		matE = new real_t[NE * NU];
-		a = jsonDocument[VARNAME_E];
-		_ASSERT(a.IsArray());
-		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
-			matE[i] = a[i].GetDouble();
-		matEd = new real_t[NE * ND];
-		a = jsonDocument[VARNAME_ED];
-		_ASSERT(a.IsArray());
-		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
-			matEd[i] = a[i].GetDouble();
 		matL = new real_t[NU * NV];
 		a = jsonDocument[VARNAME_L];
 		_ASSERT(a.IsArray());
@@ -88,46 +63,11 @@ DwnNetwork::DwnNetwork(string pathToFile){
 		_ASSERT(a.IsArray());
 		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
 			matLhat[i] = a[i].GetDouble();
-		vecXmin = new real_t[NX];
-		a = jsonDocument[VARNAME_XMIN];
-		_ASSERT(a.IsArray());
-		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
-			vecXmin[i] = a[i].GetDouble();
-		vecXmax = new real_t[NX];
-		a = jsonDocument[VARNAME_XMAX];
-		_ASSERT(a.IsArray());
-		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
-			vecXmax[i] = a[i].GetDouble();
-		vecXsafe = new real_t[NX];
-		a = jsonDocument[VARNAME_XSAFE];
-		_ASSERT(a.IsArray());
-		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
-			vecXsafe[i] = a[i].GetDouble();
-		vecUmin = new real_t[NU];
-		a = jsonDocument[VARNAME_UMIN];
-		_ASSERT(a.IsArray());
-		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
-			vecUmin[i] = a[i].GetDouble();
-		vecUmax = new real_t[NU];
-		a = jsonDocument[VARNAME_UMAX];
-		_ASSERT(a.IsArray());
-		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
-			vecUmax[i] = a[i].GetDouble();
 		matCostW = new real_t[NU * NU];
 		a = jsonDocument[VARNAME_COSTW];
 		_ASSERT(a.IsArray());
 		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
 			matCostW[i] = a[i].GetDouble();
-		vecCostAlpha1 = new real_t[NU];
-		a = jsonDocument["costAlpha1"];
-		_ASSERT(a.IsArray());
-		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
-			vecCostAlpha1[i] = a[i].GetDouble();
-		vecCostAlpha2 = new real_t[NU*N];
-		a = jsonDocument[VARNAME_ALPHA2];
-		_ASSERT(a.IsArray());
-		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
-			vecCostAlpha2[i] = a[i].GetDouble();
 		a = jsonDocument[VARNAME_PENALITY_X];
 		penaltyStateX = a[0].GetDouble();
 		a = jsonDocument["penaltySafetyX"];
@@ -157,45 +97,60 @@ DwnNetwork::DwnNetwork(string pathToFile){
 		_ASSERT(a.IsArray());
 		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
 			prevV[i] = a[i].GetDouble();
+		stepSize = 1e-4;
+		maxIteration = 500;
 		delete [] readBuffer;
 		readBuffer = NULL;
 	}
 	fclose(infile);
 }
 
-DwnNetwork::~DwnNetwork(){
-	delete [] matA;
-	delete [] matB;
-	delete [] matGd;
-	delete [] matE;
-	delete [] matEd;
+real_t* SmpcConfiguration::getMatL(){
+	return matL;
+}
+
+real_t* SmpcConfiguration::getMatLhat(){
+	return matLhat;
+}
+
+real_t* SmpcConfiguration::getCostW(){
+	return matCostW;
+}
+
+real_t* SmpcConfiguration::getCurrentX(){
+	return currentX;
+}
+
+
+real_t* SmpcConfiguration::getPrevUhat(){
+	return prevUhat;
+}
+
+real_t* SmpcConfiguration::getPrevV(){
+	return prevV;
+}
+
+real_t* SmpcConfiguration::getPrevU(){
+	return prevU;
+}
+
+SmpcConfiguration::~SmpcConfiguration(){
 	delete [] matL;
 	delete [] matLhat;
-	delete [] vecXmin;
-	delete [] vecXmax;
-	delete [] vecXsafe;
-	delete [] vecUmin;
-	delete [] vecUmax;
 	delete [] matCostW;
-	delete [] vecCostAlpha1;
-	delete [] vecCostAlpha2;
 	delete [] matDiagPrecnd;
-	matA = NULL;
-	matB = NULL;
-	matGd = NULL;
-	matE = NULL;
-	matEd = NULL;
+	delete [] currentX;
+	delete [] prevU;
+	delete [] prevUhat;
+	delete [] prevV;
 	matL = NULL;
 	matLhat = NULL;
-	vecXmin = NULL;
-	vecXmax = NULL;
-	vecXsafe = NULL;
-	vecUmin = NULL;
-	vecUmax = NULL;
 	matCostW = NULL;
-	vecCostAlpha1 = NULL;
-	vecCostAlpha2 = NULL;
 	matDiagPrecnd = NULL;
+	currentX = NULL;
+	prevUhat = NULL;
+	prevU = NULL;
+	prevV = NULL;
 	cout << "freeing the memory of the network \n";
 }
 
