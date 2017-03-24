@@ -50,16 +50,16 @@ Forecaster::Forecaster(string pathToFile){
 		a = jsonDocument[VARNAME_DIM_PRICE];
 		_ASSERT( a.IsArray() );
 		dimPrices = (uint_t) a[0].GetDouble();
-		dHat = new real_t[dimDemand * nPredHorizon];
+		demandPrediction = new real_t[dimDemand * nPredHorizon];
 		a = jsonDocument[VARNAME_DHAT];
 		_ASSERT( a.IsArray() );
 		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
 			dHat[i] = a[i].GetDouble();
-		alphaHat = new real_t[dimPrices * nPredHorizon];
+		pricePrediction = new real_t[dimPrices * nPredHorizon];
 		a = jsonDocument[VARNAME_DHAT];
 		_ASSERT( a.IsArray() );
 		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
-			alphaHat[i] = a[i].GetDouble();
+			pricePrediction[i] = a[i].GetDouble();
 		delete [] readBuffer;
 		readBuffer = NULL;
 	}
@@ -80,11 +80,11 @@ uint_t Forecaster::getDimPrice(){
 }
 
 real_t* Forecaster::getNominalDemand(){
-	return dHat;
+	return demandPrediction;
 }
 
-real_t* Forecaster::getNomialPrices(){
-	return alphaHat;
+real_t* Forecaster::getNominalPrices(){
+	return pricePrediction;
 }
 
 Forecaster::~Forecaster(){

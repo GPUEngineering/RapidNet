@@ -75,7 +75,7 @@ public:
 	/*
 	 * returns the pointer of the array of nominal prices
 	 */
-	real_t* getNomialPrices();
+	real_t* getNominalPrices();
 
 	/*TODO REMOVE Friendship */
 	friend class Engine;
@@ -101,11 +101,11 @@ private:
 	/**
 	 * Nominal demand predicted
 	 */
-	real_t *dHat;
+	real_t *demandPrediction;
 	/**
 	 * Nominal electricity prices
 	 */
-	real_t *alphaHat;
+	real_t *pricePrediction;
 };
 
 

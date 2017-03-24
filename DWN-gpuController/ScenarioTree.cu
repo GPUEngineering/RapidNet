@@ -59,68 +59,67 @@ ScenarioTree::ScenarioTree( string pathToFile ){
 		a = jsonDocument[VARNAME_NUM_CHILD_TOT];
 		_ASSERT( a.IsArray() );
 		nChildrenTot = (uint_t) a[0].GetDouble();
-		stages = new uint_t[nNodes];
+		stageArray = new uint_t[nNodes];
 		a = jsonDocument[VARNAME_STAGES];
 		_ASSERT( a.IsArray() );
 		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
-			stages[i] = (uint_t) a[i].GetDouble();
-		nodesPerStage = new uint_t[N];
+			stageArray[i] = (uint_t) a[i].GetDouble();
+		nodesPerStage = new uint_t[nPredHorizon];
 		a = jsonDocument[VARNAME_NODES_PER_STAGE];
 		_ASSERT( a.IsArray() );
 		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
 			nodesPerStage[i] = (uint_t) a[i].GetDouble();
-		nodesPerStageCumul = new uint_t[N+1];
+		nodesPerStageCumul = new uint_t[nPredHorizon + 1];
 		a = jsonDocument[VARNAME_NODES_PER_STAGE_CUMUL];
 		_ASSERT( a.IsArray() );
 		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
 			nodesPerStageCumul[i] = (uint_t) a[i].GetDouble();
-		leaves = new uint_t[K];
+		leaveArray = new uint_t[K];
 		a = jsonDocument[VARNAME_LEAVES];
 		_ASSERT( a.IsArray() );
 		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
-			leaves[i] = (uint_t) a[i].GetDouble();
-		children = new uint_t[nChildrenTot];
+			leaveArray[i] = (uint_t) a[i].GetDouble();
+		childArray = new uint_t[nChildrenTot];
 		a = jsonDocument[VARNAME_CHILDREN];
 		_ASSERT( a.IsArray() );
 		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
-			children[i] = (uint_t) a[i].GetDouble();
-		ancestor = new uint_t[nNodes];
+			childArray[i] = (uint_t) a[i].GetDouble();
+		ancestorArray = new uint_t[nNodes];
 		a = jsonDocument[VARNAME_ANCESTOR];
 		_ASSERT( a.IsArray() );
 		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
-			ancestor[i] = (uint_t) a[i].GetDouble();
-		nChildren = new uint_t[nNonleafNodes];
+			ancestorArray[i] = (uint_t) a[i].GetDouble();
+		nChildArray = new uint_t[nNonleafNodes];
 		a = jsonDocument[VARNAME_NUM_CHILDREN];
 		_ASSERT( a.IsArray() );
 		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
-			nChildren[i] = (uint_t) a[i].GetDouble();
-		nChildrenCumul = new uint_t[nNodes];
+			nChildArray[i] = (uint_t) a[i].GetDouble();
+		nChildCumulArray = new uint_t[nNodes];
 		a = jsonDocument[VARNAME_NUM_CHILD_CUMUL];
 		_ASSERT( a.IsArray() );
 		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
-			nChildrenCumul[i] = (uint_t) a[i].GetDouble();
-		probNode = new real_t[nNodes];
+			nChildCumulArray[i] = (uint_t) a[i].GetDouble();
+		probNodeArray = new real_t[nNodes];
 		a = jsonDocument[VARNAME_PROB_NODE];
 		_ASSERT( a.IsArray() );
 		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
-			probNode[i] = a[i].GetDouble();
+			probNodeArray[i] = a[i].GetDouble();
 		a = jsonDocument[VARNAME_DIM_DEMAND];
 		_ASSERT( a.IsArray() );
 		dimDemand = (uint_t) a[0].GetDouble();
 		a = jsonDocument[VARNAME_DIM_PRICE];
 		_ASSERT( a.IsArray() );
 		dimPrice = (uint_t) a[0].GetDouble();
-		valueDemandNode = new real_t[nNodes * dimDemand];
+		errorDemandArray = new real_t[nNodes * dimDemand];
 		a = jsonDocument[VARNAME_DEMAND_NODE];
 		_ASSERT( a.IsArray() );
 		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
-			valueDemandNode[i] = a[i].GetDouble();
-		valuePriceNode = new real_t[nNodes * dimPrice];
+			errorDemandArray[i] = a[i].GetDouble();
+		errorPriceArray = new real_t[nNodes * dimPrice];
 		a = jsonDocument[VARNAME_PRICE_NODE];
 		_ASSERT( a.IsArray() );
 		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
-			valuePriceNode[i] = a[i].GetDouble();
-		dHat = new real_t[nNodes * dimDemand];
+			errorPriceArray[i] = a[i].GetDouble();
 		delete [] readBuffer;
 		readBuffer = NULL;
 	}
@@ -128,29 +127,93 @@ ScenarioTree::ScenarioTree( string pathToFile ){
 	infile = NULL;
 }
 
+uint_t ScenarioTree::getPredHorizon(){
+	return nPredHorizon;
+}
+
+uint_t ScenarioTree::getNumScenarios(){
+	return nScenario;
+}
+
+uint_t ScenarioTree::getNumNodes(){
+	return nNodes;
+}
+
+uint_t ScenarioTree::getNumChildrenTot(){
+	return nChildrenTot;
+}
+
+uint_t ScenarioTree::getNumNonleafNodes(){
+	return nNonleafNodes;
+}
+
+uint_t* ScenarioTree::getStageNodes(){
+	return stageArray;
+}
+
+uint_t* ScenarioTree::getNodesPerStage(){
+	return nodesPerStage;
+}
+
+uint_t* ScenarioTree::getNodesPerStageCumul(){
+	return nodesPerStageCumul;
+}
+
+uint_t* ScenarioTree::getLeaveArray(){
+	return leaveArray;
+}
+
+uint_t* ScenarioTree::getChildArray(){
+	return childArray;
+}
+
+uint_t* ScenarioTree::getAncestorArray(){
+	return ancestorArray;
+}
+
+uint_t* ScenarioTree::getNumChildren(){
+	return nChildArray;
+}
+
+uint_t* ScenarioTree::getNumChildrenCumul(){
+	return nChildCumulArray;
+}
+
+real_t* ScenarioTree::getProbArray(){
+	return probNodeArray;
+}
+
+real_t* ScenarioTree::getErrorDemandArray(){
+	return errorDemandArray;
+}
+
+real_t* ScenarioTree::getErrorPriceArray(){
+	return errorPriceArray;
+}
+
 ScenarioTree::~ScenarioTree(){
-	delete [] stages;
+	delete [] stageArray;
 	delete [] nodesPerStage;
 	delete [] nodesPerStageCumul;
-	delete [] leaves;
-	delete [] children;
-	delete [] ancestor;
-	delete [] nChildren;
-	delete [] nChildrenCumul;
-	delete [] probNode;
-	delete [] valueDemandNode;
-	delete [] valuePriceNode;
-	stages = NULL;
+	delete [] leaveArray;
+	delete [] childArray;
+	delete [] ancestorArray;
+	delete [] nChildArray;
+	delete [] nChildCumulArray;
+	delete [] probNodeArray;
+	delete [] errorDemandArray;
+	delete [] errorPriceArray;
+	stageArray = NULL;
 	nodesPerStage = NULL;
 	nodesPerStageCumul = NULL;
-	leaves = NULL;
-	children = NULL;
-	ancestor = NULL;
-	nChildren = NULL;
-	nChildrenCumul = NULL;
-	probNode = NULL;
-	valueDemandNode = NULL;
-	valuePriceNode = NULL;
+	leaveArray = NULL;
+	childArray = NULL;
+	ancestorArray = NULL;
+	nChildArray = NULL;
+	nChildCumulArray = NULL;
+	probNodeArray = NULL;
+	errorDemandArray = NULL;
+	errorPriceArray = NULL;
 	cout << "freeing the memory of the scenario tree \n"; /*TODO Remove prints */
 }
 
