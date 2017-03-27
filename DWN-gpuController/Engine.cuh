@@ -83,6 +83,59 @@ public:
 	 *  pointer to the DWN network
 	 */
 	DwnNetwork* getDwnNetwork();
+	/* getter's of the system*/
+	/**
+	 * System matrix B
+	 */
+	real_t* getSysMatB();
+	/**
+	 * constraints matrix F
+	 */
+	real_t* getSysMatF();
+	/**
+	 * constraints matrix G
+	 */
+	real_t* getSysMatG();
+	/**
+	 * matrix L
+	 */
+	real_t* getSysMatL();
+	/**
+	 * matrix Lhat
+	 */
+	real_t* getSysMatLhat();
+	/**
+	 * pointer to Matrix B
+	 */
+	real_t** getPtrSysMatB();
+	/**
+	 * pointer to matrix F
+	 */
+	real_t** getPtrSysMatF();
+	/**
+	 * pointer to matrix G
+	 */
+	real_t** getPtrSysMatG();
+	/**
+	 * pointer to matrix L
+	 */
+	real_t** getPtrSysMatL();
+	/**
+	 * pointer to matrix Lhat
+	 */
+	real_t** getPtrSysMatLhat();
+	/**
+	 * previous control
+	 */
+	real_t* getVecPreviousControl();
+	/**
+	 * current state
+	 */
+	real_t* getVecCurrentState();
+	/**
+	 * previous uhat
+	 */
+	real_t* getVecPreviousUhat();
 	/** get's for the factor step matrices*/
 	/**
 	 *  matrix Phi
@@ -148,7 +201,63 @@ public:
 	 * pointer matrix G (Factor step)
 	 */
 	real_t** getPtrMatG();
-
+	/**
+	 * uhat
+	 */
+	real_t* getVecUhat();
+	/**
+	 * beta control-distribution elimination
+	 */
+	real_t* getVecBeta();
+	/**
+	 * e control-disturbance elimination
+	 */
+	real_t* getVecE();
+	/**
+	 * handle cublasHandle
+	 */
+	cublasHandle_t getCublasHandle();
+	/* getter's for the scenario tree */
+	/**
+	 * Array of stages
+	 */
+	uint_t* getTreeStages();
+	/**
+	 * Array of nodes per stage
+	 */
+	uint_t* getTreeNodesPerStage();
+	/**
+	 * Array of past nodes
+	 */
+	uint_t* getTreeNodesPerStageCumul();
+	/**
+	 * Array of the leaves
+	 */
+	uint_t* getTreeLeaves();
+	/**
+	 * Array number of children
+	 */
+	uint_t* getTreeNumChildren();
+	/**
+	 * Array of ancestor
+	 */
+	uint_t* getTreeAncestor();
+	/**
+	 * Array of past cumulative children
+	 */
+	uint_t* getTreeNumChildrenCumul();
+	/**
+	 * Array of the probability
+	 */
+	real_t* getTreeProb();
+	/**
+	 * Array of the error in the demand
+	 */
+	real_t* getTreeErrorDemand();
+	/**
+	 * Array of the error in the prices
+	 */
+	real_t* getTreeErrorPrices();
 	/**
 	 * @todo There should be no test methods in classes
 	 */
@@ -209,7 +318,6 @@ private:
 	 * Deallocate the device memory of the scenario tree
 	 */
 	void deallocateScenarioTreeDevice();
-
 	/**
 	 * Deallocate the device memory of the system matrices
 	 */

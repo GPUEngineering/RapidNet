@@ -503,7 +503,164 @@ real_t** Engine::getPtrMatF(){
 real_t** Engine::getPtrMatG(){
 	return devPtrMatG;
 }
+/**
+ * uhat
+ */
+real_t* Engine::getVecUhat(){
+	return devVecUhat;
+}
+/**
+ * beta control-distribution elimination
+ */
+real_t* Engine::getVecBeta(){
+	return devVecBeta;
+}
+/**
+ * e control-disturbance elimination
+ */
+real_t* Engine::getVecE(){
+	return devVecE;
+}
+/* System matrices */
+real_t* Engine::getSysMatB(){
+	return devSysMatB;
+}
+/**
+ * constraints matrix F
+ */
+real_t* Engine::getSysMatF(){
+	return devSysMatF;
+}
+/**
+ * constraints matrix G
+ */
+real_t* Engine::getSysMatG(){
+	return devSysMatG;
+}
+/**
+ * matrix L
+ */
+real_t* Engine::getSysMatL(){
+	return devSysMatL;
+}
+/**
+ * matrix Lhat
+ */
+real_t* Engine::getSysMatLhat(){
+	return devPtrSysMatLhat;
+}
+/**
+ * pointer to Matrix B
+ */
+real_t** Engine::getPtrSysMatB(){
+	return devPtrSysMatB;
+}
+/**
+ * pointer to matrix F
+ */
+real_t** Engine::getPtrSysMatF(){
+	return devPtrSysMatF;
+}
+/**
+ * pointer to matrix G
+ */
+real_t** Engine::getPtrSysMatG(){
+	return devPtrSysMatG;
+}
+/**
+ * pointer to matrix L
+ */
+real_t** Engine::getPtrSysMatL(){
+	return devPtrSysMatLhat;
+}
+/**
+ * pointer to matrix Lhat
+ */
+real_t** Engine::getPtrSysMatLhat(){
+	return devPtrSysMatLhat;
+}
+/**
+ * previous control
+ */
+real_t* Engine::getVecPreviousControl(){
+	return devVecPreviousControl;
+}
+/**
+ * current state
+ */
+real_t* Engine::getVecCurrentState(){
+	return devVecCurrentState;
+}
+/**
+ * previous uhat
+ */
+real_t* Engine::getVecPreviousUhat(){
+	return devVecPreviousUhat;
+}
+/**
+ *  Array of the stage of the nodes at the tree
+ */
+uint_t* Engine::getTreeStages(){
+	return devTreeStages;
+}
+/**
+ * Array of nodes per stage
+ */
+uint_t* Engine::getTreeNodesPerStage(){
+	return devTreeNodesPerStage;
+}
+/**
+ * Array of past nodes
+ */
+uint_t* Engine::getTreeNodesPerStageCumul(){
+	return devTreeNodesPerStageCumul;
+}
+/**
+ * Array of the leaves
+ */
+uint_t* Engine::getTreeLeaves(){
+	return devTreeLeaves;
+}
+/**
+ * Array number of children
+ */
+uint_t* Engine::getTreeNumChildren(){
+	return devTreeNumChildren;
+}
+/**
+ * Array of ancestor
+ */
+uint_t* Engine::getTreeAncestor(){
+	return devTreeAncestor;
+}
+/**
+ * Array of past cumulative children
+ */
+uint_t* Engine::getTreeNumChildrenCumul(){
+	return devTreeNumChildrenCumul;
+}
+/**
+ * Array of the probability
+ */
+real_t* Engine::getTreeProb(){
+	return devTreeProb;
+}
+/**
+ * Array of the error in the demand
+ */
+real_t* Engine::getTreeErrorDemand(){
+	return devTreeErrorDemand;
+}
+/**
+ * Array of the error in the prices
+ */
+real_t* Engine::getTreeErrorPrices(){
+	return devTreeErrorPrices;
+}
 
+cublasHandle_t Engine::getCublasHandle(){
+	return handle;
+}
 void Engine::eliminateInputDistubanceCoupling(real_t* nominalDemand, real_t *nominalPrices){
 	uint_t ns = ptrMyScenarioTree->getNumScenarios();
 	uint_t nx = ptrMyNetwork->getNumTanks();

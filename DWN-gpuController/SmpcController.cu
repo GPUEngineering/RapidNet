@@ -27,8 +27,8 @@ SmpcController::SmpcController(Forecaster *myForecaster, Engine *myEngine, SmpcC
 	ptrMyForecaster = myForecaster;
 	ptrMyEngine = myEngine;
 	ptrMySmpcConfig = mySmpcConfig;
-	DwnNetwork* ptrMyNetwork = myEngine->getDwnNetwork();
-	ScenarioTree* ptrMyScenarioTree = myEngine->getScenarioTree();
+	DwnNetwork* ptrMyNetwork = ptrMyEngine->getDwnNetwork();
+	ScenarioTree* ptrMyScenarioTree = ptrMyEngine->getScenarioTree();
 
 	uint_t nx = ptrMyNetwork->getNumTanks();
 	uint_t nu = ptrMyNetwork->getNumControls();
@@ -116,15 +116,24 @@ SmpcController::SmpcController(Forecaster *myForecaster, Engine *myEngine, SmpcC
 	delete [] ptrVecAcceleratedPsi;
 	delete [] ptrVecPrimalXi;
 	delete [] ptrVecPrimalPsi;
+	ptrVecX = NULL;
+	ptrVecU = NULL;
+	ptrVecV = NULL;
+	ptrVecAcceleratedXi = NULL;
+	ptrVecAcceleratedPsi = NULL;
+	ptrVecPrimalXi = NULL;
+	ptrVecPrimalPsi = NULL;
 	ptrMyNetwork = NULL;
 	ptrMyScenarioTree = NULL;
 }
 
 void SmpcController::dualExtrapolationStep(real_t lambda){
-	uint_t nodes = ptrMyEngine->ptrMyForecaster->nNodes;
-	uint_t nx = ptrMyEngine->ptrMyNetwork->NX;
-	uint_t nu = ptrMyEngine->ptrMyNetwork->NU;
-	float alpha;
+	DwnNetwork* ptrMyNetwork = ptrMyEngine->getDwnNetwork();
+	ScenarioTree* ptrMyScenarioTree = ptrMyEngine->getScenarioTree();
+	uint_t nodes = ptrMyScenarioTree->getNumNodes();
+	uint_t nx = ptrMyNetwork->getNumTanks();
+	uint_t nu = ptrMyNetwork->getNumControls();
+	real_t alpha;
 	// w = (1 + \lambda)y_k - \lambda y_{k-1}
 	_CUDA(cudaMemcpy(devVecAcceleratedXi, devVecUpdateXi, 2*nx*nodes*sizeof(real_t), cudaMemcpyDeviceToDevice) );
 	_CUDA(cudaMemcpy(devVecAcceleratedPsi, devVecUpdatePsi, nu*nodes*sizeof(real_t), cudaMemcpyDeviceToDevice) );
@@ -140,16 +149,17 @@ void SmpcController::dualExtrapolationStep(real_t lambda){
 }
 
 void SmpcController::solveStep(){
-
-	DwnNetwork *ptrMyNetwork = ptrMyEngine->ptrMyNetwork;
-	Forecaster *ptrMyForecaster = ptrMyEngine->ptrMyForecaster;
+	DwnNetwork *ptrMyNetwork = ptrMyEngine->getDwnNetwork();
+	ScenarioTree *ptrMyScenarioTree = ptrMyEngine->getScenarioTree();
 	real_t *devTempVecR, *devTempVecQ;
-	uint_t nx = ptrMyNetwork->NX;
-	uint_t nu = ptrMyNetwork->NU;
-	uint_t nv = ptrMyNetwork->NV;
-	uint_t ns = ptrMyForecaster->K;
-	uint_t N =  ptrMyForecaster->N;
-	uint_t nodes = ptrMyForecaster->nNodes;
+	uint_t nx = ptrMyNetwork->getNumTanks();
+	uint_t nu = ptrMyNetwork->getNumControls();
+	uint_t nv = ptrMySmpcConfig->getNV();
+	uint_t ns = ptrMyScenarioTree->getNumScenarios();
+	uint_t N =  ptrMyScenarioTree->getPredHorizon();
+	uint_t nodes = ptrMyScenarioTree->getNumNodes();
+	uint_t *nodesPerStage = ptrMyScenarioTree->getNodesPerStage();
+	uint_t *nodesPerStageCumul = ptrMyScenarioTree->getNodesPerStageCumul();
 	uint_t iStageCumulNodes, iStageNodes, prevStageNodes, prevStageCumulNodes;
 	real_t scale[2] = {-0.5, 1};
 	real_t alpha = 1;
@@ -158,110 +168,118 @@ void SmpcController::solveStep(){
 	cout<< nx << " " << nu << " " << ns << endl;
 	_CUDA( cudaMalloc((void**)&devTempVecQ, ns*nx*sizeof(real_t)) );
 	_CUDA( cudaMalloc((void**)&devTempVecR, ns*nv*sizeof(real_t)) );
-	_CUDA( cudaMemcpy(ptrMyEngine->devMatSigma, ptrMyEngine->devVecBeta, nv*nodes*sizeof(real_t), cudaMemcpyDeviceToDevice) );
+	_CUDA( cudaMemcpy(ptrMyEngine->getMatSigma(), ptrMyEngine->getVecBeta(), nv*nodes*sizeof(real_t),
+			cudaMemcpyDeviceToDevice) );
 
 	for(int iStage = N-1;iStage > -1;iStage--){
-		iStageCumulNodes = ptrMyForecaster->nodesPerStageCumul[iStage];
-		iStageNodes = ptrMyForecaster->nodesPerStage[iStage];
+		iStageCumulNodes = nodesPerStageCumul[iStage];
+		iStageNodes = nodesPerStage[iStage];
 		if(iStage < N-1){
 			// sigma=sigma+r
-			_CUBLAS(cublasSaxpy_v2(ptrMyEngine->handle, iStageNodes*nv, &alpha, devVecR, 1,
-					&ptrMyEngine->devMatSigma[iStageCumulNodes*nv],1));
+			_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), iStageNodes*nv, &alpha, devVecR, 1,
+					&ptrMyEngine->getMatSigma()[iStageCumulNodes*nv],1));
 		}
 		// v=Omega*sigma
-		_CUBLAS(cublasSgemmBatched(ptrMyEngine->handle, CUBLAS_OP_N, CUBLAS_OP_N, nv, 1, nv, &scale[0], (const float**)
-				&ptrMyEngine->devPtrMatOmega[iStageCumulNodes], nv, (const float**)&ptrMyEngine->devPtrMatSigma[iStageCumulNodes],
-				nv, &beta, &devPtrVecV[iStageCumulNodes], nv, iStageNodes));
+		_CUBLAS(cublasSgemmBatched(ptrMyEngine->getCublasHandle(), CUBLAS_OP_N, CUBLAS_OP_N, nv, 1, nv,
+				&scale[0], (const float**)&ptrMyEngine->getPtrMatOmega()[iStageCumulNodes], nv,
+				(const float**)&ptrMyEngine->getPtrMatSigma()[iStageCumulNodes], nv, &beta,
+				&devPtrVecV[iStageCumulNodes], nv, iStageNodes));
 
 		if(iStage < N-1){
 			// v=Theta*q+v
-			_CUBLAS(cublasSgemmBatched(ptrMyEngine->handle, CUBLAS_OP_N, CUBLAS_OP_N, nv, 1, nx, &alpha, (const float**)
-					&ptrMyEngine->devPtrMatTheta[iStageCumulNodes], nv, (const float**)devPtrVecQ, nx,
-					&alpha, &devPtrVecV[iStageCumulNodes], nv, iStageNodes));
+			_CUBLAS(cublasSgemmBatched(ptrMyEngine->getCublasHandle(), CUBLAS_OP_N, CUBLAS_OP_N, nv, 1, nx,
+					&alpha, (const float**)&ptrMyEngine->getPtrMatTheta()[iStageCumulNodes], nv,
+					(const float**)devPtrVecQ, nx, &alpha, &devPtrVecV[iStageCumulNodes], nv, iStageNodes));
 		}
 
 		// v=Psi*psi+v
-		_CUBLAS(cublasSgemmBatched(ptrMyEngine->handle, CUBLAS_OP_N, CUBLAS_OP_N, nv, 1, nu, &alpha, (const float**)
-				&ptrMyEngine->devPtrMatPsi[iStageCumulNodes], nv, (const float**)&devPtrVecAcceleratedPsi[iStageCumulNodes],
-				nu, &alpha, &devPtrVecV[iStageCumulNodes], nv, iStageNodes));
+		_CUBLAS(cublasSgemmBatched(ptrMyEngine->getCublasHandle(), CUBLAS_OP_N, CUBLAS_OP_N, nv, 1, nu, &alpha,
+				(const float**)&ptrMyEngine->getPtrMatPsi()[iStageCumulNodes], nv,
+				(const float**)&devPtrVecAcceleratedPsi[iStageCumulNodes], nu, &alpha, &devPtrVecV
+				[iStageCumulNodes], nv, iStageNodes));
 
 		// v=Phi*xi+v
-		_CUBLAS(cublasSgemmBatched(ptrMyEngine->handle, CUBLAS_OP_N, CUBLAS_OP_N, nv, 1, 2*nx, &alpha, (const float**)
-				&ptrMyEngine->devPtrMatPhi[iStageCumulNodes], nv, (const float**)&devPtrVecAcceleratedXi[iStageCumulNodes],
-				2*nx, &alpha, &devPtrVecV[iStageCumulNodes], nv, iStageNodes));
+		_CUBLAS(cublasSgemmBatched(ptrMyEngine->getCublasHandle(), CUBLAS_OP_N, CUBLAS_OP_N, nv, 1, 2*nx, &alpha,
+				(const float**)&ptrMyEngine->getPtrMatPhi()[iStageCumulNodes], nv, (const float**)
+				&devPtrVecAcceleratedXi[iStageCumulNodes], 2*nx, &alpha, &devPtrVecV[iStageCumulNodes],
+				nv, iStageNodes));
 
 		// r=sigma
-		_CUDA(cudaMemcpy(devVecR, &ptrMyEngine->devMatSigma[iStageCumulNodes*nv], nv*iStageNodes*sizeof(real_t), cudaMemcpyDeviceToDevice));
+		_CUDA(cudaMemcpy(devVecR, &ptrMyEngine->getMatSigma()[iStageCumulNodes*nv], nv*iStageNodes*sizeof(real_t),
+				cudaMemcpyDeviceToDevice));
 
 		// r=D*xi+r
-		_CUBLAS(cublasSgemmBatched(ptrMyEngine->handle, CUBLAS_OP_N, CUBLAS_OP_N, nv, 1, 2*nx, &alpha, (const float**)
-				&ptrMyEngine->devPtrMatD[iStageCumulNodes], nv, (const float**)&devPtrVecAcceleratedXi[iStageCumulNodes],
-				2*nx, &alpha, devPtrVecR, nv, iStageNodes));
+		_CUBLAS(cublasSgemmBatched(ptrMyEngine->getCublasHandle(), CUBLAS_OP_N, CUBLAS_OP_N, nv, 1, 2*nx, &alpha,
+				(const float**)&ptrMyEngine->getPtrMatD()[iStageCumulNodes], nv, (const float**)
+				&devPtrVecAcceleratedXi[iStageCumulNodes], 2*nx, &alpha, devPtrVecR, nv, iStageNodes));
 
 		// r=f*psi+r
-		_CUBLAS(cublasSgemmBatched(ptrMyEngine->handle, CUBLAS_OP_N, CUBLAS_OP_N, nv, 1, nu, &alpha, (const float**)
-				&ptrMyEngine->devPtrMatF[iStageCumulNodes], nv, (const float**)&devPtrVecAcceleratedPsi[iStageCumulNodes],
-				nu, &alpha, devPtrVecR, nv, iStageNodes));
+		_CUBLAS(cublasSgemmBatched(ptrMyEngine->getCublasHandle(), CUBLAS_OP_N, CUBLAS_OP_N, nv, 1, nu, &alpha,
+				(const float**)&ptrMyEngine->getPtrMatF()[iStageCumulNodes], nv, (const float**)
+				&devPtrVecAcceleratedPsi[iStageCumulNodes], nu, &alpha, devPtrVecR, nv, iStageNodes));
 
 		if(iStage < N-1){
 			// r=g*q+r
-			_CUBLAS(cublasSgemmBatched(ptrMyEngine->handle, CUBLAS_OP_N, CUBLAS_OP_N, nv, 1, nx, &alpha, (const float**)
-					&ptrMyEngine->devPtrMatG[iStageCumulNodes], nv, (const float**)devPtrVecQ, nx, &alpha, devPtrVecR, nv, iStageNodes));
+			_CUBLAS(cublasSgemmBatched(ptrMyEngine->getCublasHandle(), CUBLAS_OP_N, CUBLAS_OP_N, nv, 1, nx, &alpha,
+					(const float**)&ptrMyEngine->getPtrMatG()[iStageCumulNodes], nv, (const float**)devPtrVecQ,
+					nx, &alpha, devPtrVecR, nv, iStageNodes));
 		}
 
 		if(iStage < N-1){
 			// q=F'xi+q
-			_CUBLAS(cublasSgemmBatched(ptrMyEngine->handle, CUBLAS_OP_T, CUBLAS_OP_N, nx, 1, 2*nx, &alpha, (const float**)
-					&ptrMyEngine->devPtrMatF[iStageCumulNodes], 2*nx, (const float**)&devPtrVecAcceleratedXi[iStageCumulNodes],
-					2*nx, &alpha, devPtrVecQ, nx, iStageNodes));
+			_CUBLAS(cublasSgemmBatched(ptrMyEngine->getCublasHandle(), CUBLAS_OP_T, CUBLAS_OP_N, nx, 1, 2*nx, &alpha,
+					(const float**)&ptrMyEngine->getPtrMatF()[iStageCumulNodes], 2*nx, (const float**)
+					&devPtrVecAcceleratedXi[iStageCumulNodes], 2*nx, &alpha, devPtrVecQ, nx, iStageNodes));
 		}else{
 			// q=F'xi
-			_CUBLAS(cublasSgemmBatched(ptrMyEngine->handle, CUBLAS_OP_T, CUBLAS_OP_N, nx, 1, 2*nx, &alpha, (const float**)
-					&ptrMyEngine->devPtrMatF[iStageCumulNodes], 2*nx, (const float**)&devPtrVecAcceleratedXi[iStageCumulNodes],
-					2*nx, &beta, devPtrVecQ, nx, iStageNodes));
+			_CUBLAS(cublasSgemmBatched(ptrMyEngine->getCublasHandle(), CUBLAS_OP_T, CUBLAS_OP_N, nx, 1, 2*nx, &alpha,
+					(const float**)&ptrMyEngine->getPtrMatF()[iStageCumulNodes], 2*nx, (const float**)
+					&devPtrVecAcceleratedXi[iStageCumulNodes], 2*nx, &beta, devPtrVecQ, nx, iStageNodes));
 		}
 		if(iStage > 0){
-			prevStageNodes = ptrMyForecaster->nodesPerStage[iStage - 1];
-			prevStageCumulNodes = ptrMyForecaster->nodesPerStageCumul[iStage - 1];
+			prevStageNodes = nodesPerStage[iStage - 1];
+			prevStageCumulNodes = nodesPerStageCumul[iStage - 1];
 			if( (iStageNodes - prevStageNodes) > 0 ){
-				solveSumChildren<<<prevStageNodes, nx>>>(devVecQ, devTempVecQ, ptrMyEngine->devTreeNumChildren,
-						ptrMyEngine->devTreeNumChildrenCumul, prevStageCumulNodes, prevStageNodes, iStage - 1, nx);
-				solveSumChildren<<<prevStageNodes, nx>>>(devVecR, devTempVecR, ptrMyEngine->devTreeNumChildren,
-						ptrMyEngine->devTreeNumChildrenCumul, prevStageCumulNodes, prevStageNodes, iStage - 1 , nv);
-				_CUDA(cudaMemcpy(devVecR, devTempVecR, prevStageNodes*nv*sizeof(real_t),cudaMemcpyDeviceToDevice));
-				_CUDA(cudaMemcpy(devVecQ, devTempVecQ, prevStageNodes*nx*sizeof(real_t),cudaMemcpyDeviceToDevice));
+				solveSumChildren<<<prevStageNodes, nx>>>(devVecQ, devTempVecQ, ptrMyEngine->getTreeNumChildren(),
+						ptrMyEngine->getTreeNumChildrenCumul(), prevStageCumulNodes, prevStageNodes, iStage - 1, nx);
+				solveSumChildren<<<prevStageNodes, nx>>>(devVecR, devTempVecR, ptrMyEngine->getTreeNumChildren(),
+						ptrMyEngine->getTreeNumChildrenCumul(), prevStageCumulNodes, prevStageNodes, iStage - 1 , nv);
+				_CUDA(cudaMemcpy(devVecR, devTempVecR, prevStageNodes*nv*sizeof(real_t), cudaMemcpyDeviceToDevice));
+				_CUDA(cudaMemcpy(devVecQ, devTempVecQ, prevStageNodes*nx*sizeof(real_t), cudaMemcpyDeviceToDevice));
 			}
 		}
 	}
 
 	// Forward substitution
-	_CUDA(cudaMemcpy(devVecU, ptrMyEngine->devVecUhat, nodes*nu*sizeof(real_t), cudaMemcpyDeviceToDevice));
+	_CUDA(cudaMemcpy(devVecU, ptrMyEngine->getVecUhat(), nodes*nu*sizeof(real_t), cudaMemcpyDeviceToDevice));
 
 	for(int iStage = 0;iStage < N;iStage++){
-		iStageNodes = ptrMyForecaster->nodesPerStage[iStage];
-		iStageCumulNodes = ptrMyForecaster->nodesPerStageCumul[iStage];
+		iStageNodes = nodesPerStage[iStage];
+		iStageCumulNodes = nodesPerStageCumul[iStage];
 		if(iStage == 0){
 			// x=p, u=h
-			_CUBLAS(cublasSaxpy_v2(ptrMyEngine->handle, nv, &alpha, ptrMyEngine->devVecPreviousUhat, 1, devVecV, 1));
+			_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), nv, &alpha, ptrMyEngine->getVecPreviousUhat(),
+					1, devVecV, 1));
 			_CUDA( cudaMemcpy(devVecX, ptrMyEngine->devVecCurrentState, nx*sizeof(real_t), cudaMemcpyDeviceToDevice) );
 			// x=x+w
-			_CUBLAS(cublasSaxpy_v2(ptrMyEngine->handle, nx, &alpha, ptrMyEngine->devVecE, 1, devVecX, 1));
+			_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), nx, &alpha, ptrMyEngine->getVecE(), 1, devVecX, 1));
 			// u=Lv+\hat{u}
-			_CUBLAS(cublasSgemv_v2(ptrMyEngine->handle, CUBLAS_OP_N, nu, nv, &alpha, ptrMyEngine->devSysMatL,
-					nu, devVecV, 1, &alpha, devVecU, 1) );
+			_CUBLAS(cublasSgemv_v2(ptrMyEngine->getCublasHandle(), CUBLAS_OP_N, nu, nv, &alpha,
+					ptrMyEngine->getSysMatL(), nu, devVecV, 1, &alpha, devVecU, 1) );
 			// x=x+Bu
-			_CUBLAS(cublasSgemv_v2(ptrMyEngine->handle, CUBLAS_OP_N, nx, nu, &alpha, ptrMyEngine->devSysMatB,
-					nx, devVecU, 1, &alpha, devVecX, 1) );
-
+			_CUBLAS(cublasSgemv_v2(ptrMyEngine->getCublasHandle(), CUBLAS_OP_N, nx, nu, &alpha,
+					ptrMyEngine->getSysMatB(), nx, devVecU, 1, &alpha, devVecX, 1) );
+//TODO check from this point
 		}else{
-			prevStageCumulNodes = ptrMyForecaster->nodesPerStageCumul[iStage - 1];
-			if((ptrMyForecaster->nodesPerStage[iStage] - ptrMyForecaster->nodesPerStage[iStage-1]) > 0){
+			prevStageCumulNodes = nodesPerStageCumul[iStage - 1];
+			if((nodesPerStage[iStage] - nodesPerStage[iStage-1]) > 0){
 				// v_k=v_{k-1}+v_k
 				solveChildNodesUpdate<<<iStageNodes, nv>>>(&devVecV[prevStageCumulNodes*nv], &devVecV[iStageCumulNodes*nv],
-						ptrMyForecaster->ancestor, iStageCumulNodes, nv);
+						ptrMyScenarioTree->ancestor, iStageCumulNodes, nv);
 				// u_k=Lv_k+\hat{u}_k
-				_CUBLAS(cublasSgemm_v2(ptrMyEngine->handle, CUBLAS_OP_N, CUBLAS_OP_N, nu, iStageNodes, nv, &alpha,
-						ptrMyEngine->devSysMatL, nu, &devVecV[iStageCumulNodes*nv], nv, &alpha, &devVecU[iStageCumulNodes*nu], nu));
+				_CUBLAS(cublasSgemm_v2(ptrMyEngine->getCublasHandle(), CUBLAS_OP_N, CUBLAS_OP_N, nu, iStageNodes, nv,
+						&alpha, ptrMyEngine->getSysMatL(), nu, &devVecV[iStageCumulNodes*nv], nv, &alpha,
+						&devVecU[iStageCumulNodes*nu], nu));
 				// x=w
 				_CUDA(cudaMemcpy(&devVecX[iStageCumulNodes*nx], &ptrMyEngine->devVecE[iStageCumulNodes*nx],
 						iStageNodes*nx*sizeof(real_t), cudaMemcpyDeviceToDevice));
