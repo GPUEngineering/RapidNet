@@ -105,6 +105,9 @@ SmpcConfiguration::SmpcConfiguration(string pathToFile){
 	fclose(infile);
 }
 
+uint_t SmpcConfiguration::getNV(){
+	return NV;
+}
 real_t* SmpcConfiguration::getMatL(){
 	return matL;
 }
@@ -113,6 +116,9 @@ real_t* SmpcConfiguration::getMatLhat(){
 	return matLhat;
 }
 
+real_t* SmpcConfiguration::getMatPrcndDiag(){
+	return matDiagPrecnd;
+}
 real_t* SmpcConfiguration::getCostW(){
 	return matCostW;
 }

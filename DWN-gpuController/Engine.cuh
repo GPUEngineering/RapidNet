@@ -44,10 +44,9 @@ public:
 	 * @param forecaster
 	 * @todo remove `unitTest` from here
 	 */
-	Engine(
-	    DwnNetwork *network,
-		  Forecaster *forecaster,
-		  unitTest *ptrMyTestor);
+	Engine( DwnNetwork *network,
+			ScenarioTree *scenarioTree,
+			SmpcConfiguration *smpcConfig);
 
 	/**
 	 * @todo It seems to me that this method should become private
@@ -80,9 +79,11 @@ public:
 	void updateDistubance();
 
 	/**
-	 * @todo It seems to me that this method should become private
+	 * Eliminate input-demand coupling equations
+	 * @param   nominalDemand    demand predicted
+	 * @param   nominalPrice     price prediction
 	 */
-	void eliminateInputDistubanceCoupling();
+	void eliminateInputDistubanceCoupling(real_t* nominalDemand, real_t *nominalPrices);
 
 	/**
 	 * ?
@@ -115,8 +116,8 @@ public:
 	void testPrecondtioningFunciton();
 
 	/**
-	 */
 	 * @todo make private
+	 */
 	void deallocateForecastDevice();
 
 	/**
@@ -141,69 +142,68 @@ public:
 
 private:
 	/**
-	 *
+	 * Pointer to the network
 	 */
 	DwnNetwork *ptrMyNetwork;
 	/**
-	 *
+	 * Pointer to the scenario tree
 	 */
-	Forecaster *ptrMyForecaster;
+	ScenarioTree *ptrMyScenarioTree;
 	/**
-	 *
+	 * Pointer to the Smpc configuration
 	 */
-	unitTest   *ptrMyTestor;
-
+	SmpcConfiguration *ptrMySmpcConfig;
 	/* --- NETWORK --- */
 	/**
-	 *
+	 * matrix B
 	 */
 	real_t *devSysMatB;
 	/**
-	 *
+	 * constraints matrix F
 	 */
 	real_t *devSysMatF;
 	/**
-	 *
+	 * constraints matrix G
 	 */
 	real_t *devSysMatG;
 	/**
-	 *
+	 * matrix L
 	 */
 	real_t *devSysMatL;
 	/**
-	 *
+	 * matrix Lhat
 	 */
 	real_t  *devSysMatLhat;
 	/**
-	 *
+	 * pointer to Matrix B
 	 */
 	real_t **devPtrSysMatB;
 	/**
-	 *
+	 * pointer to matrix F
 	 */
 	real_t  **devPtrSysMatF;
 	/**
-	 *
+	 * pointer to matrix G
 	 */
 	real_t  **devPtrSysMatG;
 	/**
-	 *
+	 * pointer to matrix L
 	 */
 	real_t  **devPtrSysMatL;
 	/**
-	 *
+	 * pointer to matrix Lhat
 	 */
 	real_t  **devPtrSysMatLhat;
 	/**
-	 *
+	 * previous control
 	 */
 	real_t *devVecPreviousControl;
 	/**
-	 *
+	 * current state
 	 */
 	real_t  *devVecCurrentState;
 	/**
-	 *
+	 * previous uhat
 	 */
 	real_t  *devVecPreviousUhat;
 
@@ -213,27 +213,27 @@ private:
 	/* --- NETWORK CONSTRAINTS --- */
 
 	/**
-	 *
+	 * state/volume minimum
 	 */
 	real_t *devSysXmin;
 	/**
-	 *
+	 * state/volume maximum
 	 */
 	real_t *devSysXmax;
 	/**
-	 *
+	 * state/volume safe level
 	 */
 	real_t  *devSysXs;
 	/**
-	 *
+	 * dummy state/volume safe level
 	 */
 	real_t  *devSysXsUpper;
 	/**
-	 *
+	 * actuator/control minimum
 	 */
 	real_t  *devSysUmin;
 	/**
-	 *
+	 * actuator/cotrol maximum
 	 */
 	real_t  *devSysUmax;
 
@@ -243,142 +243,139 @@ private:
 	/* --- COST FUNCTION --- */
 
 	/**
-	 *
+	 * smooth operation cost W
 	 */
 	real_t *devSysCostW;
 	/**
-	 *
+	 * pointer to smooth operation cost W
 	 */
 	real_t **devPtrSysCostW;
 
 
-	/* --- FORECASTER --- */
+	/* --- SCENARIO TREE --- */
 
 	/**
-	 *
+	 * Array of stages
 	 */
 	uint_t *devTreeStages;
 	/**
-	 *
+	 * Array of nodes per stage
 	 */
 	uint_t *devTreeNodesPerStage;
 	/**
-	 *
+	 * Array of past nodes
 	 */
 	uint_t *devTreeNodesPerStageCumul;
 	/**
-	 *
+	 * Array of the leaves
 	 */
 	uint_t *devTreeLeaves;
 	/**
-	 *
+	 * Array number of children
 	 */
 	uint_t *devTreeNumChildren;
 	/**
-	 *
+	 * Array of ancestor
 	 */
 	uint_t *devTreeAncestor;
 	/**
-	 *
+	 * Array of past cumulative children
 	 */
 	uint_t *devTreeNumChildrenCumul;
 	/**
-	 *
+	 * Array of the probability
 	 */
 	real_t *devTreeProb;
 	/**
-	 *
+	 * Array of the error in the demand
 	 */
-	real_t *devTreeValue;
+	real_t *devTreeErrorDemand;
 	/**
-	 *
+	 * Array of the error in the prices
 	 */
-	real_t *devForecastValue;
-
-
-
+	real_t *devTreeErrorPrices;
 
 
 	/* --- FACTOR MATRICES --- */
 
 	/**
-	 *
+	 *  matrix Phi
 	 */
 	real_t *devMatPhi;
 	/**
-	 *
+	 * matrix Psi
 	 */
 	real_t *devMatPsi;
 	/**
-	 *
+	 * matrix Theta
 	 */
 	real_t *devMatTheta;
 	/**
-	 *
+	 * matrix Theta
 	 */
 	real_t *devMatOmega;
 	/**
-	 *
+	 * matrix Sigma
 	 */
 	real_t *devMatSigma;
 	/**
-	 *
+	 * matrix D
 	 */
 	real_t *devMatD;
 	/**
-	 *
+	 * matrix F (Factor step)
 	 */
 	real_t *devMatF;
 	/**
-	 *
+	 * matrix G (Facotr step)
 	 */
 	real_t *devMatG;
 	/**
-	 *
+	 * pointer matrix Phi
 	 */
 	real_t **devPtrMatPhi;
 	/**
-	 *
+	 * pointer matrix Psi
 	 */
 	real_t **devPtrMatPsi;
 	/**
-	 *
+	 * pointer matrix Theta
 	 */
 	real_t **devPtrMatTheta;
 	/**
-	 *
+	 * pointer matrix Omega
 	 */
 	real_t **devPtrMatOmega;
 	/**
-	 *
+	 * pointer matrix Sigma
 	 */
 	real_t **devPtrMatSigma;
 	/**
-	 *
+	 * pointer matrix D
 	 */
 	real_t **devPtrMatD;
 	/**
-	 *
+	 * pointer matrix F (Factor step)
 	 */
 	real_t **devPtrMatF;
 	/**
-	 *
+	 * pointer matrix G (Factor step)
 	 */
 	real_t **devPtrMatG;
 	/**
-	 *
+	 * uhat
 	 */
 	real_t *devVecUhat;
 	/**
-	 *
+	 * beta control-distribution elimination
 	 */
 	real_t *devVecBeta;
 	/**
-	 *
+	 * e control-disturbance elimination
 	 */
 	real_t *devVecE;
 	/**
-	 *
+	 * cublas handler
 	 */
 	cublasHandle_t handle;
 };

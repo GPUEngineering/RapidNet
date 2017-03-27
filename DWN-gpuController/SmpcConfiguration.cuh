@@ -51,9 +51,13 @@ public:
 	 */
 	SmpcConfiguration(string pathToFile);
 
+	uint_t getNV();
+
 	real_t* getMatL();
 
 	real_t* getMatLhat();
+
+	real_t* getMatPrcndDiag();
 
 	real_t* getCostW();
 
