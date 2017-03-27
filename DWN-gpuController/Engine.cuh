@@ -49,61 +49,105 @@ public:
 			SmpcConfiguration *smpcConfig);
 
 	/**
-	 * @todo It seems to me that this method should become private
-	 */
-	void allocateForecastDevice();
-
-	/**
-	 * @todo It seems to me that this method should become private
-	 */
-	void allocateSystemDevice();
-
-	/**
-	 * @todo It seems to me that this method should become private
-	 */
-	void initialiseForecastDevice();
-
-	/**
-	 * @todo It seems to me that this method should become private
-	 */
-	void initialiseSystemDevice();
-
-	/**
-	 * @todo It seems to me that this method should become private
-	 */
-	void factorStep();
-
-	/**
-	 * @todo explain how this works - does it read from a file?
-	 */
-	void updateDistubance();
-
-	/**
 	 * Eliminate input-demand coupling equations
 	 * @param   nominalDemand    demand predicted
 	 * @param   nominalPrice     price prediction
 	 */
-	void eliminateInputDistubanceCoupling(real_t* nominalDemand, real_t *nominalPrices);
+	void eliminateInputDistubanceCoupling(
+			real_t* nominalDemand,
+			real_t *nominalPrices);
 
 	/**
-	 * ?
+	 * Update the state and control in the device
+	 * @param   currentX      current level of tanks in the system
+	 * @param   prevU         previous control action
+	 * @param   prevUhat      previous control action particular solution
+	 * TODO replace the prevUhat parameter
 	 */
-	void updateStateControl();
+	void updateStateControl(
+			real_t* currentX,
+			real_t* prevU,
+			real_t* prevUhat);
 
 	/**
-	 *
-	 * @param src
-	 * @param dst
-	 * @param n
-	 * @param batchSize
+	 * Implements the Factor step that calculates all the constant
+	 * matrices of the APG algorithm - refer to Appendix B in the paper
 	 */
-	/*TODO float** --> real_t ** */
-	/*TODO int --> uint_t */
-	void inverseBatchMat(
-		float** src,
-		float** dst,
-		int n,
-		int batchSize);
+	void factorStep();
+
+	/**
+	 *  pointer to the scenario tree
+	 */
+	ScenarioTree* getScenarioTree();
+	/**
+	 *  pointer to the DWN network
+	 */
+	DwnNetwork* getDwnNetwork();
+	/** get's for the factor step matrices*/
+	/**
+	 *  matrix Phi
+	 */
+	real_t* getMatPhi();
+	/**
+	 * matrix Psi
+	 */
+	real_t* getMatPsi();
+	/**
+	 * matrix Theta
+	 */
+	real_t* getMatTheta();
+	/**
+	 * matrix Theta
+	 */
+	real_t* getMatOmega();
+	/**
+	 * matrix Sigma
+	 */
+	real_t* getMatSigma();
+	/**
+	 * matrix D
+	 */
+	real_t* getMatD();
+	/**
+	 * matrix F (Factor step)
+	 */
+	real_t* getMatF();
+	/**
+	 * matrix G (Facotr step)
+	 */
+	real_t* getMatG();
+	/**
+	 * pointer matrix Phi
+	 */
+	real_t** getPtrMatPhi();
+	/**
+	 * pointer matrix Psi
+	 */
+	real_t** getPtrMatPsi();
+	/**
+	 * pointer matrix Theta
+	 */
+	real_t** getPtrMatTheta();
+	/**
+	 * pointer matrix Omega
+	 */
+	real_t** getPtrMatOmega();
+	/**
+	 * pointer matrix Sigma
+	 */
+	real_t** getPtrMatSigma();
+	/**
+	 * pointer matrix D
+	 */
+	real_t** getPtrMatD();
+	/**
+	 * pointer matrix F (Factor step)
+	 */
+	real_t** getPtrMatF();
+	/**
+	 * pointer matrix G (Factor step)
+	 */
+	real_t** getPtrMatG();
 
 	/**
 	 * @todo There should be no test methods in classes
@@ -114,17 +158,6 @@ public:
 	 * @todo There should be no test methods in classes
 	 */
 	void testPrecondtioningFunciton();
-
-	/**
-	 * @todo make private
-	 */
-	void deallocateForecastDevice();
-
-	/**
-	 * @todo make private
-	 */
-	void deallocateSystemDevice();
-
 	/**
 	 * @todo remove method
 	 */
@@ -141,6 +174,46 @@ public:
 	~Engine();
 
 private:
+	/**
+	 *  Allocate the device memory for the scenario tree
+	 */
+	void allocateScenarioTreeDevice();
+
+	/**
+	 * Allocate the device memory for the system
+	 */
+	void allocateSystemDevice();
+
+	/**
+	 * Initialise the scenario tree in the device
+	 */
+	void initialiseScenarioTreeDevice();
+
+	/**
+	 * Initialise the system model in the device
+	 */
+	void initialiseSystemDevice();
+	/**
+	 *
+	 * @param src
+	 * @param dst
+	 * @param n
+	 * @param batchSize
+	 */
+	void inverseBatchMat(
+			real_t** src,
+			real_t** dst,
+			uint_t n,
+			uint_t batchSize);
+	/**
+	 * Deallocate the device memory of the scenario tree
+	 */
+	void deallocateScenarioTreeDevice();
+
+	/**
+	 * Deallocate the device memory of the system matrices
+	 */
+	void deallocateSystemDevice();
 	/**
 	 * Pointer to the network
 	 */

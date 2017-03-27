@@ -37,7 +37,7 @@ Engine::Engine(DwnNetwork *myNetwork, ScenarioTree *myScenarioTree, SmpcConfigur
 	uint_t nv = ptrMySmpcConfig->getNV();
 	uint_t nodes = ptrMyScenarioTree->getNumNodes();
 	allocateSystemDevice();
-	allocateForecastDevice();
+	allocateScenarioTreeDevice();
 	cublasCreate(&handle);
 	_CUDA( cudaMalloc((void**)&devMatPhi, 2*nodes*nv*nx*sizeof(real_t)) );
 	_CUDA( cudaMalloc((void**)&devMatPsi, nodes*nu*nv*sizeof(real_t)) );
@@ -106,7 +106,7 @@ Engine::Engine(DwnNetwork *myNetwork, ScenarioTree *myScenarioTree, SmpcConfigur
 	ptrMatG = NULL;
 }
 
-void Engine::allocateForecastDevice(){
+void Engine::allocateScenarioTreeDevice(){
 	uint_t nodes = ptrMyScenarioTree->getNumNodes();
 	uint_t N = ptrMyScenarioTree->getPredHorizon();
 	uint_t K = ptrMyScenarioTree->getNumScenarios();
@@ -124,7 +124,7 @@ void Engine::allocateForecastDevice(){
 	_CUDA( cudaMalloc((void**)&devForecastValue, N*ND*sizeof(real_t)) );
 }
 
-void Engine::initialiseForecastDevice(){
+void Engine::initialiseScenarioTreeDevice(){
 	uint_t nodes = ptrMyScenarioTree->getNumNodes();
 	uint_t N = ptrMyScenarioTree->getPredHorizon();
 	uint_t K = ptrMyScenarioTree->getNumScenarios();
@@ -319,6 +319,8 @@ void Engine::initialiseSystemDevice(){
 }
 
 void  Engine::factorStep(){
+	initialiseScenarioTreeDevice();
+	initialiseSystemDevice();
 	real_t scale[2] = {-0.5, 1};
 	real_t alpha = 1.0;
 	real_t beta = 0.0;
@@ -392,6 +394,116 @@ void  Engine::factorStep(){
 	devPtrMatGbar = NULL;
 }
 
+/**
+ *  pointer to the scenario tree
+ */
+ScenarioTree* Engine::getScenarioTree(){
+	return ptrMyScenarioTree;
+}
+/**
+ *  pointer to the DWN network
+ */
+DwnNetwork* Engine::getDwnNetwork(){
+	return ptrMyNetwork;
+}
+/** get's for the factor step matrices*/
+/**
+ *  matrix Phi
+ */
+real_t* Engine::getMatPhi(){
+	return devMatPhi;
+}
+/**
+ * matrix Psi
+ */
+real_t* Engine::getMatPsi(){
+	return devMatPsi;
+}
+/**
+ * matrix Theta
+ */
+real_t* Engine::getMatTheta(){
+	return devMatTheta;
+}
+/**
+ * matrix Theta
+ */
+real_t* Engine::getMatOmega(){
+	return devMatOmega;
+}
+/**
+ * matrix Sigma
+ */
+real_t* Engine::getMatSigma(){
+	return devMatSigma;
+}
+/**
+ * matrix D
+ */
+real_t* Engine::getMatD(){
+	return devMatD;
+}
+/**
+ * matrix F (Factor step)
+ */
+real_t* Engine::getMatF(){
+	return devMatF;
+}
+/**
+ * matrix G (Facotr step)
+ */
+real_t* Engine::getMatG(){
+	return devMatG;
+}
+/**
+ * pointer matrix Phi
+ */
+real_t** Engine::getPtrMatPhi(){
+	return devPtrMatPhi;
+}
+/**
+ * pointer matrix Psi
+ */
+real_t** Engine::getPtrMatPsi(){
+	return devPtrMatPsi;
+}
+/**
+ * pointer matrix Theta
+ */
+real_t** Engine::getPtrMatTheta(){
+	return devPtrMatTheta;
+}
+/**
+ * pointer matrix Omega
+ */
+real_t** Engine::getPtrMatOmega(){
+	return devPtrMatOmega;
+}
+/**
+ * pointer matrix Sigma
+ */
+real_t** Engine::getPtrMatSigma(){
+	return devPtrMatSigma;
+}
+/**
+ * pointer matrix D
+ */
+real_t** Engine::getPtrMatD(){
+	return devPtrMatD;
+}
+/**
+ * pointer matrix F (Factor step)
+ */
+real_t** Engine::getPtrMatF(){
+	return devPtrMatF;
+}
+/**
+ * pointer matrix G (Factor step)
+ */
+real_t** Engine::getPtrMatG(){
+	return devPtrMatG;
+}
+
 void Engine::eliminateInputDistubanceCoupling(real_t* nominalDemand, real_t *nominalPrices){
 	uint_t ns = ptrMyScenarioTree->getNumScenarios();
 	uint_t nx = ptrMyNetwork->getNumTanks();
@@ -431,7 +543,7 @@ void Engine::eliminateInputDistubanceCoupling(real_t* nominalDemand, real_t *nom
 	_CUDA( cudaMalloc((void**)&devVecZeta, nu*nodes*sizeof(real_t)) );
 
 	for (int iScenario = 0; iScenario < ns; iScenario++){
-		_CUDA( cudaMemcpy(&devMatGd[iScenario*nx*nd], ptrMyNetwork->matGd, nx*nd*sizeof(real_t), cudaMemcpyHostToDevice) );
+		_CUDA( cudaMemcpy(&devMatGd[iScenario*nx*nd], ptrMyNetwork->getMatGd(), nx*nd*sizeof(real_t), cudaMemcpyHostToDevice) );
 		ptrMatGd[iScenario] = &devMatGd[iScenario*nx*nd];
 	}
 	for( int iNode = 0; iNode < nodes; iNode++){
@@ -501,12 +613,33 @@ void Engine::eliminateInputDistubanceCoupling(real_t* nominalDemand, real_t *nom
 	_CUDA(cudaFree(devMatRhat));
 	_CUDA(cudaFree(devVecDeltaUhat));
 	_CUDA(cudaFree(devVecZeta));
+
+	ptrMatGd = NULL;
+	ptrVecE = NULL;
+	ptrVecDemand = NULL;
+	ptrVecUhat = NULL;
+	devVecDemand = NULL;
+	devVecDemandHat = NULL;
+	devMatGd = NULL;
+	devPtrMatGd = NULL;
+	devPtrVecE = NULL;
+	devPtrVecDemand = NULL;
+	devPtrVecUhat = NULL;
+	devCostVecAlpha = NULL;
+	devCostVecAlpha1 = NULL;
+	devVecAlphaBar = NULL;
+	devMatRhat = NULL;
+	devVecDeltaUhat = NULL;
+	devVecZeta = NULL;
 }
 
-void Engine::updateStateControl(){
-	_CUDA( cudaMemcpy(devVecPreviousControl, ptrMyNetwork->prevU, ptrMyNetwork->NU*sizeof(real_t), cudaMemcpyHostToDevice) );
-	_CUDA( cudaMemcpy(devVecPreviousUhat, ptrMyNetwork->prevUhat, ptrMyNetwork->NU*sizeof(real_t), cudaMemcpyHostToDevice) );
-	_CUDA( cudaMemcpy(devVecCurrentState, ptrMyNetwork->currentX, ptrMyNetwork->NX*sizeof(real_t), cudaMemcpyHostToDevice) );
+void Engine::updateStateControl(real_t* currentX, real_t* prevU, real_t* prevUhat){
+	_CUDA( cudaMemcpy(devVecCurrentState, currentX, ptrMyNetwork->getNumTanks()*sizeof(real_t),
+			cudaMemcpyHostToDevice) );
+	_CUDA( cudaMemcpy(devVecPreviousControl, prevU, ptrMyNetwork->getNumControls()*sizeof(real_t),
+			cudaMemcpyHostToDevice) );
+	_CUDA( cudaMemcpy(devVecPreviousUhat, prevUhat, ptrMyNetwork->getNumControls()*sizeof(real_t),
+			cudaMemcpyHostToDevice) );
 }
 
 void Engine::testStupidFunction(){
@@ -518,7 +651,7 @@ void Engine::testStupidFunction(){
 	cout<< maxUpperbound << endl;
 }
 
-void Engine::inverseBatchMat(float** src, float** dst, int n, int batchSize){
+void Engine::inverseBatchMat(real_t** src, real_t** dst, uint_t n, uint_t batchSize){
 	uint_t *P, *INFO;
 
 	_CUDA(cudaMalloc((void**)&P, n * batchSize * sizeof(uint_t)));
@@ -557,11 +690,13 @@ void Engine::inverseBatchMat(float** src, float** dst, int n, int batchSize){
 
 	_CUDA(cudaFree(P));
 	_CUDA(cudaFree(INFO));
+	P = NULL;
+	INFO = NULL;
 }
 
 void Engine::testInverse(){
-	uint_t size_n= 3;
-	uint_t batch_size=2;
+	uint_t size_n = 3;
+	uint_t batch_size = 2;
 
 	real_t* matA=(real_t*)malloc(size_n*size_n*batch_size*sizeof(real_t));
 	real_t* inv_matA=(real_t*)malloc(size_n*size_n*batch_size*sizeof(real_t));
@@ -627,6 +762,15 @@ void Engine::testInverse(){
 	_CUDA(cudaFree(dev_inv_matA));
 	_CUDA(cudaFree(dev_ptr_matA));
 	_CUDA(cudaFree(dev_ptr_inv_matA));
+	matA = NULL;
+	ptr_matA = NULL;
+	inv_matA = NULL;
+	ptr_inv_matA = NULL;
+
+	dev_matA = NULL;
+	dev_inv_matA = NULL;
+	dev_ptr_matA = NULL;
+	dev_ptr_inv_matA = NULL;
 }
 
 void Engine::testPrecondtioningFunciton(){
@@ -681,9 +825,30 @@ void Engine::deallocateSystemDevice(){
 	_CUDA( cudaFree(devPtrSysMatLhat) );
 	_CUDA( cudaFree(devPtrSysMatF) );
 	_CUDA( cudaFree(devPtrSysMatG) );
+
+	devSysMatB = NULL;
+	devSysMatL = NULL;
+	devSysMatLhat = NULL;
+	devSysMatF = NULL;
+	devSysMatG = NULL;
+	devSysXmin = NULL;
+	devSysXmax = NULL;
+	devSysXs = NULL;
+	devSysXsUpper = NULL;
+	devSysUmin = NULL;
+	devSysUmax = NULL;
+	devVecCurrentState = NULL;
+	devVecPreviousControl = NULL;
+	devVecPreviousUhat = NULL;
+
+	devPtrSysMatB = NULL;
+	devPtrSysMatL = NULL;
+	devPtrSysMatLhat = NULL;
+	devPtrSysMatF = NULL;
+	devPtrSysMatG = NULL;
 }
 
-void Engine::deallocateForecastDevice(){
+void Engine::deallocateScenarioTreeDevice(){
 	_CUDA( cudaFree(devTreeStages) );
 	_CUDA( cudaFree(devTreeNodesPerStage));
 	_CUDA( cudaFree(devTreeLeaves) );
@@ -692,11 +857,20 @@ void Engine::deallocateForecastDevice(){
 	_CUDA( cudaFree(devTreeNumChildrenCumul) );
 	_CUDA( cudaFree(devTreeValue) );
 	_CUDA( cudaFree(devForecastValue) );
+
+	devTreeStages = NULL;
+	devTreeNodesPerStage = NULL;
+	devTreeLeaves = NULL;
+	devTreeNodesPerStageCumul = NULL;
+	devTreeNumChildren = NULL;
+	devTreeNumChildrenCumul = NULL;
+	devTreeValue = NULL;
+	devForecastValue = NULL;
 }
 Engine::~Engine(){
 	cout << "removing the memory of the engine \n";
 	deallocateSystemDevice();
-	deallocateForecastDevice();
+	deallocateScenarioTreeDevice();
 	//delete ptrmyForecaster;
 	//delete ptrMyNetwork;
 	_CUDA(cudaFree(devMatPhi));
@@ -719,6 +893,27 @@ Engine::~Engine(){
 	_CUDA(cudaFree(devPtrMatD));
 	_CUDA(cudaFree(devPtrMatF));
 	_CUDA(cudaFree(devPtrMatG));
+
+	devMatPhi = NULL;
+	devMatPsi = NULL;
+	devMatTheta = NULL;
+	devMatOmega = NULL;
+	devMatSigma = NULL;
+	devMatD = NULL;
+	devMatF = NULL;
+	devMatG = NULL;
+	devVecUhat = NULL;
+	devVecBeta = NULL;
+	devVecE = NULL;
+
+	devPtrMatPhi = NULL;
+	devPtrMatPsi = NULL;
+	devPtrMatTheta = NULL;
+	devPtrMatOmega = NULL;
+	devPtrMatSigma = NULL;
+	devPtrMatD = NULL;
+	devPtrMatF = NULL;
+	devPtrMatG = NULL;
 	//_CUBLAS(cublasDestroy(handle));
 	cublasDestroy_v2(handle);
 }

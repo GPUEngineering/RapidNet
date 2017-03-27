@@ -34,7 +34,7 @@ public:
 	 * Construct a new Controller with a given engine.
 	 * @param myEngine An instance of Engine.
 	 */
-	SmpcController(Engine *myEngine);
+	SmpcController(Forecaster *myForecaster, Engine *myEngine, SmpcConfiguration *mySmpcConfig);
 	/**
 	 * Performs the dual extrapolation step with given parameter.
 	 * @param extrapolation parameter.
@@ -75,6 +75,14 @@ private:
 	 * The Engine is responsible for the factor step.
 	 */
 	Engine* ptrMyEngine;
+	/**
+	 *
+	 */
+	Forecaster* ptrMyForecaster;
+	/**
+	 *
+	 */
+	SmpcConfiguration* ptrMySmpcConfig;
 	/**
 	 *
 	 */

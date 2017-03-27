@@ -22,14 +22,19 @@
 #include "cublas_v2.h"
 #include "SmpcController.cuh"
 
-SmpcController::SmpcController(Engine *myEngine){
+SmpcController::SmpcController(Forecaster *myForecaster, Engine *myEngine, SmpcConfiguration *mySmpcConfig){
 	cout << "Allocation of controller memory" << endl;
+	ptrMyForecaster = myForecaster;
 	ptrMyEngine = myEngine;
-	uint_t nx = ptrMyEngine->ptrMyNetwork->NX;
-	uint_t nu = ptrMyEngine->ptrMyNetwork->NU;
-	uint_t nv = ptrMyEngine->ptrMyNetwork->NV;
-	uint_t ns = ptrMyEngine->ptrMyForecaster->K;
-	uint_t nodes = ptrMyEngine->ptrMyForecaster->nNodes;
+	ptrMySmpcConfig = mySmpcConfig;
+	DwnNetwork* ptrMyNetwork = myEngine->getDwnNetwork();
+	ScenarioTree* ptrMyScenarioTree = myEngine->getScenarioTree();
+
+	uint_t nx = ptrMyNetwork->getNumTanks();
+	uint_t nu = ptrMyNetwork->getNumControls();
+	uint_t nv = ptrMySmpcConfig->getNV();
+	uint_t ns = ptrMyScenarioTree->getNumScenarios();
+	uint_t nodes = ptrMyScenarioTree->getNumNodes();
 	MAX_ITERATIONS  = 500;
 	stepSize = 1e-4;
 
@@ -111,6 +116,8 @@ SmpcController::SmpcController(Engine *myEngine){
 	delete [] ptrVecAcceleratedPsi;
 	delete [] ptrVecPrimalXi;
 	delete [] ptrVecPrimalPsi;
+	ptrMyNetwork = NULL;
+	ptrMyScenarioTree = NULL;
 }
 
 void SmpcController::dualExtrapolationStep(real_t lambda){

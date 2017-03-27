@@ -105,6 +105,15 @@ SmpcConfiguration::SmpcConfiguration(string pathToFile){
 	fclose(infile);
 }
 
+uint_t SmpcConfiguration::getNX(){
+	return NX;
+}
+uint_t SmpcConfiguration::getNU(){
+	return NU;
+}
+uint_t SmpcConfiguration::getND(){
+	return ND;
+}
 uint_t SmpcConfiguration::getNV(){
 	return NV;
 }
