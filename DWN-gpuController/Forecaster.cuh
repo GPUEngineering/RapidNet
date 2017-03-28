@@ -33,15 +33,8 @@
  * nominal electricity prices is predicted.
  *
  * A forecaster class contains:
- *   - nominal water demands
- *     - nominal electricity prices
- *     - scenario tree used to represent the error in the predictions
- *       - nodes at a stage
- *       - children of a node
- *       - ancestor of a node
- *       - probability of a node
- *       - value of a node
- *       - nominal electricity prices
+ *    - nominal water demand
+ *    - nominal electricity prices
  * @todo remove print statements
  * @todo sanity check (check that the given file is well formed)
  * @todo new char[65536]: is this good practice?
@@ -111,11 +104,11 @@ private:
 	/**
 	 * Nominal demand predicted
 	 */
-	real_t *demandPrediction;
+	real_t *nominalDemand;
 	/**
 	 * Nominal electricity prices
 	 */
-	real_t *pricePrediction;
+	real_t *nominalPrice;
 };
 
 

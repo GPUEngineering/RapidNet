@@ -25,6 +25,8 @@
 
 #include "Configuration.h"
 #include "DwnNetwork.cuh"
+#include "ScenarioTree.cuh"
+#include "SmpcConfiguration.cuh"
 #include "Forecaster.cuh"
 #include "unitTestHeader.cuh"
 #include "Utilities.cuh"
@@ -83,7 +85,7 @@ public:
 	 *  pointer to the DWN network
 	 */
 	DwnNetwork* getDwnNetwork();
-	/* getter's of the system*/
+	/* ---- GETTER'S OF THE SYSTEM ----*/
 	/**
 	 * System matrix B
 	 */
@@ -136,7 +138,8 @@ public:
 	 * previous uhat
 	 */
 	real_t* getVecPreviousUhat();
-	/** get's for the factor step matrices*/
+
+	/** ----GETTER'S FOR FACTOR MATRICES----*/
 	/**
 	 *  matrix Phi
 	 */
@@ -217,7 +220,8 @@ public:
 	 * handle cublasHandle
 	 */
 	cublasHandle_t getCublasHandle();
-	/* getter's for the scenario tree */
+
+	/* ----GETTER'S FOR THE SCENARIO TREE----*/
 	/**
 	 * Array of stages
 	 */
@@ -258,6 +262,33 @@ public:
 	 * Array of the error in the prices
 	 */
 	real_t* getTreeErrorPrices();
+
+	/* --- GETTER'S OF NETWORK CONSTRAINTS --- */
+	/**
+	 * state/volume minimum
+	 */
+	real_t* getSysXmin();
+	/**
+	 * state/volume maximum
+	 */
+	real_t* getSysXmax();
+	/**
+	 * state/volume safe level
+	 */
+	real_t* getSysXs();
+	/**
+	 * dummy state/volume safe level
+	 */
+	real_t* getSysXsUpper();
+	/**
+	 * actuator/control minimum
+	 */
+	real_t* getSysUmin();
+	/**
+	 * actuator/cotrol maximum
+	 */
+	real_t* getSysUmax();
+
 	/**
 	 * @todo There should be no test methods in classes
 	 */

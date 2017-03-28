@@ -24,6 +24,7 @@
 #include <iostream>
 #include <cstdio>
 #include <string>
+#include <stdexcept>
 
 typedef int uint_t;
 typedef float real_t;

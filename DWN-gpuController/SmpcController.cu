@@ -269,13 +269,12 @@ void SmpcController::solveStep(){
 			// x=x+Bu
 			_CUBLAS(cublasSgemv_v2(ptrMyEngine->getCublasHandle(), CUBLAS_OP_N, nx, nu, &alpha,
 					ptrMyEngine->getSysMatB(), nx, devVecU, 1, &alpha, devVecX, 1) );
-//TODO check from this point
 		}else{
 			prevStageCumulNodes = nodesPerStageCumul[iStage - 1];
 			if((nodesPerStage[iStage] - nodesPerStage[iStage-1]) > 0){
 				// v_k=v_{k-1}+v_k
 				solveChildNodesUpdate<<<iStageNodes, nv>>>(&devVecV[prevStageCumulNodes*nv], &devVecV[iStageCumulNodes*nv],
-						ptrMyScenarioTree->ancestor, iStageCumulNodes, nv);
+						ptrMyScenarioTree->getAncestorArray(), iStageCumulNodes, nv);
 				// u_k=Lv_k+\hat{u}_k
 				_CUBLAS(cublasSgemm_v2(ptrMyEngine->getCublasHandle(), CUBLAS_OP_N, CUBLAS_OP_N, nu, iStageNodes, nv,
 						&alpha, ptrMyEngine->getSysMatL(), nu, &devVecV[iStageCumulNodes*nv], nv, &alpha,
@@ -284,27 +283,27 @@ void SmpcController::solveStep(){
 				_CUDA(cudaMemcpy(&devVecX[iStageCumulNodes*nx], &ptrMyEngine->devVecE[iStageCumulNodes*nx],
 						iStageNodes*nx*sizeof(real_t), cudaMemcpyDeviceToDevice));
 				// x=x+Bu
-				_CUBLAS(cublasSgemm_v2(ptrMyEngine->handle, CUBLAS_OP_N, CUBLAS_OP_N, nx, iStageCumulNodes, nu, &alpha,
-						ptrMyEngine->devSysMatB, nx, &devVecU[iStageCumulNodes*nu], nu, &alpha, &devVecX[iStageCumulNodes*nx], nx));
+				_CUBLAS(cublasSgemm_v2(ptrMyEngine->getCublasHandle(), CUBLAS_OP_N, CUBLAS_OP_N, nx, iStageCumulNodes, nu, &alpha,
+						ptrMyEngine->getSysMatB(), nx, &devVecU[iStageCumulNodes*nu], nu, &alpha, &devVecX[iStageCumulNodes*nx], nx));
 				// x_{k+1}=x_k
 				solveChildNodesUpdate<<<iStageNodes, nx>>>(&devVecX[prevStageCumulNodes*nx], &devVecX[iStageCumulNodes*nx],
-						ptrMyForecaster->ancestor, iStageCumulNodes, nx);
+						ptrMyScenarioTree->getAncestorArray(), iStageCumulNodes, nx);
 			}else{
 				// v_k=v_{k-1}+v_k
-				_CUBLAS(cublasSaxpy_v2(ptrMyEngine->handle, nv*iStageNodes, &alpha, &devVecV[prevStageCumulNodes*nv], 1,
+				_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), nv*iStageNodes, &alpha, &devVecV[prevStageCumulNodes*nv], 1,
 						&devVecV[iStageCumulNodes*nv], 1));
 				// u_k=Lv_k+\hat{u}_k
-				_CUBLAS(cublasSgemm_v2(ptrMyEngine->handle, CUBLAS_OP_N, CUBLAS_OP_N, nu, iStageNodes, nv, &alpha,
-						ptrMyEngine->devSysMatL, nu, &devVecV[iStageCumulNodes*nv], nv, &alpha, &devVecU[iStageCumulNodes*nu], nu));
+				_CUBLAS(cublasSgemm_v2(ptrMyEngine->getCublasHandle(), CUBLAS_OP_N, CUBLAS_OP_N, nu, iStageNodes, nv, &alpha,
+						ptrMyEngine->getSysMatL(), nu, &devVecV[iStageCumulNodes*nv], nv, &alpha, &devVecU[iStageCumulNodes*nu], nu));
 				// x_{k+1}=x_{k}
 				_CUDA(cudaMemcpy(&devVecX[iStageCumulNodes*nx], &devVecX[prevStageCumulNodes*nx], nx*iStageNodes*sizeof(real_t),
 						cudaMemcpyDeviceToDevice));
 				// x=x+w
-				_CUBLAS(cublasSaxpy_v2(ptrMyEngine->handle, nx*iStageNodes, &alpha, &ptrMyEngine->devVecE[iStageCumulNodes*nx],
-						1, &devVecX[iStageCumulNodes*nx], 1));
+				_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), nx*iStageNodes, &alpha, &ptrMyEngine->getVecE()
+						[iStageCumulNodes*nx], 1, &devVecX[iStageCumulNodes*nx], 1));
 				// x=x+Bu
-				_CUBLAS(cublasSgemm_v2(ptrMyEngine->handle, CUBLAS_OP_N, CUBLAS_OP_N, nx, iStageNodes, nu, &alpha,
-						ptrMyEngine->devSysMatB, nx, &devVecU[iStageCumulNodes*nu], nu, &alpha, &devVecX[iStageCumulNodes*nx], nx));
+				_CUBLAS(cublasSgemm_v2(ptrMyEngine->getCublasHandle(), CUBLAS_OP_N, CUBLAS_OP_N, nx, iStageNodes, nu, &alpha,
+						ptrMyEngine->getSysMatB(), nx, &devVecU[iStageCumulNodes*nu], nu, &alpha, &devVecX[iStageCumulNodes*nx], nx));
 			}
 		}
 	}/**/
@@ -313,7 +312,8 @@ void SmpcController::solveStep(){
 	_CUDA(cudaFree(devTempVecR));
 	devTempVecQ = NULL;
 	ptrMyNetwork = NULL;
-	ptrMyForecaster = NULL;
+	ptrMyScenarioTree = NULL;
+	ptrMyNetwork = NULL;
 
 	//free(ptr_x_c);
 	//free(x_c);
@@ -321,10 +321,11 @@ void SmpcController::solveStep(){
 }
 
 void SmpcController::proximalFunG(){
-	DwnNetwork *ptrMyNetwork = ptrMyEngine->ptrMyNetwork;
-	uint_t nodes = ptrMyEngine->ptrMyForecaster->nNodes;
-	uint_t nx = ptrMyEngine->ptrMyNetwork->NX;
-	uint_t nu = ptrMyEngine->ptrMyNetwork->NU;
+	DwnNetwork *ptrMyNetwork = ptrMyEngine->getDwnNetwork();
+	ScenarioTree *ptrMyScenarioTree = ptrMyEngine->getScenarioTree();
+	uint_t nodes = ptrMyScenarioTree->getNumNodes();
+	uint_t nx = ptrMyNetwork->getNumTanks();
+	uint_t nu = ptrMyNetwork->getNumControls();
 	real_t alpha = 1;
 	real_t negAlpha = -1;
 	real_t beta = 0;
@@ -336,63 +337,69 @@ void SmpcController::proximalFunG(){
 	_CUDA( cudaMalloc((void**)&devSuffleVecXi, 2*nx*nodes*sizeof(real_t)) );
 	_CUDA( cudaMalloc((void**)&devVecDiffXi, 2*nx*nodes*sizeof(real_t)) );
 	// primalDual = Hx
-	_CUBLAS(cublasSgemmBatched(ptrMyEngine->handle, CUBLAS_OP_N, CUBLAS_OP_N, 2*nx, 1, nx, &alpha, (const float**)
-			ptrMyEngine->devPtrSysMatF, 2*nx, (const float**)devPtrVecX, 2*nx, &beta, devPtrVecPrimalXi, 2*nx, nodes) );
-	_CUBLAS(cublasSgemmBatched(ptrMyEngine->handle, CUBLAS_OP_N, CUBLAS_OP_N, nu, 1, nu, &alpha, (const float**)
-			ptrMyEngine->devPtrSysMatG, nu, (const float**)devPtrVecU, nu, &beta, devPtrVecPrimalPsi, nu, nodes) );
+	_CUBLAS(cublasSgemmBatched(ptrMyEngine->getCublasHandle(), CUBLAS_OP_N, CUBLAS_OP_N, 2*nx, 1, nx, &alpha, (const float**)
+			ptrMyEngine->getPtrSysMatF(), 2*nx, (const float**)devPtrVecX, 2*nx, &beta, devPtrVecPrimalXi, 2*nx, nodes) );
+	_CUBLAS(cublasSgemmBatched(ptrMyEngine->getCublasHandle(), CUBLAS_OP_N, CUBLAS_OP_N, nu, 1, nu, &alpha, (const float**)
+			ptrMyEngine->getPtrSysMatG(), nu, (const float**)devPtrVecU, nu, &beta, devPtrVecPrimalPsi, nu, nodes) );
 	// Hx + \lambda^{-1}w
 	_CUDA( cudaMemcpy(devVecDualXi, devPtrVecPrimalXi, 2*nodes*nx*sizeof(real_t), cudaMemcpyDeviceToDevice) );
 	_CUDA( cudaMemcpy(devVecDualPsi, devPtrVecPrimalPsi, nodes*nu*sizeof(real_t), cudaMemcpyDeviceToDevice) );
-	_CUBLAS(cublasSaxpy_v2(ptrMyEngine->handle, 2*nx*nodes, &invLambda, devVecAcceleratedXi, 1, devVecDualXi, 1) );
-	_CUBLAS(cublasSaxpy_v2(ptrMyEngine->handle, nu*nodes, &invLambda, devVecAcceleratedPsi, 1, devVecDualPsi, 1) );
+	_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), 2*nx*nodes, &invLambda, devVecAcceleratedXi, 1, devVecDualXi, 1) );
+	_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), nu*nodes, &invLambda, devVecAcceleratedPsi, 1, devVecDualPsi, 1) );
 
 	_CUDA( cudaMemcpy(devVecDiffXi, devVecDualXi, 2*nx*nodes*sizeof(real_t), cudaMemcpyDeviceToDevice) );
 	// proj(xi|X), proj(xi|Xsafe)
-	projectionBox<<<nodes, nx>>>(devVecDualXi, ptrMyEngine->devSysXmin, ptrMyEngine->devSysXmax, 2*nx, 0, nx*nodes);
-	projectionBox<<<nodes, nx>>>(devVecDualXi, ptrMyEngine->devSysXs, ptrMyEngine->devSysXsUpper, 2*nx, nx, nx*nodes);
+	projectionBox<<<nodes, nx>>>(devVecDualXi, ptrMyEngine->getSysXmin(), ptrMyEngine->getSysXmax(), 2*nx, 0, nx*nodes);
+	projectionBox<<<nodes, nx>>>(devVecDualXi, ptrMyEngine->getSysXs(), ptrMyEngine->getSysXsUpper(), 2*nx, nx, nx*nodes);
 	// x-proj(x)
-	_CUBLAS(cublasSaxpy_v2(ptrMyEngine->handle, 2*nx*nodes, &negAlpha, devVecDualXi, 1, devVecDiffXi, 1) );
+	_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), 2*nx*nodes, &negAlpha, devVecDualXi, 1, devVecDiffXi, 1) );
 	shuffleVector<<<nodes, 2*nx>>>(devSuffleVecXi, devVecDiffXi, nx, 2, nodes);
-	_CUBLAS(cublasSnrm2_v2(ptrMyEngine->handle, nx*nodes, devSuffleVecXi, 1, &distanceXcst));
-	if(distanceXcst > invLambda*ptrMyNetwork->penaltyStateX){
+	_CUBLAS(cublasSnrm2_v2(ptrMyEngine->getCublasHandle(), nx*nodes, devSuffleVecXi, 1, &distanceXcst));
+	if(distanceXcst > invLambda*ptrMySmpcConfig->getPenaltyState()){
 		penaltyScalar = 1-1/distanceXcst;
 		additionVectorOffset<<<nodes, nx>>>(devVecDualXi, devVecDiffXi, penaltyScalar, 2*nx, 0, nx*nodes);
 	}
-	_CUBLAS(cublasSnrm2_v2(ptrMyEngine->handle, nx*nodes, &devSuffleVecXi[nx*nodes], 1, &distanceXs));
-	if(distanceXs > invLambda*ptrMyNetwork->penaltySafetyX){
+	_CUBLAS(cublasSnrm2_v2(ptrMyEngine->getCublasHandle(), nx*nodes, &devSuffleVecXi[nx*nodes], 1, &distanceXs));
+	if(distanceXs > invLambda*ptrMySmpcConfig->getPenaltySafety()){
 		penaltyScalar = 1-1/distanceXs;
 		additionVectorOffset<<<nodes, nx>>>(devVecDualXi, devVecDiffXi, penaltyScalar, 2*nx, nx, nx*nodes);
 	}
-	projectionBox<<<nodes, nu>>>(devVecDualPsi, ptrMyEngine->devSysUmin, ptrMyEngine->devSysUmax, nu, 0, nu*nodes);
+	projectionBox<<<nodes, nu>>>(devVecDualPsi, ptrMyEngine->getSysUmin(), ptrMyEngine->getSysUmax(), nu, 0, nu*nodes);
 	_CUDA( cudaFree(devSuffleVecXi) );
 	_CUDA( cudaFree(devVecDiffXi) );
 	devSuffleVecXi = NULL;
 	devVecDiffXi = NULL;
 	ptrMyNetwork = NULL;
+	ptrMyScenarioTree = NULL;
 }
 
 void SmpcController::dualUpdate(){
-	uint_t nodes = ptrMyEngine->ptrMyForecaster->nNodes;
-	uint_t nx = ptrMyEngine->ptrMyNetwork->NX;
-	uint_t nu = ptrMyEngine->ptrMyNetwork->NU;
+	DwnNetwork *ptrMyNetwork = ptrMyEngine->getDwnNetwork();
+	ScenarioTree *ptrMyScenarioTree = ptrMyEngine->getScenarioTree();
+	uint_t nodes = ptrMyScenarioTree->getNumNodes();
+	uint_t nx = ptrMyNetwork->getNumTanks();
+	uint_t nu = ptrMyNetwork->getNumControls();
 	real_t negAlpha = -1;
 	//Hx - z
 	_CUDA(cudaMemcpy(devPrimalInfeasibilty, devVecPrimalXi, 2*nx*nodes*sizeof(real_t), cudaMemcpyDeviceToDevice));
 	_CUDA(cudaMemcpy(&devPrimalInfeasibilty[2*nx*nodes], devVecPrimalPsi, nu*nodes*sizeof(real_t), cudaMemcpyDeviceToDevice));
-	_CUBLAS(cublasSaxpy_v2(ptrMyEngine->handle, 2*nx*nodes, &negAlpha, devVecDualXi, 1, devPrimalInfeasibilty, 1));
-	_CUBLAS(cublasSaxpy_v2(ptrMyEngine->handle, nu*nodes, &negAlpha, devVecDualPsi, 1, &devPrimalInfeasibilty[2*nx*nodes], 1));
+	_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), 2*nx*nodes, &negAlpha, devVecDualXi, 1, devPrimalInfeasibilty, 1));
+	_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), nu*nodes, &negAlpha, devVecDualPsi, 1, &devPrimalInfeasibilty[2*nx*nodes], 1));
 	// y = w + \lambda(Hx - z)
 	_CUDA( cudaMemcpy(devVecUpdateXi, devVecAcceleratedXi, 2*nx*nodes*sizeof(real_t), cudaMemcpyDeviceToDevice));
 	_CUDA( cudaMemcpy(devVecUpdatePsi, devVecAcceleratedPsi, nu*nodes*sizeof(real_t), cudaMemcpyDeviceToDevice));
-	_CUBLAS(cublasSaxpy_v2(ptrMyEngine->handle, 2*nx*nodes, &stepSize, devPrimalInfeasibilty, 1, devVecUpdateXi, 1) );
-	_CUBLAS(cublasSaxpy_v2(ptrMyEngine->handle, nu*nodes, &stepSize, &devPrimalInfeasibilty[2*nx*nodes], 1, devVecUpdatePsi, 1) );
+	_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), 2*nx*nodes, &stepSize, devPrimalInfeasibilty, 1, devVecUpdateXi, 1) );
+	_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), nu*nodes, &stepSize, &devPrimalInfeasibilty[2*nx*nodes], 1,
+			devVecUpdatePsi, 1) );
 }
 
 
 void SmpcController::algorithmApg(){
-	uint_t nodes = ptrMyEngine->ptrMyForecaster->nNodes;
-	uint_t nx = ptrMyEngine->ptrMyNetwork->NX;
-	uint_t nu = ptrMyEngine->ptrMyNetwork->NU;
+	DwnNetwork *ptrMyNetwork = ptrMyEngine->getDwnNetwork();
+	ScenarioTree *ptrMyScenarioTree = ptrMyEngine->getScenarioTree();
+	uint_t nodes = ptrMyScenarioTree->getNumNodes();
+	uint_t nx = ptrMyNetwork->getNumTanks();
+	uint_t nu = ptrMyNetwork->getNumControls();
 	_CUDA( cudaMemset(devVecXi, 0, 2*nx*nodes*sizeof(real_t)) );
 	_CUDA( cudaMemset(devVecPsi, 0, nu*nodes*sizeof(real_t)) );
 	_CUDA( cudaMemset(devVecAcceleratedXi, 0, 2*nx*nodes*sizeof(real_t)) );
@@ -423,8 +430,10 @@ void SmpcController::algorithmApg(){
 }
 
 void SmpcController::controllerSmpc(){
-	ptrMyEngine->updateStateControl();
-	ptrMyEngine->eliminateInputDistubanceCoupling();
+	ptrMyEngine->updateStateControl(ptrMySmpcConfig->getCurrentX(), ptrMySmpcConfig->getPrevU(),
+			ptrMySmpcConfig->getPrevUhat());
+	ptrMyEngine->eliminateInputDistubanceCoupling(ptrMyForecaster->getNominalDemand(),
+			ptrMyForecaster->getNominalPrices());
 	algorithmApg();
 }
 

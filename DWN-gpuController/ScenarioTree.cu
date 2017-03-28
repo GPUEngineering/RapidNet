@@ -30,7 +30,7 @@
 
 
 ScenarioTree::ScenarioTree( string pathToFile ){
-	cout << "allocating memory for the forecaster \n"; /*TODO Remove prints */
+	cout << "allocating memory for the Scenario tree \n"; /*TODO Remove prints */
 	const char* fileName = pathToFile.c_str();
 	rapidjson::Document jsonDocument;
 	rapidjson::Value a;
@@ -38,7 +38,7 @@ ScenarioTree::ScenarioTree( string pathToFile ){
 	if(infile == NULL){
 		cout << pathToFile << infile << endl;
 		cerr << "Error in opening the file " <<__LINE__ << fileName << endl;
-		throw std::logic_error;
+		throw std::logic_error("Error in opening the file");
 		//exit(100); /*TODO never use `exit`; throw an exception instead */
 	}else{
 		char* readBuffer = new char[65536]; /*TODO Make sure this is a good practice */
@@ -74,7 +74,7 @@ ScenarioTree::ScenarioTree( string pathToFile ){
 		_ASSERT( a.IsArray() );
 		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
 			nodesPerStageCumul[i] = (uint_t) a[i].GetDouble();
-		leaveArray = new uint_t[K];
+		leaveArray = new uint_t[nScenario];
 		a = jsonDocument[VARNAME_LEAVES];
 		_ASSERT( a.IsArray() );
 		for (rapidjson::SizeType i = 0; i < a.Size(); i++)

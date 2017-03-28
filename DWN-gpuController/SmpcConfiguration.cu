@@ -17,7 +17,9 @@
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  */
-
+#include "rapidjson/document.h"
+#include "rapidjson/rapidjson.h"
+#include "rapidjson/filereadstream.h"
 #include "SmpcConfiguration.cuh"
 
 
@@ -147,6 +149,14 @@ real_t* SmpcConfiguration::getPrevV(){
 
 real_t* SmpcConfiguration::getPrevU(){
 	return prevU;
+}
+
+real_t SmpcConfiguration::getPenaltyState(){
+	return penaltyStateX;
+}
+
+real_t SmpcConfiguration::getPenaltySafety(){
+	return penaltySafetyX;
 }
 
 SmpcConfiguration::~SmpcConfiguration(){

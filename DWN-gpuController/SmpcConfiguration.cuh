@@ -74,7 +74,14 @@ public:
 	real_t* getPrevUhat();
 
 	real_t* getPrevV();
-
+	/**
+	 * Weight that penalise the constraints on the tank level
+	 */
+	real_t getPenaltyState();
+	/**
+	 * Weight that penalise the safety volume of the tank
+	 */
+	real_t getPenaltySafety();
 	/**
 	 * Default destructor to free the memory
 	 */

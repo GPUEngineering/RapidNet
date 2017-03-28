@@ -50,16 +50,16 @@ Forecaster::Forecaster(string pathToFile){
 		a = jsonDocument[VARNAME_DIM_PRICE];
 		_ASSERT( a.IsArray() );
 		dimPrices = (uint_t) a[0].GetDouble();
-		demandPrediction = new real_t[dimDemand * nPredHorizon];
+		nominalDemand = new real_t[dimDemand * nPredHorizon];
 		a = jsonDocument[VARNAME_DHAT];
 		_ASSERT( a.IsArray() );
 		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
-			dHat[i] = a[i].GetDouble();
-		pricePrediction = new real_t[dimPrices * nPredHorizon];
-		a = jsonDocument[VARNAME_DHAT];
+			nominalDemand[i] = a[i].GetDouble();
+		nominalPrice = new real_t[dimPrices * nPredHorizon];
+		a = jsonDocument[VARNAME_ALPHAHAT];
 		_ASSERT( a.IsArray() );
 		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
-			pricePrediction[i] = a[i].GetDouble();
+			nominalPrice[i] = a[i].GetDouble();
 		delete [] readBuffer;
 		readBuffer = NULL;
 	}
@@ -80,17 +80,17 @@ uint_t Forecaster::getDimPrice(){
 }
 
 real_t* Forecaster::getNominalDemand(){
-	return demandPrediction;
+	return nominalDemand;
 }
 
 real_t* Forecaster::getNominalPrices(){
-	return pricePrediction;
+	return nominalPrice;
 }
 
 Forecaster::~Forecaster(){
-	delete [] dHat;
-	delete [] alphaHat;
-	dHat = NULL;
-	alphaHat = NULL;
+	delete [] nominalDemand;
+	delete [] nominalPrice;
+	nominalDemand = NULL;
+	nominalPrice = NULL;
 	cout << "freeing the memory of the forecaster \n"; /*TODO Remove prints */
 }

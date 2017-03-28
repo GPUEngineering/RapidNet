@@ -53,9 +53,9 @@ DwnNetwork::DwnNetwork(string pathToFile){
 		a = jsonDocument[VARNAME_NE];
 		_ASSERT(a.IsArray());
 		nMixNodes = (uint_t) a[0].GetDouble();
-		a = jsonDocument[VARNAME_N];
+		/*a = jsonDocument[VARNAME_N];
 		_ASSERT(a.IsArray());
-		uint_t N = (uint_t) a[0].GetDouble();
+		uint_t N = (uint_t) a[0].GetDouble();*/
 		matA = new real_t[nTanks * nTanks];
 		a = jsonDocument[VARNAME_A];
 		_ASSERT(a.IsArray());
@@ -107,7 +107,7 @@ DwnNetwork::DwnNetwork(string pathToFile){
 		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
 			vecUmax[i] = a[i].GetDouble();
 		vecCostAlpha1 = new real_t[nControl];
-		a = jsonDocument["costAlpha1"];
+		a = jsonDocument[VARNAME_ALPHA1];
 		_ASSERT(a.IsArray());
 		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
 			vecCostAlpha1[i] = a[i].GetDouble();

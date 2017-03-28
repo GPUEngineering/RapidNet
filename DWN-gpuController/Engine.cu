@@ -111,6 +111,7 @@ void Engine::allocateScenarioTreeDevice(){
 	uint_t N = ptrMyScenarioTree->getPredHorizon();
 	uint_t K = ptrMyScenarioTree->getNumScenarios();
 	uint_t ND = ptrMyNetwork->getNumDemands();
+	uint_t NU = ptrMyNetwork->getNumControls();
 	uint_t N_NONLEAF_NODES = ptrMyScenarioTree->getNumNonleafNodes();
 	_CUDA( cudaMalloc((void**)&devTreeStages, nodes*sizeof(uint_t)) );
 	_CUDA( cudaMalloc((void**)&devTreeNodesPerStage, (N + 1)*sizeof(uint_t)) );
@@ -120,26 +121,34 @@ void Engine::allocateScenarioTreeDevice(){
 	_CUDA( cudaMalloc((void**)&devTreeAncestor, nodes*sizeof(uint_t)) );
 	_CUDA( cudaMalloc((void**)&devTreeNumChildrenCumul, nodes*sizeof(uint_t)) );
 	_CUDA( cudaMalloc((void**)&devTreeProb, nodes*sizeof(real_t)) );
-	_CUDA( cudaMalloc((void**)&devTreeValue, nodes*ND*sizeof(real_t)) );
-	_CUDA( cudaMalloc((void**)&devForecastValue, N*ND*sizeof(real_t)) );
+	_CUDA( cudaMalloc((void**)&devTreeErrorDemand, nodes*ND*sizeof(real_t)) );
+	_CUDA( cudaMalloc((void**)&devTreeErrorPrices, nodes*NU*sizeof(real_t)) );
+	//_CUDA( cudaMalloc((void**)&devForecastValue, N*ND*sizeof(real_t)) );
 }
 
 void Engine::initialiseScenarioTreeDevice(){
 	uint_t nodes = ptrMyScenarioTree->getNumNodes();
 	uint_t N = ptrMyScenarioTree->getPredHorizon();
 	uint_t K = ptrMyScenarioTree->getNumScenarios();
-	uint_t ND = ptrMyNetwork->getNumDemands();
-	uint_t N_NONLEAF_NODES = ptrMyScenarioTree->getNumNonleafNodes();
-	_CUDA( cudaMemcpy(devTreeStages, ptrMyForecaster->stages, nodes*sizeof(uint_t), cudaMemcpyHostToDevice) );
-	_CUDA( cudaMemcpy(devTreeNodesPerStage, ptrMyForecaster->nodesPerStage, (N + 1)*sizeof(uint_t), cudaMemcpyHostToDevice) );
-	_CUDA( cudaMemcpy(devTreeNodesPerStageCumul, ptrMyForecaster->nodesPerStageCumul, (N + 2)*sizeof(uint_t), cudaMemcpyHostToDevice) );
-	_CUDA( cudaMemcpy(devTreeLeaves, ptrMyForecaster->leaves, K*sizeof(uint_t), cudaMemcpyHostToDevice) );
-	_CUDA( cudaMemcpy(devTreeNumChildren, ptrMyForecaster->nChildren, N_NONLEAF_NODES*sizeof(uint_t), cudaMemcpyHostToDevice) );
-	_CUDA( cudaMemcpy(devTreeAncestor, ptrMyForecaster->ancestor, nodes*sizeof(uint_t), cudaMemcpyHostToDevice) );
-	_CUDA( cudaMemcpy(devTreeNumChildrenCumul, ptrMyForecaster->nChildrenCumul, nodes*sizeof(uint_t), cudaMemcpyHostToDevice) );
-	_CUDA( cudaMemcpy(devTreeProb, ptrMyForecaster->probNode, nodes*sizeof(real_t), cudaMemcpyHostToDevice) );
-	_CUDA( cudaMemcpy(devTreeValue, ptrMyForecaster->valueNode, nodes*ND*sizeof(real_t), cudaMemcpyHostToDevice) );
-	_CUDA( cudaMemcpy(devForecastValue, ptrMyForecaster->dHat, N*ND*sizeof(real_t), cudaMemcpyHostToDevice) );
+	uint_t nd = ptrMyNetwork->getNumDemands();
+	uint_t nu = ptrMyNetwork->getNumControls();
+	uint_t numNonLeafNodes = ptrMyScenarioTree->getNumNonleafNodes();
+	_CUDA( cudaMemcpy(devTreeStages, ptrMyScenarioTree->getStageNodes(), nodes*sizeof(uint_t), cudaMemcpyHostToDevice) );
+	_CUDA( cudaMemcpy(devTreeNodesPerStage, ptrMyScenarioTree->getNodesPerStage(), (N + 1)*sizeof(uint_t), cudaMemcpyHostToDevice) );
+	_CUDA( cudaMemcpy(devTreeNodesPerStageCumul, ptrMyScenarioTree->getNodesPerStageCumul(), (N + 2)*sizeof(uint_t),
+			cudaMemcpyHostToDevice) );
+	_CUDA( cudaMemcpy(devTreeLeaves, ptrMyScenarioTree->getLeaveArray(), K*sizeof(uint_t), cudaMemcpyHostToDevice) );
+	_CUDA( cudaMemcpy(devTreeNumChildren, ptrMyScenarioTree->getNumChildren(), numNonLeafNodes*sizeof(uint_t),
+			cudaMemcpyHostToDevice) );
+	_CUDA( cudaMemcpy(devTreeAncestor, ptrMyScenarioTree->getAncestorArray(), nodes*sizeof(uint_t), cudaMemcpyHostToDevice) );
+	_CUDA( cudaMemcpy(devTreeNumChildrenCumul, ptrMyScenarioTree->getNumChildrenCumul(), nodes*sizeof(uint_t),
+			cudaMemcpyHostToDevice) );
+	_CUDA( cudaMemcpy(devTreeProb, ptrMyScenarioTree->getProbArray(), nodes*sizeof(real_t), cudaMemcpyHostToDevice) );
+	_CUDA( cudaMemcpy(devTreeErrorDemand, ptrMyScenarioTree->getErrorDemandArray(), nodes*nd*sizeof(real_t),
+			cudaMemcpyHostToDevice) );
+	_CUDA( cudaMemcpy(devTreeErrorPrices, ptrMyScenarioTree->getErrorPriceArray(), nodes*nu*sizeof(real_t),
+				cudaMemcpyHostToDevice) );
+	//_CUDA( cudaMemcpy(devForecastValue, ptrMyForecaster->dHat, N*ND*sizeof(real_t), cudaMemcpyHostToDevice) );
 }
 
 void Engine::allocateSystemDevice(){
@@ -189,7 +198,7 @@ void Engine::allocateSystemDevice(){
 		ptrSysCostW[iNode] = &devSysCostW[iNode*nv*nv];
 	}
 	for(iStage = 0; iStage < N; iStage++){
-		for(iNode = 0; j < nodesPerStage[iStage]; iNode++){
+		for(iNode = 0; iNode < nodesPerStage[iStage]; iNode++){
 			ptrSysMatB[nodesPerStageCumul[iStage] + iNode] = &devSysMatB[iNode*nx*nu];
 			ptrSysMatL[nodesPerStageCumul[iStage] + iNode] = &devSysMatL[iNode*nu*nv];
 			ptrSysMatLhat[nodesPerStageCumul[iStage] + iNode] = &devSysMatLhat[iNode*nu*nd];
@@ -406,7 +415,7 @@ ScenarioTree* Engine::getScenarioTree(){
 DwnNetwork* Engine::getDwnNetwork(){
 	return ptrMyNetwork;
 }
-/** get's for the factor step matrices*/
+/** ----GETTER'S FOR THE FACTOR STEP---*/
 /**
  *  matrix Phi
  */
@@ -450,7 +459,7 @@ real_t* Engine::getMatF(){
 	return devMatF;
 }
 /**
- * matrix G (Facotr step)
+ * matrix G (Factor step)
  */
 real_t* Engine::getMatG(){
 	return devMatG;
@@ -521,7 +530,7 @@ real_t* Engine::getVecBeta(){
 real_t* Engine::getVecE(){
 	return devVecE;
 }
-/* System matrices */
+/** ---GETTER'S FOR THE SYSTEM MATRICES */
 real_t* Engine::getSysMatB(){
 	return devSysMatB;
 }
@@ -547,7 +556,7 @@ real_t* Engine::getSysMatL(){
  * matrix Lhat
  */
 real_t* Engine::getSysMatLhat(){
-	return devPtrSysMatLhat;
+	return devSysMatLhat;
 }
 /**
  * pointer to Matrix B
@@ -597,6 +606,7 @@ real_t* Engine::getVecCurrentState(){
 real_t* Engine::getVecPreviousUhat(){
 	return devVecPreviousUhat;
 }
+/** ----GETTER'S FOR THE SCENARIO TREE----*/
 /**
  *  Array of the stage of the nodes at the tree
  */
@@ -657,6 +667,44 @@ real_t* Engine::getTreeErrorDemand(){
 real_t* Engine::getTreeErrorPrices(){
 	return devTreeErrorPrices;
 }
+/** ----GETTER'S OF NETWORK CONSTRAINTS----*/
+/**
+ * state/volume minimum
+ */
+real_t* Engine::getSysXmin(){
+	return devSysXmin;
+}
+/**
+ * state/volume maximum
+ */
+real_t* Engine::getSysXmax(){
+	return devSysXmax;
+}
+/**
+ * state/volume safe level
+ */
+real_t* Engine::getSysXs(){
+	return devSysXs;
+}
+/**
+ * dummy state/volume safe level
+ */
+real_t* Engine::getSysXsUpper(){
+	return devSysXsUpper;
+}
+/**
+ * actuator/control minimum
+ */
+real_t* Engine::getSysUmin(){
+	return devSysUmin;
+}
+/**
+ * actuator/control maximum
+ */
+real_t* Engine::getSysUmax(){
+	return devSysUmax;
+}
+
 
 cublasHandle_t Engine::getCublasHandle(){
 	return handle;
@@ -730,7 +778,6 @@ void Engine::eliminateInputDistubanceCoupling(real_t* nominalDemand, real_t *nom
 	// uhat = Lhat*d
 	_CUBLAS(cublasSgemmBatched(handle, CUBLAS_OP_N, CUBLAS_OP_N, nu, 1, nd, &alpha, (const float**)
 			devPtrSysMatLhat, nu, (const float**)devPtrVecDemand, nd, &beta, devPtrVecUhat, nu , nodes));
-	//uhat
 	//alphaBar = L* (alpha1 +alpah2)
 	_CUDA( cudaMemcpy(devCostVecAlpha, nominalPrices, N*nu*sizeof(real_t), cudaMemcpyHostToDevice) );
 	_CUDA( cudaMemcpy(devCostVecAlpha1, ptrMyNetwork->getAlpha(), nu*sizeof(real_t), cudaMemcpyHostToDevice));
@@ -801,7 +848,7 @@ void Engine::updateStateControl(real_t* currentX, real_t* prevU, real_t* prevUha
 
 void Engine::testStupidFunction(){
 	real_t maxUpperbound = 0;
-	uint_t nx = ptrMyNetwork->NX;
+	uint_t nx = ptrMyNetwork->getNumTanks();
 	_CUBLAS( cublasSnrm2_v2(handle, 1, devSysXsUpper, 1, &maxUpperbound) );
 	cout<< maxUpperbound << endl;
 	_CUBLAS( cublasSnrm2_v2(handle, nx, devSysXmax, 1, &maxUpperbound) );
@@ -931,12 +978,13 @@ void Engine::testInverse(){
 }
 
 void Engine::testPrecondtioningFunciton(){
-	uint_t nx = ptrMyNetwork->NX;
-	uint_t nu = ptrMyNetwork->NU;
+	uint_t nx = ptrMyNetwork->getNumTanks();
+	uint_t nu = ptrMyNetwork->getNumControls();
+	uint_t N = ptrMyScenarioTree->getNumScenarios();
 	real_t *x = new real_t[2*nu*nu];
 	real_t *devMatDiagPrcnd;
-	_CUDA( cudaMalloc((void**)&devMatDiagPrcnd, ptrMyForecaster->N*(2*nx + nu)*sizeof(real_t)) );
-	_CUDA( cudaMemcpy(devMatDiagPrcnd, ptrMyNetwork->matDiagPrecnd, ptrMyForecaster->N*(2*nx + nu)*sizeof(real_t), cudaMemcpyHostToDevice) );
+	_CUDA( cudaMalloc((void**)&devMatDiagPrcnd, N*(2*nx + nu)*sizeof(real_t)) );
+	_CUDA( cudaMemcpy(devMatDiagPrcnd, ptrMySmpcConfig->getMatPrcndDiag(), N*(2*nx + nu)*sizeof(real_t), cudaMemcpyHostToDevice) );
 
 	preconditionSystem<<<2, 2*nx+nu>>>(&devSysMatF[0], &devSysMatG[0], &devMatDiagPrcnd[0], &devTreeProb[0], nx, nu );
 	for (int i = 0; i < 2 ; i++ ){
@@ -1012,8 +1060,9 @@ void Engine::deallocateScenarioTreeDevice(){
 	_CUDA( cudaFree(devTreeNodesPerStageCumul) );
 	_CUDA( cudaFree(devTreeNumChildren) );
 	_CUDA( cudaFree(devTreeNumChildrenCumul) );
-	_CUDA( cudaFree(devTreeValue) );
-	_CUDA( cudaFree(devForecastValue) );
+	_CUDA( cudaFree(devTreeErrorDemand) );
+	_CUDA( cudaFree(devTreeErrorPrices) );
+	//_CUDA( cudaFree(devForecastValue) );
 
 	devTreeStages = NULL;
 	devTreeNodesPerStage = NULL;
@@ -1021,8 +1070,9 @@ void Engine::deallocateScenarioTreeDevice(){
 	devTreeNodesPerStageCumul = NULL;
 	devTreeNumChildren = NULL;
 	devTreeNumChildrenCumul = NULL;
-	devTreeValue = NULL;
-	devForecastValue = NULL;
+	devTreeErrorDemand = NULL;
+	devTreeErrorPrices = NULL;
+	//devForecastValue = NULL;
 }
 Engine::~Engine(){
 	cout << "removing the memory of the engine \n";
