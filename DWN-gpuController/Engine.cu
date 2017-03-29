@@ -28,7 +28,6 @@
 #include "Engine.cuh"
 
 Engine::Engine(DwnNetwork *myNetwork, ScenarioTree *myScenarioTree, SmpcConfiguration *mySmpcConfig){
-	cout << "allocating memory for the engine \n";
 	ptrMyNetwork = myNetwork;
 	ptrMyScenarioTree = myScenarioTree;
 	ptrMySmpcConfig = mySmpcConfig;
@@ -112,12 +111,12 @@ void Engine::allocateScenarioTreeDevice(){
 	uint_t K = ptrMyScenarioTree->getNumScenarios();
 	uint_t ND = ptrMyNetwork->getNumDemands();
 	uint_t NU = ptrMyNetwork->getNumControls();
-	uint_t N_NONLEAF_NODES = ptrMyScenarioTree->getNumNonleafNodes();
+	uint_t nNumNonLeafNodes = ptrMyScenarioTree->getNumNonleafNodes();
 	_CUDA( cudaMalloc((void**)&devTreeStages, nodes*sizeof(uint_t)) );
 	_CUDA( cudaMalloc((void**)&devTreeNodesPerStage, (N + 1)*sizeof(uint_t)) );
 	_CUDA( cudaMalloc((void**)&devTreeNodesPerStageCumul, (N + 2)*sizeof(uint_t)) );
 	_CUDA( cudaMalloc((void**)&devTreeLeaves, K*sizeof(uint_t)) );
-	_CUDA( cudaMalloc((void**)&devTreeNumChildren, N_NONLEAF_NODES*sizeof(uint_t)) );
+	_CUDA( cudaMalloc((void**)&devTreeNumChildren, nNumNonLeafNodes*sizeof(uint_t)) );
 	_CUDA( cudaMalloc((void**)&devTreeAncestor, nodes*sizeof(uint_t)) );
 	_CUDA( cudaMalloc((void**)&devTreeNumChildrenCumul, nodes*sizeof(uint_t)) );
 	_CUDA( cudaMalloc((void**)&devTreeProb, nodes*sizeof(real_t)) );
@@ -1075,7 +1074,6 @@ void Engine::deallocateScenarioTreeDevice(){
 	//devForecastValue = NULL;
 }
 Engine::~Engine(){
-	cout << "removing the memory of the engine \n";
 	deallocateSystemDevice();
 	deallocateScenarioTreeDevice();
 	//delete ptrmyForecaster;

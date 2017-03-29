@@ -50,29 +50,55 @@ public:
 	 * 		     configuration.
 	 */
 	SmpcConfiguration(string pathToFile);
-
+	/** ---GETTER'S FOR CONTROLLER CONFIGURATION---*/
+	/**
+	 * Dimension of the state
+	 */
 	uint_t getNX();
-
+	/**
+	 * Dimension of the control
+	 */
 	uint_t getNU();
-
+	/**
+	 * Dimension of the demand
+	 */
 	uint_t getND();
-
+	/**
+	 *  Reduced dimension of the control after eliminating the
+	 *  control-disturbance equality
+	 */
 	uint_t getNV();
-
+	/**
+	 * Affine space representation for the control-disturbance equality
+	 */
 	real_t* getMatL();
-
+	/**
+	 * matrix to calculate the particular solution
+	 */
 	real_t* getMatLhat();
-
+	/**
+	 * Diagonal preconditioner used
+	 */
 	real_t* getMatPrcndDiag();
-
+	/**
+	 * Smooth operation cost matrix
+	 */
 	real_t* getCostW();
-
+	/**
+	 * Current state/level of water in the tanks
+	 */
 	real_t* getCurrentX();
-
+	/**
+	 * Previous control/actuators for the valves and pumps
+	 */
 	real_t* getPrevU();
-
+	/**
+	 * Previous particular solution based on the previous control
+	 */
 	real_t* getPrevUhat();
-
+	/**
+	 * Previous reduced control in the reduced spaces
+	 */
 	real_t* getPrevV();
 	/**
 	 * Weight that penalise the constraints on the tank level

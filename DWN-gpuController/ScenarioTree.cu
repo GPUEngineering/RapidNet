@@ -30,7 +30,6 @@
 
 
 ScenarioTree::ScenarioTree( string pathToFile ){
-	cout << "allocating memory for the Scenario tree \n"; /*TODO Remove prints */
 	const char* fileName = pathToFile.c_str();
 	rapidjson::Document jsonDocument;
 	rapidjson::Value a;
@@ -214,7 +213,6 @@ ScenarioTree::~ScenarioTree(){
 	probNodeArray = NULL;
 	errorDemandArray = NULL;
 	errorPriceArray = NULL;
-	cout << "freeing the memory of the scenario tree \n"; /*TODO Remove prints */
 }
 
 

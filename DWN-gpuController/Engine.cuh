@@ -30,6 +30,7 @@
 #include "Forecaster.cuh"
 #include "unitTestHeader.cuh"
 #include "Utilities.cuh"
+#include "cublas_v2.h"
 
 /*TODO IF A METHOD IS NOT TO BE INVOKED FROM THE OUTSIDE OF THIS CLASS, MAKE IT PRIVATE */
 /*TODO INTRODUCE GETTERS FOR THOSE FIELDS WHICH NEED TO BE ACCESSIBLE FROM THE OUTSIDE */

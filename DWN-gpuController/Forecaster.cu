@@ -28,7 +28,6 @@
 
 
 Forecaster::Forecaster(string pathToFile){
-	cout << "allocating memory for the forecaster \n"; /*TODO Remove prints */
 	const char* fileName = pathToFile.c_str();
 	rapidjson::Document jsonDocument;
 	rapidjson::Value a;
@@ -36,7 +35,7 @@ Forecaster::Forecaster(string pathToFile){
 	if(infile == NULL){
 		cout << pathToFile << infile << endl;
 		cerr << "Error in opening the file " <<__LINE__ << fileName << endl;
-		exit(100); /*TODO never use `exit`; throw an exception instead */
+		exit(100);
 	}else{
 		char* readBuffer = new char[65536]; /*TODO Make sure this is a good practice */
 		rapidjson::FileReadStream networkJsonStream( infile, readBuffer, sizeof(readBuffer) );
@@ -47,7 +46,7 @@ Forecaster::Forecaster(string pathToFile){
 		a = jsonDocument[VARNAME_DIM_DEMAND];
 		_ASSERT( a.IsArray() );
 		dimDemand = (uint_t) a[0].GetDouble();
-		a = jsonDocument[VARNAME_DIM_PRICE];
+		a = jsonDocument[VARNAME_DIM_PRICES];
 		_ASSERT( a.IsArray() );
 		dimPrices = (uint_t) a[0].GetDouble();
 		nominalDemand = new real_t[dimDemand * nPredHorizon];
@@ -92,5 +91,4 @@ Forecaster::~Forecaster(){
 	delete [] nominalPrice;
 	nominalDemand = NULL;
 	nominalPrice = NULL;
-	cout << "freeing the memory of the forecaster \n"; /*TODO Remove prints */
 }

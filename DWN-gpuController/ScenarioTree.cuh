@@ -35,7 +35,7 @@
 #define VARNAME_NUM_CHILD_CUMUL "nChildrenCumul"
 #define VARNAME_PROB_NODE "probNode"
 #define VARNAME_DIM_DEMAND "dimDemand"
-#define VARNAME_DIM_PRICE "dimPrices"
+#define VARNAME_DIM_PRICE "dimPrice"
 #define VARNAME_DEMAND_NODE "valueDemandNode"
 #define VARNAME_PRICE_NODE "valuePriceNode"
 #include "Configuration.h"

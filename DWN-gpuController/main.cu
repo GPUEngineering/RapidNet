@@ -7,6 +7,7 @@
 
 #include "Configuration.h"
 #include "SmpcController.cuh"
+#include "test/Testing.cuh"
 //#include "cudaKernalHeader.cuh"
 //#include "EngineHeader.cuh"
 //#include "cudaKernal.cu"
@@ -24,12 +25,22 @@ int main(void){
 	cudaRuntimeGetVersion(&runtimeVersion);
 	_CUDA(cudaDriverGetVersion(&driverVersion));
 	cout << runtimeVersion << " " << driverVersion << endl;
+	Testing *myTesting = new Testing();
+	_ASSERT( myTesting->testNetwork() );
+	_ASSERT( myTesting->testScenarioTree() );
+	_ASSERT( myTesting->testForecaster() );
+	myTesting->testControllerConfig();
+	_ASSERT( myTesting->testControllerConfig() );
+
 	string pathToNetworkFile = "../dataFiles/network.json";
-	string pathToForecastFile = "../dataFiles/scenarioTree.json";
+	string pathToScenarioTreeFile = "../dataFiles/scenarioTree.json";
 	string pathToForecastFile = "../dataFiles/forecastor.json";
-	string pathToTestfile = "../dataFiles/testVariables.json";
-	DwnNetwork myNetwork( pathToNetworkFile );
-	Forecaster myForecaster( pathToForecastFile );
+	string pathToTestFile = "../dataFiles/testVariables.json";
+	string pathToSmpcConfigFile = "../dataFiles/controllerConfig.json";
+	//DwnNetwork myNetwork( pathToNetworkFile );
+	//Forecaster myForecaster( pathToForecastFile );
+	//ScenarioTree myScenarioTree( pathToScenarioTreeFile );
+	//SmpcConfiguration mySmpcConfig( pathToSmpcConfigFile );
 	//unitTest myTestor( pathToTestfile );
 	//Engine myEngine(&myNetwork, &myForecaster, &myTestor);
 	//SMPCController myController( &myEngine);

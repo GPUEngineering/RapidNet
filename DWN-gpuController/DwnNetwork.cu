@@ -28,7 +28,6 @@
 #include "DwnNetwork.cuh"
 
 DwnNetwork::DwnNetwork(string pathToFile){
-	cout << "allocating memory for the network \n";
 	const char* fileName = pathToFile.c_str();
 	rapidjson::Document jsonDocument;
 	rapidjson::Value a;
@@ -200,5 +199,4 @@ DwnNetwork::~DwnNetwork(){
 	vecUmin = NULL;
 	vecUmax = NULL;
 	vecCostAlpha1 = NULL;
-	cout << "freeing the memory of the network \n";
 }

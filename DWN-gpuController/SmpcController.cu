@@ -23,7 +23,6 @@
 #include "SmpcController.cuh"
 
 SmpcController::SmpcController(Forecaster *myForecaster, Engine *myEngine, SmpcConfiguration *mySmpcConfig){
-	cout << "Allocation of controller memory" << endl;
 	ptrMyForecaster = myForecaster;
 	ptrMyEngine = myEngine;
 	ptrMySmpcConfig = mySmpcConfig;
@@ -438,7 +437,6 @@ void SmpcController::controllerSmpc(){
 }
 
 SmpcController::~SmpcController(){
-	cout << "removing the memory of the controller" << endl;
 	_CUDA( cudaFree(devVecX) );
 	_CUDA( cudaFree(devVecU) );
 	_CUDA( cudaFree(devVecV) );

@@ -22,7 +22,7 @@
 #define FORECASTCLASS_CUH_
 #define VARNAME_N  "N"
 #define VARNAME_DIM_DEMAND "dimDemand"
-#define VARNAME_DIM_PRICE "dimPrices"
+#define VARNAME_DIM_PRICES "dimPrices"
 #define VARNAME_DHAT "dHat"
 #define VARNAME_ALPHAHAT "alphaHat"
 #include "Configuration.h"
@@ -98,9 +98,6 @@ private:
 	 * Dimension of the electricity prices
 	 */
 	uint_t dimPrices;
-	/**
-	 * Number of scenarios
-	 */
 	/**
 	 * Nominal demand predicted
 	 */

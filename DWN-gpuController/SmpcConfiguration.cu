@@ -24,7 +24,6 @@
 
 
 SmpcConfiguration::SmpcConfiguration(string pathToFile){
-	cout << "allocating memory for the network \n";
 	const char* fileName = pathToFile.c_str();
 	rapidjson::Document jsonDocument;
 	rapidjson::Value a;
@@ -105,6 +104,7 @@ SmpcConfiguration::SmpcConfiguration(string pathToFile){
 		readBuffer = NULL;
 	}
 	fclose(infile);
+	infile = NULL;
 }
 
 uint_t SmpcConfiguration::getNX(){
@@ -176,7 +176,6 @@ SmpcConfiguration::~SmpcConfiguration(){
 	prevUhat = NULL;
 	prevU = NULL;
 	prevV = NULL;
-	cout << "freeing the memory of the network \n";
 }
 
 
