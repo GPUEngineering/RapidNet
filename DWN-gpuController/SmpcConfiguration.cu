@@ -45,9 +45,6 @@ SmpcConfiguration::SmpcConfiguration(string pathToFile){
 		a = jsonDocument[VARNAME_ND];
 		_ASSERT(a.IsArray());
 		ND = (uint_t) a[0].GetDouble();
-		a = jsonDocument[VARNAME_NE];
-		_ASSERT(a.IsArray());
-		NE = (uint_t) a[0].GetDouble();
 		a = jsonDocument[VARNAME_NV];
 		_ASSERT(a.IsArray());
 		NV = (uint_t) a[0].GetDouble();
@@ -71,7 +68,7 @@ SmpcConfiguration::SmpcConfiguration(string pathToFile){
 			matCostW[i] = a[i].GetDouble();
 		a = jsonDocument[VARNAME_PENALITY_X];
 		penaltyStateX = a[0].GetDouble();
-		a = jsonDocument["penaltySafetyX"];
+		a = jsonDocument[VARNAME_PENALITY_XS];
 		penaltySafetyX = a[0].GetDouble();
 		matDiagPrecnd = new real_t[(NU + 2*NX) * N];
 		a = jsonDocument[VARNAME_DIAG_PRCND];

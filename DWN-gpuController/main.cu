@@ -29,7 +29,6 @@ int main(void){
 	_ASSERT( myTesting->testNetwork() );
 	_ASSERT( myTesting->testScenarioTree() );
 	_ASSERT( myTesting->testForecaster() );
-	myTesting->testControllerConfig();
 	_ASSERT( myTesting->testControllerConfig() );
 
 	string pathToNetworkFile = "../dataFiles/network.json";

@@ -180,26 +180,26 @@ void SmpcController::solveStep(){
 		}
 		// v=Omega*sigma
 		_CUBLAS(cublasSgemmBatched(ptrMyEngine->getCublasHandle(), CUBLAS_OP_N, CUBLAS_OP_N, nv, 1, nv,
-				&scale[0], (const float**)&ptrMyEngine->getPtrMatOmega()[iStageCumulNodes], nv,
-				(const float**)&ptrMyEngine->getPtrMatSigma()[iStageCumulNodes], nv, &beta,
+				&scale[0], (const real_t**)&ptrMyEngine->getPtrMatOmega()[iStageCumulNodes], nv,
+				(const real_t**)&ptrMyEngine->getPtrMatSigma()[iStageCumulNodes], nv, &beta,
 				&devPtrVecV[iStageCumulNodes], nv, iStageNodes));
 
 		if(iStage < N-1){
 			// v=Theta*q+v
 			_CUBLAS(cublasSgemmBatched(ptrMyEngine->getCublasHandle(), CUBLAS_OP_N, CUBLAS_OP_N, nv, 1, nx,
-					&alpha, (const float**)&ptrMyEngine->getPtrMatTheta()[iStageCumulNodes], nv,
-					(const float**)devPtrVecQ, nx, &alpha, &devPtrVecV[iStageCumulNodes], nv, iStageNodes));
+					&alpha, (const real_t**)&ptrMyEngine->getPtrMatTheta()[iStageCumulNodes], nv,
+					(const real_t**)devPtrVecQ, nx, &alpha, &devPtrVecV[iStageCumulNodes], nv, iStageNodes));
 		}
 
 		// v=Psi*psi+v
 		_CUBLAS(cublasSgemmBatched(ptrMyEngine->getCublasHandle(), CUBLAS_OP_N, CUBLAS_OP_N, nv, 1, nu, &alpha,
-				(const float**)&ptrMyEngine->getPtrMatPsi()[iStageCumulNodes], nv,
-				(const float**)&devPtrVecAcceleratedPsi[iStageCumulNodes], nu, &alpha, &devPtrVecV
+				(const real_t**)&ptrMyEngine->getPtrMatPsi()[iStageCumulNodes], nv,
+				(const real_t**)&devPtrVecAcceleratedPsi[iStageCumulNodes], nu, &alpha, &devPtrVecV
 				[iStageCumulNodes], nv, iStageNodes));
 
 		// v=Phi*xi+v
 		_CUBLAS(cublasSgemmBatched(ptrMyEngine->getCublasHandle(), CUBLAS_OP_N, CUBLAS_OP_N, nv, 1, 2*nx, &alpha,
-				(const float**)&ptrMyEngine->getPtrMatPhi()[iStageCumulNodes], nv, (const float**)
+				(const real_t**)&ptrMyEngine->getPtrMatPhi()[iStageCumulNodes], nv, (const real_t**)
 				&devPtrVecAcceleratedXi[iStageCumulNodes], 2*nx, &alpha, &devPtrVecV[iStageCumulNodes],
 				nv, iStageNodes));
 
@@ -209,30 +209,30 @@ void SmpcController::solveStep(){
 
 		// r=D*xi+r
 		_CUBLAS(cublasSgemmBatched(ptrMyEngine->getCublasHandle(), CUBLAS_OP_N, CUBLAS_OP_N, nv, 1, 2*nx, &alpha,
-				(const float**)&ptrMyEngine->getPtrMatD()[iStageCumulNodes], nv, (const float**)
+				(const real_t**)&ptrMyEngine->getPtrMatD()[iStageCumulNodes], nv, (const real_t**)
 				&devPtrVecAcceleratedXi[iStageCumulNodes], 2*nx, &alpha, devPtrVecR, nv, iStageNodes));
 
 		// r=f*psi+r
 		_CUBLAS(cublasSgemmBatched(ptrMyEngine->getCublasHandle(), CUBLAS_OP_N, CUBLAS_OP_N, nv, 1, nu, &alpha,
-				(const float**)&ptrMyEngine->getPtrMatF()[iStageCumulNodes], nv, (const float**)
+				(const real_t**)&ptrMyEngine->getPtrMatF()[iStageCumulNodes], nv, (const real_t**)
 				&devPtrVecAcceleratedPsi[iStageCumulNodes], nu, &alpha, devPtrVecR, nv, iStageNodes));
 
 		if(iStage < N-1){
 			// r=g*q+r
 			_CUBLAS(cublasSgemmBatched(ptrMyEngine->getCublasHandle(), CUBLAS_OP_N, CUBLAS_OP_N, nv, 1, nx, &alpha,
-					(const float**)&ptrMyEngine->getPtrMatG()[iStageCumulNodes], nv, (const float**)devPtrVecQ,
+					(const real_t**)&ptrMyEngine->getPtrMatG()[iStageCumulNodes], nv, (const real_t**)devPtrVecQ,
 					nx, &alpha, devPtrVecR, nv, iStageNodes));
 		}
 
 		if(iStage < N-1){
 			// q=F'xi+q
 			_CUBLAS(cublasSgemmBatched(ptrMyEngine->getCublasHandle(), CUBLAS_OP_T, CUBLAS_OP_N, nx, 1, 2*nx, &alpha,
-					(const float**)&ptrMyEngine->getPtrMatF()[iStageCumulNodes], 2*nx, (const float**)
+					(const real_t**)&ptrMyEngine->getPtrMatF()[iStageCumulNodes], 2*nx, (const real_t**)
 					&devPtrVecAcceleratedXi[iStageCumulNodes], 2*nx, &alpha, devPtrVecQ, nx, iStageNodes));
 		}else{
 			// q=F'xi
 			_CUBLAS(cublasSgemmBatched(ptrMyEngine->getCublasHandle(), CUBLAS_OP_T, CUBLAS_OP_N, nx, 1, 2*nx, &alpha,
-					(const float**)&ptrMyEngine->getPtrMatF()[iStageCumulNodes], 2*nx, (const float**)
+					(const real_t**)&ptrMyEngine->getPtrMatF()[iStageCumulNodes], 2*nx, (const real_t**)
 					&devPtrVecAcceleratedXi[iStageCumulNodes], 2*nx, &beta, devPtrVecQ, nx, iStageNodes));
 		}
 		if(iStage > 0){
@@ -336,10 +336,10 @@ void SmpcController::proximalFunG(){
 	_CUDA( cudaMalloc((void**)&devSuffleVecXi, 2*nx*nodes*sizeof(real_t)) );
 	_CUDA( cudaMalloc((void**)&devVecDiffXi, 2*nx*nodes*sizeof(real_t)) );
 	// primalDual = Hx
-	_CUBLAS(cublasSgemmBatched(ptrMyEngine->getCublasHandle(), CUBLAS_OP_N, CUBLAS_OP_N, 2*nx, 1, nx, &alpha, (const float**)
-			ptrMyEngine->getPtrSysMatF(), 2*nx, (const float**)devPtrVecX, 2*nx, &beta, devPtrVecPrimalXi, 2*nx, nodes) );
-	_CUBLAS(cublasSgemmBatched(ptrMyEngine->getCublasHandle(), CUBLAS_OP_N, CUBLAS_OP_N, nu, 1, nu, &alpha, (const float**)
-			ptrMyEngine->getPtrSysMatG(), nu, (const float**)devPtrVecU, nu, &beta, devPtrVecPrimalPsi, nu, nodes) );
+	_CUBLAS(cublasSgemmBatched(ptrMyEngine->getCublasHandle(), CUBLAS_OP_N, CUBLAS_OP_N, 2*nx, 1, nx, &alpha, (const real_t**)
+			ptrMyEngine->getPtrSysMatF(), 2*nx, (const real_t**)devPtrVecX, 2*nx, &beta, devPtrVecPrimalXi, 2*nx, nodes) );
+	_CUBLAS(cublasSgemmBatched(ptrMyEngine->getCublasHandle(), CUBLAS_OP_N, CUBLAS_OP_N, nu, 1, nu, &alpha, (const real_t**)
+			ptrMyEngine->getPtrSysMatG(), nu, (const real_t**)devPtrVecU, nu, &beta, devPtrVecPrimalPsi, nu, nodes) );
 	// Hx + \lambda^{-1}w
 	_CUDA( cudaMemcpy(devVecDualXi, devPtrVecPrimalXi, 2*nodes*nx*sizeof(real_t), cudaMemcpyDeviceToDevice) );
 	_CUDA( cudaMemcpy(devVecDualPsi, devPtrVecPrimalPsi, nodes*nu*sizeof(real_t), cudaMemcpyDeviceToDevice) );

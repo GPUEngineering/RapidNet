@@ -127,10 +127,6 @@ private:
 	 */
 	uint_t ND;
 	/**
-	 * Number of mixing nodes
-	 */
-	uint_t NE;
-	/**
 	 * Dimension of the control after eliminating the equality constraints
 	 */
 	uint_t NV;

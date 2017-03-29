@@ -225,11 +225,10 @@ int Testing::testControllerConfig(){
 		char* readBuffer = new char[65536];
 		rapidjson::FileReadStream networkJsonStream(infile, readBuffer, sizeof(readBuffer));
 		jsonDocument.ParseStream(networkJsonStream);
-		//a = jsonDocument[VARNAME_NX];
-		//_ASSERT(a.IsArray());
-		cout << ptrMySmpcConfig->getNX() << endl;
-		//_ASSERT( ptrMySmpcConfig->getNX() == (uint_t) a[0].GetDouble() );
-		/*a = jsonDocument[VARNAME_NU];
+		a = jsonDocument[VARNAME_NX];
+		_ASSERT(a.IsArray());
+		_ASSERT( ptrMySmpcConfig->getNX() == (uint_t) a[0].GetDouble() );
+		a = jsonDocument[VARNAME_NU];
 		_ASSERT(a.IsArray());
 		_ASSERT( ptrMySmpcConfig->getNU() == (uint_t) a[0].GetDouble() );
 		a = jsonDocument[VARNAME_ND];
@@ -267,7 +266,7 @@ int Testing::testControllerConfig(){
 		_ASSERT( compareArray<real_t>( ptrMySmpcConfig->getPrevU() ) );
 		a = jsonDocument[VARNAME_PREV_V];
 		_ASSERT(a.IsArray());
-		_ASSERT( compareArray<real_t>( ptrMySmpcConfig->getPrevV() ) );*/
+		_ASSERT( compareArray<real_t>( ptrMySmpcConfig->getPrevV() ) );
 		delete [] readBuffer;
 		readBuffer = NULL;
 	}
@@ -278,6 +277,8 @@ int Testing::testControllerConfig(){
 	cout << "Completed testing the SmpcConfiguration" << endl;
 	return 1;
 }
+
+
 Testing::~Testing(){
 
 }

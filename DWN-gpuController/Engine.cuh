@@ -86,6 +86,7 @@ public:
 	 *  pointer to the DWN network
 	 */
 	DwnNetwork* getDwnNetwork();
+
 	/* ---- GETTER'S OF THE SYSTEM ----*/
 	/**
 	 * System matrix B
@@ -289,20 +290,6 @@ public:
 	 * actuator/cotrol maximum
 	 */
 	real_t* getSysUmax();
-
-	/**
-	 * @todo There should be no test methods in classes
-	 */
-	void testInverse();
-
-	/**
-	 * @todo There should be no test methods in classes
-	 */
-	void testPrecondtioningFunciton();
-	/**
-	 * @todo remove method
-	 */
-	void testStupidFunction();
 
 	/**
 	 * @todo remove Friendship

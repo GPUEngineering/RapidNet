@@ -255,10 +255,10 @@ void Engine::initialiseSystemDevice(){
 	_CUDA( cudaMalloc((void**)&devCostMatW, nu*nu*sizeof(real_t)) );
 	_CUDA( cudaMalloc((void**)&devMatvariable, nu*nv*sizeof(real_t)) );
 	_CUDA( cudaMemcpy(devCostMatW, ptrMySmpcConfig->getCostW(), nu*nu*sizeof(real_t), cudaMemcpyHostToDevice) );
-	_CUBLAS( cublasSgemm_v2(handle, CUBLAS_OP_N, CUBLAS_OP_N, nu, nv, nu, &alpha, (const float*) devCostMatW, nu,
-			(const float*) devSysMatL, nu, &beta, devMatvariable, nu) );
-	_CUBLAS( cublasSgemm_v2(handle, CUBLAS_OP_T, CUBLAS_OP_N, nv, nv, nu, &alpha, (const float*) devSysMatL, nu,
-			(const float*) devMatvariable, nu, &beta, devCostMatW, nv) );
+	_CUBLAS( cublasSgemm_v2(handle, CUBLAS_OP_N, CUBLAS_OP_N, nu, nv, nu, &alpha, (const real_t*) devCostMatW, nu,
+			(const real_t*) devSysMatL, nu, &beta, devMatvariable, nu) );
+	_CUBLAS( cublasSgemm_v2(handle, CUBLAS_OP_T, CUBLAS_OP_N, nv, nv, nu, &alpha, (const real_t*) devSysMatL, nu,
+			(const real_t*) devMatvariable, nu, &beta, devCostMatW, nv) );
 
 	_CUDA( cudaMemset(devSysMatF, 0, nodes*2*nx*nx*sizeof(real_t)) );
 	_CUDA( cudaMemset(devSysMatG, 0, nodes*nu*nu*sizeof(real_t)) );
@@ -357,8 +357,8 @@ void  Engine::factorStep(){
 	_CUDA( cudaMemcpy(devPtrMatGbar, ptrMatGbar, ns*sizeof(real_t*), cudaMemcpyHostToDevice) );
 	_CUDA( cudaMemcpy(devPtrMatBbar, ptrMatBbar, ns*sizeof(real_t*), cudaMemcpyHostToDevice) );
 	// Bbar'
-	_CUBLAS( cublasSgemmBatched(handle, CUBLAS_OP_T, CUBLAS_OP_T, nv, nx, nu, &alpha, (const float**)devPtrSysMatL, nu,
-			(const float**)devPtrSysMatB, nx, &beta, devPtrMatBbar, nv, ns));
+	_CUBLAS( cublasSgemmBatched(handle, CUBLAS_OP_T, CUBLAS_OP_T, nv, nx, nu, &alpha, (const real_t**)devPtrSysMatL, nu,
+			(const real_t**)devPtrSysMatB, nx, &beta, devPtrMatBbar, nv, ns));
 
 	for(int iStage = N-1; iStage > -1; iStage--){
 		iStageCumulNodes = nodesPerStageCumul[iStage];
@@ -366,24 +366,24 @@ void  Engine::factorStep(){
 		// omega=(p_k\bar{R})^{-1}
 		inverseBatchMat( &devPtrSysCostW[iStageCumulNodes], &devPtrMatOmega[iStageCumulNodes], nv, iStageNodes );
 		// effinet_f=GBar
-		_CUBLAS(cublasSgemmBatched(handle, CUBLAS_OP_T, CUBLAS_OP_T, nv, nu, nu, &alpha, (const float**)devPtrSysMatL, nu,
-				(const float**)&devPtrMatG[iStageCumulNodes], nu, &beta, &devPtrMatF[iStageCumulNodes], nv, iStageNodes) );
+		_CUBLAS(cublasSgemmBatched(handle, CUBLAS_OP_T, CUBLAS_OP_T, nv, nu, nu, &alpha, (const real_t**)devPtrSysMatL, nu,
+				(const real_t**)&devPtrMatG[iStageCumulNodes], nu, &beta, &devPtrMatF[iStageCumulNodes], nv, iStageNodes) );
 		// effinet_g=\bar{B}'
 		_CUDA( cudaMemcpy(&devMatG[nx*nv*iStageCumulNodes], devMatBbar, nx*nv*iStageNodes*sizeof(real_t), cudaMemcpyDeviceToDevice));
 		// effinet_d=\bar{B}'F'
-		_CUBLAS(cublasSgemmBatched(handle, CUBLAS_OP_N, CUBLAS_OP_T, nv, 2*nx, nx, &alpha, (const float**)devPtrMatBbar, nv,
-				(const float**)&devPtrSysMatF[iStageCumulNodes], 2*nx, &beta, &devPtrMatD[iStageCumulNodes], nv, iStageNodes));
+		_CUBLAS(cublasSgemmBatched(handle, CUBLAS_OP_N, CUBLAS_OP_T, nv, 2*nx, nx, &alpha, (const real_t**)devPtrMatBbar, nv,
+				(const real_t**)&devPtrSysMatF[iStageCumulNodes], 2*nx, &beta, &devPtrMatD[iStageCumulNodes], nv, iStageNodes));
 		// phi=\omega \bar{B}'F'
-		_CUBLAS(cublasSgemmBatched(handle, CUBLAS_OP_N, CUBLAS_OP_N, nv, 2*nx, nv, &scale[0], (const float**)
-				&devPtrMatOmega[iStageCumulNodes], nv, (const float**)&devPtrMatD[iStageCumulNodes], nv, &beta,
+		_CUBLAS(cublasSgemmBatched(handle, CUBLAS_OP_N, CUBLAS_OP_N, nv, 2*nx, nv, &scale[0], (const real_t**)
+				&devPtrMatOmega[iStageCumulNodes], nv, (const real_t**)&devPtrMatD[iStageCumulNodes], nv, &beta,
 				&devPtrMatPhi[iStageCumulNodes], nv, iStageNodes));
 		// theta=\omega \bar{B}'
-		_CUBLAS(cublasSgemmBatched(handle, CUBLAS_OP_N, CUBLAS_OP_N, nv, nx, nv, &scale[0], (const float**)
-				&devPtrMatOmega[iStageCumulNodes], nv, (const float**)devPtrMatBbar, nv, &beta,
+		_CUBLAS(cublasSgemmBatched(handle, CUBLAS_OP_N, CUBLAS_OP_N, nv, nx, nv, &scale[0], (const real_t**)
+				&devPtrMatOmega[iStageCumulNodes], nv, (const real_t**)devPtrMatBbar, nv, &beta,
 				&devPtrMatTheta[iStageCumulNodes], nv , iStageNodes));
 		// psi=\omega \bar{G}'
-		_CUBLAS(cublasSgemmBatched(handle, CUBLAS_OP_N, CUBLAS_OP_N, nv, nu, nv, &scale[0],(const float**)
-				&devPtrMatOmega[iStageCumulNodes], nv, (const float**)&devPtrMatF[iStageCumulNodes], nv, &beta,
+		_CUBLAS(cublasSgemmBatched(handle, CUBLAS_OP_N, CUBLAS_OP_N, nv, nu, nv, &scale[0],(const real_t**)
+				&devPtrMatOmega[iStageCumulNodes], nv, (const real_t**)&devPtrMatF[iStageCumulNodes], nv, &beta,
 				&devPtrMatPsi[iStageCumulNodes], nv, iStageNodes));
 	}
 	printf("Factor step is completed\n");
@@ -770,29 +770,29 @@ void Engine::eliminateInputDistubanceCoupling(real_t* nominalDemand, real_t *nom
 			jNodes = iStageCumulNodes + j;
 			_CUBLAS( cublasSaxpy_v2(handle, nd, &alpha, &devVecDemandHat[iStage*nd], 1, &devVecDemand[jNodes*nd],1) );
 		}
-		_CUBLAS(cublasSgemmBatched(handle, CUBLAS_OP_N, CUBLAS_OP_N, nx, 1, nd, &alpha, (const float**)
-				&devPtrMatGd, nx, (const float**)devPtrVecDemand[iStageCumulNodes], nd, &beta,
+		_CUBLAS(cublasSgemmBatched(handle, CUBLAS_OP_N, CUBLAS_OP_N, nx, 1, nd, &alpha, (const real_t**)
+				&devPtrMatGd, nx, (const real_t**)devPtrVecDemand[iStageCumulNodes], nd, &beta,
 				&devPtrVecE[iStageCumulNodes], nx , iStageNodes));
 	}
 	// uhat = Lhat*d
-	_CUBLAS(cublasSgemmBatched(handle, CUBLAS_OP_N, CUBLAS_OP_N, nu, 1, nd, &alpha, (const float**)
-			devPtrSysMatLhat, nu, (const float**)devPtrVecDemand, nd, &beta, devPtrVecUhat, nu , nodes));
+	_CUBLAS(cublasSgemmBatched(handle, CUBLAS_OP_N, CUBLAS_OP_N, nu, 1, nd, &alpha, (const real_t**)
+			devPtrSysMatLhat, nu, (const real_t**)devPtrVecDemand, nd, &beta, devPtrVecUhat, nu , nodes));
 	//alphaBar = L* (alpha1 +alpah2)
 	_CUDA( cudaMemcpy(devCostVecAlpha, nominalPrices, N*nu*sizeof(real_t), cudaMemcpyHostToDevice) );
 	_CUDA( cudaMemcpy(devCostVecAlpha1, ptrMyNetwork->getAlpha(), nu*sizeof(real_t), cudaMemcpyHostToDevice));
 	for(int iStage = 0; iStage < N; iStage++){
 		_CUBLAS( cublasSaxpy_v2(handle, N*nu, &alpha, devCostVecAlpha1, 1, &devCostVecAlpha[iStage*nu], 1) );
 	}
-	_CUBLAS( cublasSgemm_v2(handle, CUBLAS_OP_T, CUBLAS_OP_N, nv, N, nu, &alpha, (const float*) devSysMatL, nu,
-			(const float*)devCostVecAlpha, nu, &beta, devVecAlphaBar, nv));
-	_CUBLAS( cublasSgemm_v2(handle, CUBLAS_OP_N, CUBLAS_OP_N, nu, nv, nu, &alpha, (const float*) devSysCostW, nu,
-			(const float*)devSysMatL, nu, &beta, devMatRhat, nu));
+	_CUBLAS( cublasSgemm_v2(handle, CUBLAS_OP_T, CUBLAS_OP_N, nv, N, nu, &alpha, (const real_t*) devSysMatL, nu,
+			(const real_t*)devCostVecAlpha, nu, &beta, devVecAlphaBar, nv));
+	_CUBLAS( cublasSgemm_v2(handle, CUBLAS_OP_N, CUBLAS_OP_N, nu, nv, nu, &alpha, (const real_t*) devSysCostW, nu,
+			(const real_t*)devSysMatL, nu, &beta, devMatRhat, nu));
 	// Beta
 	calculateDiffUhat<<<nodes, nu>>>(devVecDeltaUhat, devVecUhat, devVecPreviousUhat, devTreeAncestor, nu, nodes);
 	calculateZeta<<<nodes, nu>>>(devVecZeta, devVecDeltaUhat, devTreeProb, devTreeNumChildrenCumul, nu, numNonleafNodes, nodes);
 	alpha = 2;
-	_CUBLAS( cublasSgemm_v2(handle, CUBLAS_OP_T, CUBLAS_OP_N, nv, nodes, nu, &alpha, (const float *) devMatRhat, nu,
-			(const float *) devVecZeta, nu, &beta, devVecBeta, nv) );
+	_CUBLAS( cublasSgemm_v2(handle, CUBLAS_OP_T, CUBLAS_OP_N, nv, nodes, nu, &alpha, (const real_t *) devMatRhat, nu,
+			(const real_t *) devVecZeta, nu, &beta, devVecBeta, nv) );
 	alpha = 1;
 	for(int iNode = 0; iNode < nodes; iNode++){
 		real_t scale = ptrMyScenarioTree->getProbArray()[iNode];
@@ -845,15 +845,6 @@ void Engine::updateStateControl(real_t* currentX, real_t* prevU, real_t* prevUha
 			cudaMemcpyHostToDevice) );
 }
 
-void Engine::testStupidFunction(){
-	real_t maxUpperbound = 0;
-	uint_t nx = ptrMyNetwork->getNumTanks();
-	_CUBLAS( cublasSnrm2_v2(handle, 1, devSysXsUpper, 1, &maxUpperbound) );
-	cout<< maxUpperbound << endl;
-	_CUBLAS( cublasSnrm2_v2(handle, nx, devSysXmax, 1, &maxUpperbound) );
-	cout<< maxUpperbound << endl;
-}
-
 void Engine::inverseBatchMat(real_t** src, real_t** dst, uint_t n, uint_t batchSize){
 	uint_t *P, *INFO;
 
@@ -880,7 +871,7 @@ void Engine::inverseBatchMat(real_t** src, real_t** dst, uint_t n, uint_t batchS
 		}
 	}
 
-	_CUBLAS(cublasSgetriBatched(handle,n,(const float **)src,lda,P,dst,lda,INFO,batchSize));
+	_CUBLAS(cublasSgetriBatched(handle,n,(const real_t **)src,lda,P,dst,lda,INFO,batchSize));
 	_CUDA(cudaMemcpy(INFOh,INFO,batchSize*sizeof(uint_t),cudaMemcpyDeviceToHost));
 
 	for (uint_t i = 0; i < batchSize; i++)
@@ -897,116 +888,6 @@ void Engine::inverseBatchMat(real_t** src, real_t** dst, uint_t n, uint_t batchS
 	INFO = NULL;
 }
 
-void Engine::testInverse(){
-	uint_t size_n = 3;
-	uint_t batch_size = 2;
-
-	real_t* matA=(real_t*)malloc(size_n*size_n*batch_size*sizeof(real_t));
-	real_t* inv_matA=(real_t*)malloc(size_n*size_n*batch_size*sizeof(real_t));
-	real_t** ptr_matA=(real_t**)malloc(batch_size*sizeof(real_t*));
-	real_t** ptr_inv_matA=(real_t**)malloc(batch_size*sizeof(real_t*));
-
-	real_t *dev_matA,*dev_inv_matA,**dev_ptr_matA,**dev_ptr_inv_matA;
-
-	_CUDA(cudaMalloc((void**)&dev_matA,batch_size*size_n*size_n*sizeof(real_t)));
-	_CUDA(cudaMalloc((void**)&dev_inv_matA,batch_size*size_n*size_n*sizeof(real_t)));
-
-	_CUDA(cudaMalloc((void**)&dev_ptr_matA,batch_size*sizeof(real_t*)));
-	_CUDA(cudaMalloc((void**)&dev_ptr_inv_matA,batch_size*sizeof(real_t*)));
-
-	real_t temp;
-	for(int k=0;k<batch_size;k++){
-		for(int i=0;i<size_n;i++)
-			for(int j=0;j<size_n;j++){
-				temp=(real_t)(rand() % 29)/32;
-				matA[k*size_n*size_n+i*size_n+j]=temp;
-				if(i==j){
-					matA[k*size_n*size_n+i*size_n+j]=0.5;
-				}
-			}
-		ptr_matA[k]=&dev_matA[k*size_n*size_n];
-		ptr_inv_matA[k]=&dev_inv_matA[k*size_n*size_n];
-	}
-	for(int k=0;k<batch_size;k++){
-		printf("matrix :%d \n",k);
-		for(int i=0;i<size_n;i++){
-			for(int j=0;j<size_n;j++){
-				printf("%f ",matA[k*size_n*size_n+i*size_n+j]);
-			}
-			printf("\n");
-		}
-	}
-
-	_CUDA(cudaMemcpy(dev_matA,matA,batch_size*size_n*size_n*sizeof(real_t),cudaMemcpyHostToDevice));
-	_CUDA(cudaMemcpy(dev_ptr_matA,ptr_matA,batch_size*sizeof(real_t*),cudaMemcpyHostToDevice));
-
-	_CUDA(cudaMemcpy(dev_ptr_inv_matA,ptr_inv_matA,batch_size*sizeof(real_t*),cudaMemcpyHostToDevice));
-
-
-	this->inverseBatchMat(dev_ptr_matA,dev_ptr_inv_matA,size_n,batch_size);
-	_CUDA(cudaMemcpy(inv_matA,dev_inv_matA,batch_size*size_n*size_n*sizeof(real_t),cudaMemcpyDeviceToHost));
-	for(int k=0;k<batch_size;k++){
-		printf("inverse of matrix :%d \n",k);
-		for(int i=0;i<size_n;i++){
-			for(int j=0;j<size_n;j++){
-				printf("%f ",inv_matA[k*size_n*size_n+i*size_n+j]);
-			}
-			printf("\n");
-		}
-	}
-	printf("Test successful\n");
-
-	free(matA);
-	free(ptr_matA);
-	free(inv_matA);
-	free(ptr_inv_matA);
-
-	_CUDA(cudaFree(dev_matA));
-	_CUDA(cudaFree(dev_inv_matA));
-	_CUDA(cudaFree(dev_ptr_matA));
-	_CUDA(cudaFree(dev_ptr_inv_matA));
-	matA = NULL;
-	ptr_matA = NULL;
-	inv_matA = NULL;
-	ptr_inv_matA = NULL;
-
-	dev_matA = NULL;
-	dev_inv_matA = NULL;
-	dev_ptr_matA = NULL;
-	dev_ptr_inv_matA = NULL;
-}
-
-void Engine::testPrecondtioningFunciton(){
-	uint_t nx = ptrMyNetwork->getNumTanks();
-	uint_t nu = ptrMyNetwork->getNumControls();
-	uint_t N = ptrMyScenarioTree->getNumScenarios();
-	real_t *x = new real_t[2*nu*nu];
-	real_t *devMatDiagPrcnd;
-	_CUDA( cudaMalloc((void**)&devMatDiagPrcnd, N*(2*nx + nu)*sizeof(real_t)) );
-	_CUDA( cudaMemcpy(devMatDiagPrcnd, ptrMySmpcConfig->getMatPrcndDiag(), N*(2*nx + nu)*sizeof(real_t), cudaMemcpyHostToDevice) );
-
-	preconditionSystem<<<2, 2*nx+nu>>>(&devSysMatF[0], &devSysMatG[0], &devMatDiagPrcnd[0], &devTreeProb[0], nx, nu );
-	for (int i = 0; i < 2 ; i++ ){
-		_CUDA( cudaMemcpy(x, &devSysMatG[i*nu*nu], nu*nu*sizeof(real_t), cudaMemcpyDeviceToHost));
-		for (int iRow = 0; iRow < nu; iRow++){
-			for(int iCol = 0; iCol < nu; iCol++){
-				cout<< x[iCol*nu + iRow] << " ";
-				//cout<< iCol*nu + iRow << " ";
-			}
-			cout << "\n";
-		}
-		_CUDA( cudaMemcpy(x, &devSysMatF[i*2*nx*nx], 2*nx*nx*sizeof(real_t), cudaMemcpyDeviceToHost));
-		for (int iRow = 0; iRow < 2*nx; iRow++){
-			for(int iCol = 0; iCol < nx; iCol++){
-				cout<< x[2*iCol*nx + iRow] << " ";
-				//cout<< 2*iCol*nx + iRow << " ";
-			}
-			cout << "\n";
-		}
-	}
-	_CUDA( cudaFree(devMatDiagPrcnd) );
-	delete [] x;
-}
 
 void Engine::deallocateSystemDevice(){
 	_CUDA( cudaFree(devSysMatB) );
