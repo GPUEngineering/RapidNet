@@ -11,7 +11,9 @@
 #include "../rapidjson/document.h"
 #include "../rapidjson/rapidjson.h"
 #include "../rapidjson/filereadstream.h"
-
+#define VARNAME_BETA "beta"
+#define VARNAME_UHAT "uHat"
+#define VARNAME_VEC_E "vecE"
 class Testing{
 public:
 	Testing();
@@ -19,9 +21,11 @@ public:
 	int testScenarioTree();
 	int testForecaster();
 	int testControllerConfig();
+	int testEngineTesting();
 	~Testing();
 private:
 	template<typename T> int compareArray(T* arrayA);
+	template<typename T> int compareDeviceArray(T* arrayA);
 	//int compareArray(real_t* arrayA);
 	string pathToFileNetwork;
 	string pathToFileForecaster;

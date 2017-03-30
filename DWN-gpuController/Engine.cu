@@ -726,11 +726,12 @@ void Engine::eliminateInputDistubanceCoupling(real_t* nominalDemand, real_t *nom
 	real_t **ptrVecUhat = new real_t*[nodes];
 	real_t *devVecDemand, *devVecDemandHat;
 	real_t **devPtrVecUhat, *devVecDeltaUhat, *devVecZeta;
-	real_t *devCostVecAlpha, *devCostVecAlpha1, *devVecAlphaBar;
+	real_t *devVecAlphaHat, *devVecAlpha1, *devVecAlpha, *devVecAlphaBar;
 	real_t *devMatRhat;
+	uint_t *nodeStage = ptrMyScenarioTree->getStageNodes();
 	uint_t *nodesPerStage = ptrMyScenarioTree->getNodesPerStage();
 	uint_t *nodesPerStageCumul = ptrMyScenarioTree->getNodesPerStageCumul();
-	uint_t iStageNodes, iStageCumulNodes, jNodes;
+	uint_t iStageNodes, iStageCumulNodes, jNodes, iStage;
 
 	_CUDA( cudaMalloc((void**)&devVecDemand, nodes*nd*sizeof(real_t)) );
 	_CUDA( cudaMalloc((void**)&devVecDemandHat, N*nd*sizeof(real_t)) );
@@ -739,9 +740,10 @@ void Engine::eliminateInputDistubanceCoupling(real_t* nominalDemand, real_t *nom
 	_CUDA( cudaMalloc((void**)&devPtrVecE, nodes*sizeof(real_t*)) );
 	_CUDA( cudaMalloc((void**)&devPtrVecDemand, nodes*sizeof(real_t*)));
 	_CUDA( cudaMalloc((void**)&devPtrVecUhat, nodes*sizeof(real_t*)) );
-	_CUDA( cudaMalloc((void**)&devCostVecAlpha, N*nu*sizeof(real_t)) );
-	_CUDA( cudaMalloc((void**)&devCostVecAlpha1, nu*sizeof(real_t)) );
-	_CUDA( cudaMalloc((void**)&devVecAlphaBar, N*nv*sizeof(real_t)) );
+	_CUDA( cudaMalloc((void**)&devVecAlphaHat, N*nu*sizeof(real_t)) );
+	_CUDA( cudaMalloc((void**)&devVecAlpha1, nu*sizeof(real_t)) );
+	_CUDA( cudaMalloc((void**)&devVecAlpha, nodes*nu*sizeof(real_t)));
+	_CUDA( cudaMalloc((void**)&devVecAlphaBar, nodes*nv*sizeof(real_t)) );
 	_CUDA( cudaMalloc((void**)&devMatRhat, nu*nv*sizeof(real_t)) );
 	_CUDA( cudaMalloc((void**)&devVecDeltaUhat, nu*nodes*sizeof(real_t)) );
 	_CUDA( cudaMalloc((void**)&devVecZeta, nu*nodes*sizeof(real_t)) );
@@ -750,7 +752,7 @@ void Engine::eliminateInputDistubanceCoupling(real_t* nominalDemand, real_t *nom
 		_CUDA( cudaMemcpy(&devMatGd[iScenario*nx*nd], ptrMyNetwork->getMatGd(), nx*nd*sizeof(real_t), cudaMemcpyHostToDevice) );
 		ptrMatGd[iScenario] = &devMatGd[iScenario*nx*nd];
 	}
-	for( int iNode = 0; iNode < nodes; iNode++){
+	for( uint_t iNode = 0; iNode < nodes; iNode++){
 		ptrVecE[iNode] = &devVecE[iNode*nx];
 		ptrVecDemand[iNode] = &devVecDemand[iNode*nd];
 		ptrVecUhat[iNode] = &devVecUhat[iNode*nu];
@@ -763,10 +765,10 @@ void Engine::eliminateInputDistubanceCoupling(real_t* nominalDemand, real_t *nom
 			cudaMemcpyHostToDevice ));
 	_CUDA( cudaMemcpy(devVecDemandHat, nominalDemand, N*nd*sizeof(real_t), cudaMemcpyHostToDevice ));
 	// d(node) = dhat(stage) + d(node)
-	for (int iStage = 0 ; iStage < N; iStage++){
+	for (iStage = 0 ; iStage < N; iStage++){
 		iStageCumulNodes = nodesPerStageCumul[iStage];
 		iStageNodes = nodesPerStage[iStage];
-		for(int j = 0; j < iStageNodes; j++){
+		for(uint_t j = 0; j < iStageNodes; j++){
 			jNodes = iStageCumulNodes + j;
 			_CUBLAS( cublasSaxpy_v2(handle, nd, &alpha, &devVecDemandHat[iStage*nd], 1, &devVecDemand[jNodes*nd],1) );
 		}
@@ -777,14 +779,20 @@ void Engine::eliminateInputDistubanceCoupling(real_t* nominalDemand, real_t *nom
 	// uhat = Lhat*d
 	_CUBLAS(cublasSgemmBatched(handle, CUBLAS_OP_N, CUBLAS_OP_N, nu, 1, nd, &alpha, (const real_t**)
 			devPtrSysMatLhat, nu, (const real_t**)devPtrVecDemand, nd, &beta, devPtrVecUhat, nu , nodes));
-	//alphaBar = L* (alpha1 +alpah2)
-	_CUDA( cudaMemcpy(devCostVecAlpha, nominalPrices, N*nu*sizeof(real_t), cudaMemcpyHostToDevice) );
-	_CUDA( cudaMemcpy(devCostVecAlpha1, ptrMyNetwork->getAlpha(), nu*sizeof(real_t), cudaMemcpyHostToDevice));
-	for(int iStage = 0; iStage < N; iStage++){
-		_CUBLAS( cublasSaxpy_v2(handle, N*nu, &alpha, devCostVecAlpha1, 1, &devCostVecAlpha[iStage*nu], 1) );
+	// alpha = alphaHat + alpha1 + errorprice
+	_CUDA( cudaMemcpy(devVecAlphaHat, nominalPrices, N*nu*sizeof(real_t), cudaMemcpyHostToDevice) );
+	_CUDA( cudaMemcpy(devVecAlpha1, ptrMyNetwork->getAlpha(), nu*sizeof(real_t), cudaMemcpyHostToDevice));
+	_CUDA(cudaMemcpy(devVecAlpha, ptrMyScenarioTree->getErrorPriceArray(), nu*nodes*sizeof(real_t), cudaMemcpyHostToDevice));
+	for(iStage = 0; iStage < N; iStage++){
+		_CUBLAS( cublasSaxpy_v2(handle, nu, &alpha, devVecAlpha1, 1, &devVecAlphaHat[iStage*nu], 1) );
 	}
-	_CUBLAS( cublasSgemm_v2(handle, CUBLAS_OP_T, CUBLAS_OP_N, nv, N, nu, &alpha, (const real_t*) devSysMatL, nu,
-			(const real_t*)devCostVecAlpha, nu, &beta, devVecAlphaBar, nv));
+	for(uint_t iNode = 0; iNode < nodes; iNode++){
+		iStage = nodeStage[iNode];
+		_CUBLAS( cublasSaxpy_v2(handle, nu, &alpha, &devVecAlphaHat[iStage*nu], 1 , &devVecAlpha[iNode*nu], 1));
+	}
+	// alphaBar = L* (alpha)
+	_CUBLAS( cublasSgemm_v2(handle, CUBLAS_OP_T, CUBLAS_OP_N, nv, nodes, nu, &alpha, (const real_t*) devSysMatL, nu,
+			(const real_t*)devVecAlpha, nu, &beta, devVecAlphaBar, nv));
 	_CUBLAS( cublasSgemm_v2(handle, CUBLAS_OP_N, CUBLAS_OP_N, nu, nv, nu, &alpha, (const real_t*) devSysCostW, nu,
 			(const real_t*)devSysMatL, nu, &beta, devMatRhat, nu));
 	// Beta
@@ -794,7 +802,7 @@ void Engine::eliminateInputDistubanceCoupling(real_t* nominalDemand, real_t *nom
 	_CUBLAS( cublasSgemm_v2(handle, CUBLAS_OP_T, CUBLAS_OP_N, nv, nodes, nu, &alpha, (const real_t *) devMatRhat, nu,
 			(const real_t *) devVecZeta, nu, &beta, devVecBeta, nv) );
 	alpha = 1;
-	for(int iNode = 0; iNode < nodes; iNode++){
+	for(uint_t iNode = 0; iNode < nodes; iNode++){
 		real_t scale = ptrMyScenarioTree->getProbArray()[iNode];
 		_CUBLAS( cublasSaxpy_v2(handle, nv, &scale, &devVecAlphaBar[nv*iNode], 1, &devVecBeta[nv*iNode],1) );
 	}
@@ -810,8 +818,9 @@ void Engine::eliminateInputDistubanceCoupling(real_t* nominalDemand, real_t *nom
 	_CUDA(cudaFree(devPtrVecE));
 	_CUDA(cudaFree(devPtrVecDemand));
 	_CUDA(cudaFree(devPtrVecUhat));
-	_CUDA(cudaFree(devCostVecAlpha));
-	_CUDA(cudaFree(devCostVecAlpha1));
+	_CUDA(cudaFree(devVecAlpha));
+	_CUDA(cudaFree(devVecAlphaHat));
+	_CUDA(cudaFree(devVecAlpha1));
 	_CUDA(cudaFree(devVecAlphaBar));
 	_CUDA(cudaFree(devMatRhat));
 	_CUDA(cudaFree(devVecDeltaUhat));
@@ -828,8 +837,9 @@ void Engine::eliminateInputDistubanceCoupling(real_t* nominalDemand, real_t *nom
 	devPtrVecE = NULL;
 	devPtrVecDemand = NULL;
 	devPtrVecUhat = NULL;
-	devCostVecAlpha = NULL;
-	devCostVecAlpha1 = NULL;
+	devVecAlphaHat = NULL;
+	devVecAlpha = NULL;
+	devVecAlpha1 = NULL;
 	devVecAlphaBar = NULL;
 	devMatRhat = NULL;
 	devVecDeltaUhat = NULL;

@@ -26,18 +26,35 @@ Testing::Testing(){
 	pathToFileNetwork = "../test/testDataFiles/network.json";
 	pathToFileScenarioTree = "../test/testDataFiles/scenarioTree.json";
 	pathToFileControllerConfig = "../test/testDataFiles/controllerConfig.json";
+	pathToFileEnigne = "../test/testDataFiles/engineTest.json";
 }
 
 template<typename T>
 int Testing::compareArray(T* arrayA){
 	T variable;
-	real_t TOLERANCE = 1e-4;
+	real_t TOLERANCE = 1e-2;
 	for (rapidjson::SizeType i = 0; i < a.Size(); i++){
 		variable = arrayA[i] - a[i].GetDouble();
 		_ASSERT(abs(variable) < TOLERANCE);
 	}
 	return 1;
 }
+
+template<typename T>
+int Testing::compareDeviceArray(T* deviceArrayA){
+	T variable;
+	real_t TOLERANCE = 1e-2;
+	T* hostArrayA = new T[a.Size()];
+	_CUDA( cudaMemcpy(hostArrayA, deviceArrayA, a.Size()*sizeof(T), cudaMemcpyDeviceToHost) );
+	for (rapidjson::SizeType i = 0; i < a.Size(); i++){
+		variable = hostArrayA[i] - a[i].GetDouble();
+		cout << variable << " ";
+		//_ASSERT(abs(variable) < TOLERANCE);
+	}
+	cout << endl;
+	return 1;
+}
+
 
 
 int Testing::testNetwork(){
@@ -278,6 +295,49 @@ int Testing::testControllerConfig(){
 	return 1;
 }
 
+int Testing::testEngineTesting(){
+	DwnNetwork *ptrMyDwnNetwork = new DwnNetwork(pathToFileNetwork);
+	ScenarioTree *ptrMyScenarioTree = new ScenarioTree( pathToFileScenarioTree );
+	SmpcConfiguration *ptrMySmpcConfig = new SmpcConfiguration( pathToFileControllerConfig );
+	Forecaster *ptrMyForecaster = new Forecaster( pathToFileForecaster );
+
+	Engine *ptrMyEngine = new Engine( ptrMyDwnNetwork, ptrMyScenarioTree, ptrMySmpcConfig );
+	ptrMyEngine->eliminateInputDistubanceCoupling( ptrMyForecaster->getNominalDemand(),
+			ptrMyForecaster->getNominalPrices());
+	const char* fileName = pathToFileEnigne.c_str();
+	rapidjson::Document jsonDocument;
+	FILE* infile = fopen(fileName, "r");
+	if(infile == NULL){
+		cout << pathToFileEnigne << infile << endl;
+		cerr << "Error in opening the file " <<__LINE__ << endl;
+		exit(100);
+	}else{
+		char* readBuffer = new char[65536];
+		rapidjson::FileReadStream networkJsonStream(infile, readBuffer, sizeof(readBuffer));
+		jsonDocument.ParseStream(networkJsonStream);
+		a = jsonDocument[VARNAME_BETA];
+		_ASSERT(a.IsArray());
+		_ASSERT( compareDeviceArray<real_t>( ptrMyEngine->getVecBeta() ) );
+		/*a = jsonDocument[VARNAME_UHAT];
+		_ASSERT(a.IsArray());
+		_ASSERT( compareDeviceArray<real_t>( ptrMyEngine->getVecUhat() ) );
+		a = jsonDocument[VARNAME_VEC_E];
+		_ASSERT(a.IsArray());
+		_ASSERT( compareDeviceArray<real_t>( ptrMyEngine->getVecE() ) );*/
+		delete [] readBuffer;
+		readBuffer = NULL;
+	}
+	fclose(infile);
+	infile = NULL;	/**/
+	ptrMyDwnNetwork->~DwnNetwork();
+	ptrMyScenarioTree->~ScenarioTree();
+	ptrMySmpcConfig->~SmpcConfiguration();
+	ptrMyForecaster->~Forecaster();
+	ptrMyEngine->~Engine();
+
+	cout << "Completed testing the Engine" << endl;
+	return 1;
+}
 
 Testing::~Testing(){
 

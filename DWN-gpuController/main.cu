@@ -30,6 +30,7 @@ int main(void){
 	_ASSERT( myTesting->testScenarioTree() );
 	_ASSERT( myTesting->testForecaster() );
 	_ASSERT( myTesting->testControllerConfig() );
+	_ASSERT( myTesting->testEngineTesting() );
 
 	string pathToNetworkFile = "../dataFiles/network.json";
 	string pathToScenarioTreeFile = "../dataFiles/scenarioTree.json";

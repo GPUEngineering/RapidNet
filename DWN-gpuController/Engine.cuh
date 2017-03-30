@@ -28,7 +28,6 @@
 #include "ScenarioTree.cuh"
 #include "SmpcConfiguration.cuh"
 #include "Forecaster.cuh"
-#include "unitTestHeader.cuh"
 #include "Utilities.cuh"
 #include "cublas_v2.h"
 
@@ -45,7 +44,7 @@ public:
 	 *
 	 * @param network
 	 * @param forecaster
-	 * @todo remove `unitTest` from here
+	 * @todo remove `SmpcConfig` from here
 	 */
 	Engine( DwnNetwork *network,
 			ScenarioTree *scenarioTree,
