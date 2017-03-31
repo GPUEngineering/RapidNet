@@ -94,9 +94,13 @@ SmpcConfiguration::SmpcConfiguration(string pathToFile){
 		a = jsonDocument[VARNAME_PREV_V];
 		_ASSERT(a.IsArray());
 		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
-			prevV[i] = a[i].GetDouble();
-		stepSize = 1e-4;
-		maxIteration = 500;
+			prevV[i] = (real_t) a[i].GetDouble();
+		a = jsonDocument[VARNAME_STEP_SIZE];
+		_ASSERT(a.IsArray());
+		stepSize = (real_t) a[0].GetDouble();
+		a = jsonDocument[VARNAME_MAX_ITER];
+		_ASSERT(a.IsArray());
+		maxIteration = (uint_t) a[0].GetDouble();
 		delete [] readBuffer;
 		readBuffer = NULL;
 	}
@@ -156,6 +160,13 @@ real_t SmpcConfiguration::getPenaltySafety(){
 	return penaltySafetyX;
 }
 
+uint_t SmpcConfiguration::getMaxIterations(){
+	return maxIteration;
+}
+
+real_t SmpcConfiguration::getStepSize(){
+	return stepSize;
+}
 SmpcConfiguration::~SmpcConfiguration(){
 	delete [] matL;
 	delete [] matLhat;

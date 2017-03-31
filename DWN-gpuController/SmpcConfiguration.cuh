@@ -37,7 +37,8 @@
 #define VARNAME_PREV_UHAT "prevUhat"
 #define VARNAME_PREV_U "prevU"
 #define VARNAME_PREV_V "prevV"
-
+#define VARNAME_STEP_SIZE "stepSize"
+#define VARNAME_MAX_ITER "maxIterations"
 class SmpcConfiguration{
 public:
 
@@ -108,6 +109,14 @@ public:
 	 * Weight that penalise the safety volume of the tank
 	 */
 	real_t getPenaltySafety();
+	/**
+	 * Get the maximum iterations number of iterations
+	 */
+	uint_t getMaxIterations();
+	/**
+	 * Get the step size
+	 */
+	real_t getStepSize();
 	/**
 	 * Default destructor to free the memory
 	 */

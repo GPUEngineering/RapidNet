@@ -284,6 +284,12 @@ int Testing::testControllerConfig(){
 		a = jsonDocument[VARNAME_PREV_V];
 		_ASSERT(a.IsArray());
 		_ASSERT( compareArray<real_t>( ptrMySmpcConfig->getPrevV() ) );
+		a = jsonDocument[VARNAME_STEP_SIZE];
+		_ASSERT(a.IsArray());
+		_ASSERT( ptrMySmpcConfig->getStepSize() == (real_t) a[0].GetDouble() );
+		a = jsonDocument[VARNAME_MAX_ITER];
+		_ASSERT(a.IsArray());
+		_ASSERT( ptrMySmpcConfig->getMaxIterations() == (uint_t) a[0].GetDouble() );
 		delete [] readBuffer;
 		readBuffer = NULL;
 	}
@@ -302,8 +308,8 @@ int Testing::testEngineTesting(){
 	Forecaster *ptrMyForecaster = new Forecaster( pathToFileForecaster );
 
 	Engine *ptrMyEngine = new Engine( ptrMyDwnNetwork, ptrMyScenarioTree, ptrMySmpcConfig );
-	ptrMyEngine->eliminateInputDistubanceCoupling( ptrMyForecaster->getNominalDemand(),
-			ptrMyForecaster->getNominalPrices());
+	//ptrMyEngine->eliminateInputDistubanceCoupling( ptrMyForecaster->getNominalDemand(),
+		//	ptrMyForecaster->getNominalPrices());
 	const char* fileName = pathToFileEnigne.c_str();
 	rapidjson::Document jsonDocument;
 	FILE* infile = fopen(fileName, "r");
@@ -315,10 +321,10 @@ int Testing::testEngineTesting(){
 		char* readBuffer = new char[65536];
 		rapidjson::FileReadStream networkJsonStream(infile, readBuffer, sizeof(readBuffer));
 		jsonDocument.ParseStream(networkJsonStream);
-		a = jsonDocument[VARNAME_BETA];
+		/*a = jsonDocument[VARNAME_BETA];
 		_ASSERT(a.IsArray());
 		_ASSERT( compareDeviceArray<real_t>( ptrMyEngine->getVecBeta() ) );
-		/*a = jsonDocument[VARNAME_UHAT];
+		a = jsonDocument[VARNAME_UHAT];
 		_ASSERT(a.IsArray());
 		_ASSERT( compareDeviceArray<real_t>( ptrMyEngine->getVecUhat() ) );
 		a = jsonDocument[VARNAME_VEC_E];
@@ -328,7 +334,7 @@ int Testing::testEngineTesting(){
 		readBuffer = NULL;
 	}
 	fclose(infile);
-	infile = NULL;	/**/
+	infile = NULL;
 	ptrMyDwnNetwork->~DwnNetwork();
 	ptrMyScenarioTree->~ScenarioTree();
 	ptrMySmpcConfig->~SmpcConfiguration();

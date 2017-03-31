@@ -34,8 +34,7 @@ SmpcController::SmpcController(Forecaster *myForecaster, Engine *myEngine, SmpcC
 	uint_t nv = ptrMySmpcConfig->getNV();
 	uint_t ns = ptrMyScenarioTree->getNumScenarios();
 	uint_t nodes = ptrMyScenarioTree->getNumNodes();
-	MAX_ITERATIONS  = 500;
-	stepSize = 1e-4;
+	stepSize = ptrMySmpcConfig->getStepSize();
 
 	_CUDA( cudaMalloc((void**)&devVecX, nx*nodes*sizeof(real_t)) );
 	_CUDA( cudaMalloc((void**)&devVecU, nu*nodes*sizeof(real_t)) );
@@ -74,11 +73,11 @@ SmpcController::SmpcController(Forecaster *myForecaster, Engine *myEngine, SmpcC
 	real_t** ptrVecQ = new real_t*[ns];
 	real_t** ptrVecR = new real_t*[ns];
 
-	for(int iLeaf = 0; iLeaf < ns; iLeaf++){
-		ptrVecQ[iLeaf] = &devVecQ[iLeaf*nx];
-		ptrVecR[iLeaf] = &devVecR[iLeaf*nv];
+	for(uint_t iScenario = 0; iScenario < ns; iScenario++){
+		ptrVecQ[iScenario] = &devVecQ[iScenario*nx];
+		ptrVecR[iScenario] = &devVecR[iScenario*nv];
 	}
-	for(int iNode = 0; iNode < nodes; iNode++){
+	for(uint_t iNode = 0; iNode < nodes; iNode++){
 		ptrVecX[iNode] = &devVecX[iNode*nx];
 		ptrVecU[iNode] = &devVecU[iNode*nu];
 		ptrVecV[iNode] = &devVecV[iNode*nv];
@@ -170,7 +169,7 @@ void SmpcController::solveStep(){
 	_CUDA( cudaMemcpy(ptrMyEngine->getMatSigma(), ptrMyEngine->getVecBeta(), nv*nodes*sizeof(real_t),
 			cudaMemcpyDeviceToDevice) );
 
-	for(int iStage = N-1;iStage > -1;iStage--){
+	for(uint_t iStage = N-1;iStage > -1;iStage--){
 		iStageCumulNodes = nodesPerStageCumul[iStage];
 		iStageNodes = nodesPerStage[iStage];
 		if(iStage < N-1){
@@ -252,7 +251,7 @@ void SmpcController::solveStep(){
 	// Forward substitution
 	_CUDA(cudaMemcpy(devVecU, ptrMyEngine->getVecUhat(), nodes*nu*sizeof(real_t), cudaMemcpyDeviceToDevice));
 
-	for(int iStage = 0;iStage < N;iStage++){
+	for(uint_t iStage = 0;iStage < N;iStage++){
 		iStageNodes = nodesPerStage[iStage];
 		iStageCumulNodes = nodesPerStageCumul[iStage];
 		if(iStage == 0){
@@ -413,7 +412,7 @@ void SmpcController::algorithmApg(){
 	real_t theta[2] = {1, 1};
 	real_t lambda;
 
-	for (int iter = 0; iter < MAX_ITERATIONS; iter++){
+	for (uint_t iter = 0; iter < ptrMySmpcConfig->getMaxIterations(); iter++){
 		lambda = theta[1]*(1/theta[0] - 1);
 		dualExtrapolationStep(lambda);
 		solveStep();

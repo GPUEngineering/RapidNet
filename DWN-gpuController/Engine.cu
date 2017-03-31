@@ -191,7 +191,7 @@ void Engine::allocateSystemDevice(){
 	real_t **ptrSysMatG = new real_t*[nodes];
 	real_t **ptrSysCostW = new real_t*[nodes];
 
-	for(int iNode = 0; iNode < nodes; iNode++ ){
+	for(uint_t iNode = 0; iNode < nodes; iNode++ ){
 		ptrSysMatF[iNode] = &devSysMatF[iNode*2*nx*nx];
 		ptrSysMatG[iNode] = &devSysMatG[iNode*nu*nu];
 		ptrSysCostW[iNode] = &devSysCostW[iNode*nv*nv];
@@ -246,7 +246,7 @@ void Engine::initialiseSystemDevice(){
 	_CUDA( cudaMalloc((void**)&devMatDiagPrcnd, N*(2*nx + nu)*sizeof(real_t)) );
 	_CUDA( cudaMemcpy(devMatDiagPrcnd, ptrMySmpcConfig->getMatPrcndDiag(), N*(2*nx + nu)*sizeof(real_t),
 			cudaMemcpyHostToDevice) );
-	for (int iScen = 0; iScen < ns; iScen++){
+	for (uint_t iScen = 0; iScen < ns; iScen++){
 		_CUDA( cudaMemcpy(&devSysMatB[iScen*nx*nu], ptrMyNetwork->getMatB(), nx*nu*sizeof(real_t), cudaMemcpyHostToDevice) );
 		_CUDA( cudaMemcpy(&devSysMatL[iScen*nu*nv], ptrMySmpcConfig->getMatL(), nu*nv*sizeof(real_t), cudaMemcpyHostToDevice) );
 		_CUDA( cudaMemcpy(&devSysMatLhat[iScen*nu*nd], ptrMySmpcConfig->getMatLhat(), nu*nd*sizeof(real_t),
@@ -262,7 +262,7 @@ void Engine::initialiseSystemDevice(){
 
 	_CUDA( cudaMemset(devSysMatF, 0, nodes*2*nx*nx*sizeof(real_t)) );
 	_CUDA( cudaMemset(devSysMatG, 0, nodes*nu*nu*sizeof(real_t)) );
-	for (int iStage = 0; iStage < N; iStage++){
+	for (uint_t iStage = 0; iStage < N; iStage++){
 		numBlock = nodesPerStage[iStage];
 		prevNodes = nodesPerStageCumul[iStage];
 		matFIdx = prevNodes*(2*nx * nx);
@@ -300,7 +300,7 @@ void Engine::initialiseSystemDevice(){
 
 	}
 	 */
-	for (int iNodes = 0; iNodes < nodes; iNodes++){
+	for (uint_t iNodes = 0; iNodes < nodes; iNodes++){
 		_CUDA( cudaMemcpy(&devSysXmin[iNodes*nx], ptrMyNetwork->getXmin(), nx*sizeof(real_t), cudaMemcpyHostToDevice) );
 		_CUDA( cudaMemcpy(&devSysXmax[iNodes*nx], ptrMyNetwork->getXmin(), nx*sizeof(real_t), cudaMemcpyHostToDevice) );
 		_CUDA( cudaMemcpy(&devSysXs[iNodes*nx], ptrMyNetwork->getXsafe(), nx*sizeof(real_t), cudaMemcpyHostToDevice) );
@@ -350,7 +350,7 @@ void  Engine::factorStep(){
 	_CUDA( cudaMalloc((void**)&devPtrMatGbar, ns*sizeof(real_t*)) );
 	ptrMatBbar = new real_t*[ns];
 	ptrMatGbar = new real_t*[ns];
-	for(int i = 0; i < ns; i++){
+	for(uint_t i = 0; i < ns; i++){
 		ptrMatBbar[i] = &devMatBbar[i*nx*nv];
 		ptrMatGbar[i] = &devMatGbar[i*nu*nv];
 	}
@@ -360,7 +360,7 @@ void  Engine::factorStep(){
 	_CUBLAS( cublasSgemmBatched(handle, CUBLAS_OP_T, CUBLAS_OP_T, nv, nx, nu, &alpha, (const real_t**)devPtrSysMatL, nu,
 			(const real_t**)devPtrSysMatB, nx, &beta, devPtrMatBbar, nv, ns));
 
-	for(int iStage = N-1; iStage > -1; iStage--){
+	for(uint_t iStage = N-1; iStage > -1; iStage--){
 		iStageCumulNodes = nodesPerStageCumul[iStage];
 		iStageNodes = nodesPerStage[iStage];
 		// omega=(p_k\bar{R})^{-1}
@@ -748,7 +748,7 @@ void Engine::eliminateInputDistubanceCoupling(real_t* nominalDemand, real_t *nom
 	_CUDA( cudaMalloc((void**)&devVecDeltaUhat, nu*nodes*sizeof(real_t)) );
 	_CUDA( cudaMalloc((void**)&devVecZeta, nu*nodes*sizeof(real_t)) );
 
-	for (int iScenario = 0; iScenario < ns; iScenario++){
+	for (uint_t iScenario = 0; iScenario < ns; iScenario++){
 		_CUDA( cudaMemcpy(&devMatGd[iScenario*nx*nd], ptrMyNetwork->getMatGd(), nx*nd*sizeof(real_t), cudaMemcpyHostToDevice) );
 		ptrMatGd[iScenario] = &devMatGd[iScenario*nx*nd];
 	}

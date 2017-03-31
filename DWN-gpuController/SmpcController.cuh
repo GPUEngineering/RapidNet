@@ -35,8 +35,8 @@
  * The object initiates the controller object. This contains
  *   - The forecaster object to predict the nominal water demand and nominal prices
  *   - The Engine object generates matrices that are used in the actual algorithm
- *   - The SmpcConfiguration object that have all the control parameters for the
- *     system
+ *   - The SmpcConfiguration object that have all the user defined parameters of the
+ *     algorithm
  *
  */
 class SmpcController {
@@ -203,11 +203,6 @@ private:
 	 * step size
 	 */
 	real_t stepSize;
-	/**
-	 * Maximum number of iterations.
-	 * Default: 500
-	 */
-	uint_t MAX_ITERATIONS;
 };
 
 #endif /* SMPCONTROLLERCLASS_CUH_ */
