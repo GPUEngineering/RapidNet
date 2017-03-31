@@ -13,13 +13,6 @@
 //#include "cudaKernal.cu"
 //#include "SMPControllerClass.cuh"
 
-/*
-__global__ void increment ( int* dev_a, int p, int N){
-	int tid = threadIdx.x;
-	if ( tid < N)
-		dev_a [tid] = dev_a [tid] + p;
-}
-*/
 int main(void){
 	int runtimeVersion = -1 , driverVersion = -1;
 	cudaRuntimeGetVersion(&runtimeVersion);
