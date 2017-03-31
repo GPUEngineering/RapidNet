@@ -271,6 +271,7 @@ void Engine::initialiseSystemDevice(){
 				&devMatDiagPrcnd[iStage*(2*nx + nu)], &devTreeProb[prevNodes], nx, nu );
 	}
 	/*
+	 real_t *y = new real_t[nodes*nu*nu];
 	_CUDA( cudaMemcpy(y, devPtrSysMatF, nodes*sizeof(real_t*), cudaMemcpyDeviceToHost) );
 
 	for( int iNodes = 0; iNodes < nodes; iNodes++){
@@ -726,12 +727,16 @@ void Engine::eliminateInputDistubanceCoupling(real_t* nominalDemand, real_t *nom
 	real_t **ptrVecUhat = new real_t*[nodes];
 	real_t *devVecDemand, *devVecDemandHat;
 	real_t **devPtrVecUhat, *devVecDeltaUhat, *devVecZeta;
-	real_t *devVecAlphaHat, *devVecAlpha1, *devVecAlpha, *devVecAlphaBar;
+	real_t *devVecAlphaHat;
+	real_t *devVecAlpha1;
+	real_t *devVecAlpha;
+	real_t *devVecAlphaBar;
 	real_t *devMatRhat;
 	uint_t *nodeStage = ptrMyScenarioTree->getStageNodes();
 	uint_t *nodesPerStage = ptrMyScenarioTree->getNodesPerStage();
 	uint_t *nodesPerStageCumul = ptrMyScenarioTree->getNodesPerStageCumul();
 	uint_t iStageNodes, iStageCumulNodes, jNodes, iStage;
+
 
 	_CUDA( cudaMalloc((void**)&devVecDemand, nodes*nd*sizeof(real_t)) );
 	_CUDA( cudaMalloc((void**)&devVecDemandHat, N*nd*sizeof(real_t)) );
@@ -748,6 +753,7 @@ void Engine::eliminateInputDistubanceCoupling(real_t* nominalDemand, real_t *nom
 	_CUDA( cudaMalloc((void**)&devVecDeltaUhat, nu*nodes*sizeof(real_t)) );
 	_CUDA( cudaMalloc((void**)&devVecZeta, nu*nodes*sizeof(real_t)) );
 
+
 	for (uint_t iScenario = 0; iScenario < ns; iScenario++){
 		_CUDA( cudaMemcpy(&devMatGd[iScenario*nx*nd], ptrMyNetwork->getMatGd(), nx*nd*sizeof(real_t), cudaMemcpyHostToDevice) );
 		ptrMatGd[iScenario] = &devMatGd[iScenario*nx*nd];
@@ -757,14 +763,15 @@ void Engine::eliminateInputDistubanceCoupling(real_t* nominalDemand, real_t *nom
 		ptrVecDemand[iNode] = &devVecDemand[iNode*nd];
 		ptrVecUhat[iNode] = &devVecUhat[iNode*nu];
 	}
-
 	_CUDA( cudaMemcpy(devPtrMatGd, ptrMatGd, ns*sizeof(real_t*), cudaMemcpyHostToDevice));
+	_CUDA( cudaMemcpy(devPtrVecDemand, ptrVecDemand, nodes*sizeof(real_t*), cudaMemcpyHostToDevice));
 	_CUDA( cudaMemcpy(devPtrVecE, ptrVecE, nodes*sizeof(real_t*), cudaMemcpyHostToDevice));
-	_CUDA( cudaMemcpy(devPtrVecUhat, ptrVecUhat, nu*sizeof(real_t*), cudaMemcpyHostToDevice));
+	_CUDA( cudaMemcpy(devPtrVecUhat, ptrVecUhat, nodes*sizeof(real_t*), cudaMemcpyHostToDevice));
+	// d(node) = dhat(stage) + d(node)
+	// e = Gd*d
 	_CUDA( cudaMemcpy(devVecDemand, ptrMyScenarioTree->getErrorDemandArray(), nodes*nd*sizeof(real_t),
 			cudaMemcpyHostToDevice ));
 	_CUDA( cudaMemcpy(devVecDemandHat, nominalDemand, N*nd*sizeof(real_t), cudaMemcpyHostToDevice ));
-	// d(node) = dhat(stage) + d(node)
 	for (iStage = 0 ; iStage < N; iStage++){
 		iStageCumulNodes = nodesPerStageCumul[iStage];
 		iStageNodes = nodesPerStage[iStage];
@@ -772,9 +779,9 @@ void Engine::eliminateInputDistubanceCoupling(real_t* nominalDemand, real_t *nom
 			jNodes = iStageCumulNodes + j;
 			_CUBLAS( cublasSaxpy_v2(handle, nd, &alpha, &devVecDemandHat[iStage*nd], 1, &devVecDemand[jNodes*nd],1) );
 		}
-		_CUBLAS(cublasSgemmBatched(handle, CUBLAS_OP_N, CUBLAS_OP_N, nx, 1, nd, &alpha, (const real_t**)
-				&devPtrMatGd, nx, (const real_t**)devPtrVecDemand[iStageCumulNodes], nd, &beta,
-				&devPtrVecE[iStageCumulNodes], nx , iStageNodes));
+		_CUBLAS(cublasSgemmBatched(handle, CUBLAS_OP_N, CUBLAS_OP_N, nx, 1, nd, &alpha, (const real_t**)devPtrMatGd,
+				nx, (const real_t**)&devPtrVecDemand[iStageCumulNodes], nd, &beta, &devPtrVecE[iStageCumulNodes],
+				nx , iStageNodes));
 	}
 	// uhat = Lhat*d
 	_CUBLAS(cublasSgemmBatched(handle, CUBLAS_OP_N, CUBLAS_OP_N, nu, 1, nd, &alpha, (const real_t**)
@@ -806,7 +813,6 @@ void Engine::eliminateInputDistubanceCoupling(real_t* nominalDemand, real_t *nom
 		real_t scale = ptrMyScenarioTree->getProbArray()[iNode];
 		_CUBLAS( cublasSaxpy_v2(handle, nv, &scale, &devVecAlphaBar[nv*iNode], 1, &devVecBeta[nv*iNode],1) );
 	}
-
 	delete [] ptrMatGd;
 	delete [] ptrVecE;
 	delete [] ptrVecDemand;

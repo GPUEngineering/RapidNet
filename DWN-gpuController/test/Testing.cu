@@ -46,16 +46,31 @@ int Testing::compareDeviceArray(T* deviceArrayA){
 	real_t TOLERANCE = 1e-2;
 	T* hostArrayA = new T[a.Size()];
 	_CUDA( cudaMemcpy(hostArrayA, deviceArrayA, a.Size()*sizeof(T), cudaMemcpyDeviceToHost) );
-	for (rapidjson::SizeType i = 0; i < a.Size(); i++){
+	for (uint_t i = 0; i < a.Size(); i++){
 		variable = hostArrayA[i] - a[i].GetDouble();
-		cout << variable << " ";
-		//_ASSERT(abs(variable) < TOLERANCE);
+		//cout << variable << " ";
+		_ASSERT(abs(variable) < TOLERANCE);
 	}
-	cout << endl;
+	//cout << endl;
 	return 1;
 }
 
-
+template<typename T>
+int Testing::compareDeviceScenarioArray(T* arrayA, uint_t *nodes, uint_t dim){
+	T variable;
+	real_t TOLERANCE = 1e-2;
+	T* hostArrayA = new T[dim];
+	uint_t numNodes = a.Size()/dim;
+	for (uint_t i = 0; i < numNodes; i++){
+		_CUDA( cudaMemcpy(hostArrayA, &arrayA[(nodes[i]-1)*dim], dim*sizeof(T), cudaMemcpyDeviceToHost));
+		for (uint_t j = 0; j < dim; j++ ){
+			variable = hostArrayA[j] - a[i*dim + j].GetDouble();
+			//cout<< hostArrayA[j] << " " << a[i*dim + j].GetDouble() << " ";
+			_ASSERT(abs(variable) < TOLERANCE);
+		}
+	}
+	return 1;
+}
 
 int Testing::testNetwork(){
 	DwnNetwork *ptrMyDwnNetwork = new DwnNetwork(pathToFileNetwork);
@@ -308,8 +323,22 @@ int Testing::testEngineTesting(){
 	Forecaster *ptrMyForecaster = new Forecaster( pathToFileForecaster );
 
 	Engine *ptrMyEngine = new Engine( ptrMyDwnNetwork, ptrMyScenarioTree, ptrMySmpcConfig );
-	//ptrMyEngine->eliminateInputDistubanceCoupling( ptrMyForecaster->getNominalDemand(),
-		//	ptrMyForecaster->getNominalPrices());
+	uint_t *testNodeArray = new uint_t[ptrMyScenarioTree->getPredHorizon()];
+	uint_t dim;
+	uint_t nx  = ptrMyDwnNetwork->getNumTanks();
+	uint_t nu  = ptrMyDwnNetwork->getNumControls();
+	uint_t nv  = ptrMySmpcConfig->getNV();
+	real_t *y = new real_t[ptrMyScenarioTree->getNumNodes()*nu*nu];
+	/*for (uint_t i = 0; i < ptrMyForecaster->getDimDemand()*ptrMyForecaster->getPredHorizon(); i++)
+		cout << ptrMyForecaster->getNominalDemand()[i] << " ";
+	cout << endl;
+	for (uint_t i = 0; i < ptrMyForecaster->getDimPrice()*ptrMyForecaster->getPredHorizon(); i++)
+			cout << ptrMyForecaster->getNominalPrices()[i] << " ";
+	cout << endl;
+	*/
+	ptrMyEngine->factorStep();
+	ptrMyEngine->eliminateInputDistubanceCoupling( ptrMyForecaster->getNominalDemand(),
+			ptrMyForecaster->getNominalPrices());
 	const char* fileName = pathToFileEnigne.c_str();
 	rapidjson::Document jsonDocument;
 	FILE* infile = fopen(fileName, "r");
@@ -323,13 +352,81 @@ int Testing::testEngineTesting(){
 		jsonDocument.ParseStream(networkJsonStream);
 		/*a = jsonDocument[VARNAME_BETA];
 		_ASSERT(a.IsArray());
-		_ASSERT( compareDeviceArray<real_t>( ptrMyEngine->getVecBeta() ) );
-		a = jsonDocument[VARNAME_UHAT];
+		_ASSERT( compareDeviceArray<real_t>( ptrMyEngine->getVecBeta() ) );*/
+		/*a = jsonDocument[VARNAME_UHAT];
 		_ASSERT(a.IsArray());
 		_ASSERT( compareDeviceArray<real_t>( ptrMyEngine->getVecUhat() ) );
 		a = jsonDocument[VARNAME_VEC_E];
 		_ASSERT(a.IsArray());
 		_ASSERT( compareDeviceArray<real_t>( ptrMyEngine->getVecE() ) );*/
+		a = jsonDocument[VARNAME_SCE_NOD];
+		_ASSERT(a.IsArray());
+		for (uint_t i = 0; i < ptrMyScenarioTree->getPredHorizon(); i++){
+			testNodeArray[i] = (uint_t) a[i].GetDouble();
+		}
+		a = jsonDocument[VARNAME_L];
+		_ASSERT(a.IsArray());
+		_ASSERT( compareDeviceArray<real_t>( ptrMyEngine->getSysMatL() ) );
+		/*cout<< endl;
+		uint_t nx = ptrMyDwnNetwork->getNumTanks();
+		uint_t nodes = ptrMyScenarioTree->getNumNodes();
+		_CUDA( cudaMemcpy(y, ptrMyEngine->getSysMatF(), 2*nodes*nx*nx*sizeof(real_t), cudaMemcpyDeviceToHost));
+		for ( uint_t j = 0; j < nodes; j++){
+			cout << j << " ";
+			for ( uint_t iEle = 0; iEle < 2*nx*nx; iEle++){
+				cout << y[j*2*nx*nx + iEle] << " ";
+			}
+			cout << endl;
+		}*/
+		/*a = jsonDocument[VARNAME_SYS_F];
+		_ASSERT(a.IsArray());
+		dim = 2*nx*nx;
+		_ASSERT( compareDeviceScenarioArray( ptrMyEngine->getSysMatF(), testNodeArray, dim));
+		a = jsonDocument[VARNAME_SYS_G];
+		_ASSERT(a.IsArray());
+		dim = nu*nu;
+		_ASSERT( compareDeviceScenarioArray( ptrMyEngine->getSysMatG(), testNodeArray, dim));*/
+		a = jsonDocument[VARNAME_OMEGA];
+		_ASSERT(a.IsArray());
+		dim = nv*nv;
+		_ASSERT( compareDeviceScenarioArray( ptrMyEngine->getMatOmega(), testNodeArray, dim));
+		cout << VARNAME_OMEGA << endl;
+		a = jsonDocument[VARNAME_F];
+		_ASSERT(a.IsArray());
+		dim = nu*nv;
+		_ASSERT( compareDeviceScenarioArray( ptrMyEngine->getMatF(), testNodeArray, dim));
+		cout << VARNAME_F<< endl;
+		/*
+		a = jsonDocument[VARNAME_PHI];
+		_ASSERT(a.IsArray());
+		dim = 2*nv*nx;
+		_ASSERT( compareDeviceScenarioArray( ptrMyEngine->getMatPhi(), testNodeArray, dim));
+		cout << VARNAME_PHI << endl;
+		a = jsonDocument[VARNAME_PSI];
+		_ASSERT(a.IsArray());
+		dim = nv*nu;
+		_ASSERT( compareDeviceScenarioArray( ptrMyEngine->getMatPsi(), testNodeArray, dim));
+		cout << VARNAME_PSI << endl;
+		a = jsonDocument[VARNAME_THETA];
+		_ASSERT(a.IsArray());
+		dim = nx*nv;
+		_ASSERT( compareDeviceScenarioArray( ptrMyEngine->getMatTheta(), testNodeArray, dim));
+		cout << VARNAME_THETA << endl;
+		a = jsonDocument[VARNAME_D];
+		_ASSERT(a.IsArray());
+		dim = 2*nx*nv;
+		_ASSERT( compareDeviceScenarioArray( ptrMyEngine->getMatD(), testNodeArray, dim));
+		cout << VARNAME_D << endl;
+		a = jsonDocument[VARNAME_F];
+		_ASSERT(a.IsArray());
+		dim = nu*nv;
+		_ASSERT( compareDeviceScenarioArray( ptrMyEngine->getMatF(), testNodeArray, dim));
+		cout << VARNAME_F << endl;
+		a = jsonDocument[VARNAME_G];
+		_ASSERT(a.IsArray());
+		dim = nx*nv;
+		_ASSERT( compareDeviceScenarioArray( ptrMyEngine->getMatG(), testNodeArray, dim));
+		cout << VARNAME_G << endl;*/
 		delete [] readBuffer;
 		readBuffer = NULL;
 	}

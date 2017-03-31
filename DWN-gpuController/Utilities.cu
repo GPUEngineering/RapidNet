@@ -43,7 +43,7 @@ __global__ void preconditionSystem(
 	int currentBlock  = blockIdx.x;
 	int matFDim = 2*nx*nx;
 	int matGDim = nu*nu;
-	real_t probValue = scaleVec[ currentBlock ];
+	real_t probSqrtValue = sqrt(scaleVec[ currentBlock ]);
 	real_t currentScaleValue = dualDiagPrcnd[ currentThread ];
 	/*if( currentThread < nx){
 		uint_t matFIdx = currentBlock * matFDim + (nx*currentThread + currentThread);
@@ -58,16 +58,16 @@ __global__ void preconditionSystem(
 	}*/
 	if( currentThread < nu ){
 		int matGIdx = currentBlock*matGDim + nu*currentThread + currentThread;
-		matG[ matGIdx ] = probValue * currentScaleValue;
+		matG[ matGIdx ] = probSqrtValue * currentScaleValue;
 	}else if( currentThread > nx & currentThread < nx + nu){
 		int rowIdx = currentThread - nu;
 		int matFIdx = currentBlock*matFDim + 2*nx*rowIdx + rowIdx;
-		matF[matFIdx] = probValue * currentScaleValue;
+		matF[matFIdx] = probSqrtValue * currentScaleValue;
 	}else{
 		int rowIdx = currentThread - nu;
 		//int matFIdx = currentBlock*matFDim + nx*rowIdx + rowIdx - nx;
 		int matFIdx = currentBlock*matFDim + 2*nx*(rowIdx - nx) + rowIdx;
-		matF[matFIdx] = probValue * currentScaleValue;
+		matF[matFIdx] = probSqrtValue * currentScaleValue;
 	}
 }
 
