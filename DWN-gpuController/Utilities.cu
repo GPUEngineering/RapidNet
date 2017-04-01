@@ -95,8 +95,8 @@ __global__ void calculateDiffUhat(
 		if (currentBlock == 0){
 			devDeltaUhat[currentThread] = devUhat[currentThread] - prevUhat[currentThread];
 		}else{
-			ancestorIdx = devTreeAncestor[currentBlock]*nu + currentThread;
-			devDeltaUhat[tid] = devUhat[tid] - devUhat[currentThread];
+			ancestorIdx = (devTreeAncestor[currentBlock]-1)*nu + currentThread;
+			devDeltaUhat[tid] = devUhat[tid] - devUhat[ancestorIdx];
 		}
 	}
 }

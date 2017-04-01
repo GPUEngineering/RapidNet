@@ -176,6 +176,7 @@ void Engine::allocateSystemDevice(){
 	_CUDA( cudaMalloc((void**)&devVecCurrentState, nx*sizeof(real_t)) );
 	_CUDA( cudaMalloc((void**)&devVecPreviousControl, nu*sizeof(real_t)) );
 	_CUDA( cudaMalloc((void**)&devVecPreviousUhat, nu*sizeof(real_t)) );
+	_CUDA( cudaMalloc((void**)&devMatWv, nu*nv*sizeof(real_t)) );
 
 	_CUDA( cudaMalloc((void**)&devPtrSysMatB, nodes*sizeof(real_t*)) );
 	_CUDA( cudaMalloc((void**)&devPtrSysMatL, nodes*sizeof(real_t*)) );
@@ -257,6 +258,7 @@ void Engine::initialiseSystemDevice(){
 	_CUDA( cudaMemcpy(devCostMatW, ptrMySmpcConfig->getCostW(), nu*nu*sizeof(real_t), cudaMemcpyHostToDevice) );
 	_CUBLAS( cublasSgemm_v2(handle, CUBLAS_OP_N, CUBLAS_OP_N, nu, nv, nu, &alpha, (const real_t*) devCostMatW, nu,
 			(const real_t*) devSysMatL, nu, &beta, devMatvariable, nu) );
+	_CUDA( cudaMemcpy( devMatWv, devMatvariable, nu*nv*sizeof(real_t), cudaMemcpyDeviceToDevice) );
 	_CUBLAS( cublasSgemm_v2(handle, CUBLAS_OP_T, CUBLAS_OP_N, nv, nv, nu, &alpha, (const real_t*) devSysMatL, nu,
 			(const real_t*) devMatvariable, nu, &beta, devCostMatW, nv) );
 
@@ -270,37 +272,7 @@ void Engine::initialiseSystemDevice(){
 		preconditionSystem<<<numBlock, 2*nx+nu>>>(&devSysMatF[matFIdx], &devSysMatG[matGIdx],
 				&devMatDiagPrcnd[iStage*(2*nx + nu)], &devTreeProb[prevNodes], nx, nu );
 	}
-	/*
-	 real_t *y = new real_t[nodes*nu*nu];
-	_CUDA( cudaMemcpy(y, devPtrSysMatF, nodes*sizeof(real_t*), cudaMemcpyDeviceToHost) );
 
-	for( int iNodes = 0; iNodes < nodes; iNodes++){
-		//cout<< y[iNodes] << " ";
-		_CUDA( cudaMemcpy(x, &devSysMatF[iNodes*2*nx*nx], 2*nx*nx*sizeof(real_t), cudaMemcpyDeviceToHost));
-		for (int iRow = 0; iRow < 2*nx; iRow++){
-			for(int iCol = 0; iCol < nx; iCol++){
-				cout<< x[2*iCol*nx + iRow] << " ";
-				//cout<< 2*iCol*nx + iRow << " ";
-			}
-			cout << "\n";
-		}
-	}
-
-	_CUDA( cudaMemcpy(x, devMatDiagPrcnd, N*(2*nx + nu)*sizeof(real_t), cudaMemcpyDeviceToHost));
-	for (int i = 0; i < N*(2*nx + nu); i++)
-		cout<< x[i] << " " << i << " ";
-	cout<<"\n";
-	_CUDA( cudaMemcpy(x, devTreeProb, N*sizeof(real_t), cudaMemcpyDeviceToHost) );
-	for (int i = 0; i < N; i++ )
-		cout<< x[i] << " ";
-	cout<<"\n";
-
-	for( int iNodes = 0; iNodes < nodes; iNodes++){
-		//cout<< y[iNodes] << " ";
-		_CUDA( cudaMemcpy(x, &devSysMatG[iNodes*nu*nu], nu*nu*sizeof(real_t), cudaMemcpyDeviceToHost));
-
-	}
-	 */
 	for (uint_t iNodes = 0; iNodes < nodes; iNodes++){
 		_CUDA( cudaMemcpy(&devSysXmin[iNodes*nx], ptrMyNetwork->getXmin(), nx*sizeof(real_t), cudaMemcpyHostToDevice) );
 		_CUDA( cudaMemcpy(&devSysXmax[iNodes*nx], ptrMyNetwork->getXmin(), nx*sizeof(real_t), cudaMemcpyHostToDevice) );
@@ -368,7 +340,7 @@ void  Engine::factorStep(){
 		inverseBatchMat( &devPtrSysCostW[iStageCumulNodes], &devPtrMatOmega[iStageCumulNodes], nv, iStageNodes );
 		// effinet_f=GBar
 		_CUBLAS(cublasSgemmBatched(handle, CUBLAS_OP_T, CUBLAS_OP_T, nv, nu, nu, &alpha, (const real_t**)devPtrSysMatL, nu,
-				(const real_t**)&devPtrMatG[iStageCumulNodes], nu, &beta, &devPtrMatF[iStageCumulNodes], nv, iStageNodes) );
+				(const real_t**)&devPtrSysMatG[iStageCumulNodes], nu, &beta, &devPtrMatF[iStageCumulNodes], nv, iStageNodes) );
 		// effinet_g=\bar{B}'
 		_CUDA( cudaMemcpy(&devMatG[nx*nv*iStageCumulNodes], devMatBbar, nx*nv*iStageNodes*sizeof(real_t), cudaMemcpyDeviceToDevice));
 		// effinet_d=\bar{B}'F'
@@ -387,7 +359,7 @@ void  Engine::factorStep(){
 				&devPtrMatOmega[iStageCumulNodes], nv, (const real_t**)&devPtrMatF[iStageCumulNodes], nv, &beta,
 				&devPtrMatPsi[iStageCumulNodes], nv, iStageNodes));
 	}
-	printf("Factor step is completed\n");
+	//cout << "Factor step is completed\n";
 
 	delete [] ptrMatBbar;
 	delete [] ptrMatGbar;
@@ -805,10 +777,12 @@ void Engine::eliminateInputDistubanceCoupling(real_t* nominalDemand, real_t *nom
 	// Beta
 	calculateDiffUhat<<<nodes, nu>>>(devVecDeltaUhat, devVecUhat, devVecPreviousUhat, devTreeAncestor, nu, nodes);
 	calculateZeta<<<nodes, nu>>>(devVecZeta, devVecDeltaUhat, devTreeProb, devTreeNumChildrenCumul, nu, numNonleafNodes, nodes);
+
 	alpha = 2;
-	_CUBLAS( cublasSgemm_v2(handle, CUBLAS_OP_T, CUBLAS_OP_N, nv, nodes, nu, &alpha, (const real_t *) devMatRhat, nu,
+	_CUBLAS( cublasSgemm_v2(handle, CUBLAS_OP_T, CUBLAS_OP_N, nv, nodes, nu, &alpha, (const real_t *) devMatWv, nu,
 			(const real_t *) devVecZeta, nu, &beta, devVecBeta, nv) );
 	alpha = 1;
+
 	for(uint_t iNode = 0; iNode < nodes; iNode++){
 		real_t scale = ptrMyScenarioTree->getProbArray()[iNode];
 		_CUBLAS( cublasSaxpy_v2(handle, nv, &scale, &devVecAlphaBar[nv*iNode], 1, &devVecBeta[nv*iNode],1) );
@@ -920,6 +894,7 @@ void Engine::deallocateSystemDevice(){
 	_CUDA( cudaFree(devVecCurrentState));
 	_CUDA( cudaFree(devVecPreviousControl));
 	_CUDA( cudaFree(devVecPreviousUhat));
+	_CUDA( cudaFree(devMatWv) );
 
 	_CUDA( cudaFree(devPtrSysMatB) );
 	_CUDA( cudaFree(devPtrSysMatL) );

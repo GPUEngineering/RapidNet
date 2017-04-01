@@ -574,6 +574,10 @@ private:
 	 */
 	real_t *devVecE;
 	/**
+	 * Wv = W*L
+	 */
+	real_t *devMatWv;
+	/**
 	 * cublas handler
 	 */
 	cublasHandle_t handle;
