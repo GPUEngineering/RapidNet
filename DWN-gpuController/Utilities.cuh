@@ -109,7 +109,7 @@ __global__  void solveSumChildren(
 			real_t *dst,
 			uint_t *devTreeNumChildren,
 			uint_t *devTreeNumChildCumul,
-		  uint_t iStageCumulNodes,
+		    uint_t iStageCumulNodes,
 			uint_t iStageNodes,
 			uint_t iStage,
 			uint_t dim);
@@ -126,7 +126,7 @@ __global__ void kernelDualExtrapolationStep(
 			real_t *vecPrevDual,
 			real_t *vecCurrentDual,
 			real_t alpha,
-			int size);
+			uint_t size);
 
 
 
@@ -143,9 +143,9 @@ __global__ void projectionBox(
 			real_t *vecX,
 			real_t *lowerbound,
 			real_t *upperbound,
-			int dim,
-			int offset,
-			int size);
+			uint_t dim,
+			uint_t offset,
+			uint_t size);
 
 
 /**
@@ -159,12 +159,10 @@ __global__ void projectionBox(
 __global__ void shuffleVector(
 				real_t *dst,
 				real_t *src,
-				int dimVec,
-				int numVec,
-				int numBlocks);
+				uint_t dimVec,
+				uint_t numVec,
+				uint_t numBlocks);
 /**
- * @todo int change to: uint_t
- *
  * @param dst
  * @param src
  * @param scale
@@ -176,12 +174,11 @@ __global__ void additionVectorOffset(
 			real_t *dst,
 			real_t *src,
 			real_t scale,
-			int dim,
-			int offset,
-			int size);
+			uint_t dim,
+			uint_t offset,
+			uint_t size);
 
 /**
- * @todo int change to: uint_t
  * @param vecDualY
  * @param vecDualW
  * @param vecHX
@@ -194,19 +191,10 @@ __global__ void kernelDualUpdate(
 			real_t *vecDualW,
 			real_t *vecHX,
 			real_t *vecZ,
-			float stepSize,
-			int size);
+			real_t stepSize,
+			uint_t size);
 
 /**
- * @todo remove this method
- */
-__global__ void testGPUAdd(
-			real_t *matF,
-			real_t *matG,
-			uint_t k);
-
-/**
- * @todo change int into uint_t
  * @param vecU
  * @param lowerbound
  * @param upperbound
@@ -216,7 +204,42 @@ __global__ void projectionControl(
 			real_t *vecU,
 			real_t *lowerbound,
 			real_t *upperbound,
-			int size);
+			uint_t size);
 
+/**
+ *
+ * @param  devXmax
+ * @param  devXmin
+ * @param  devXsafe
+ * @param  matPrcndDiag
+ * @param  probNode
+ * @param  dim
+ * @param  numBlock
+ */
+__global__ void preconditionConstraintX(
+		real_t *devXmax,
+		real_t *devXmin,
+		real_t *devXsafe,
+		real_t *matPrcndDiag,
+		real_t *probNode,
+		uint_t dim,
+		uint_t numBlock);
+
+/**
+ *
+ * @param  devXmax
+ * @param  devXmin
+ * @param  devXsafe
+ * @param  matPrcndDiag
+ * @param  dim
+ * @param  numBlock
+ */
+__global__ void preconditionConstraintU(
+		real_t *devUmax,
+		real_t *devUmin,
+		real_t *matPrcndDiag,
+		real_t *probNode,
+		uint_t dim,
+		uint_t numBlock);
 
 #endif /* CUDAKERNELHEADER_CUH_ */
