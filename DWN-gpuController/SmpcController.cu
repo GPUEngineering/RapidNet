@@ -144,6 +144,8 @@ void SmpcController::dualExtrapolationStep(real_t lambda){
 	// y_{k} = y_{k-1}
 	_CUDA(cudaMemcpy(devVecXi, devVecUpdateXi, 2*nx*nodes*sizeof(real_t), cudaMemcpyDeviceToDevice));
 	_CUDA(cudaMemcpy(devVecPsi, devVecUpdatePsi, nu*nodes*sizeof(real_t), cudaMemcpyDeviceToDevice));
+	ptrMyNetwork = NULL;
+	ptrMyScenarioTree = NULL;
 }
 
 void SmpcController::solveStep(){

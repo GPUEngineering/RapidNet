@@ -57,7 +57,7 @@ public:
 	 * Destructor. Frees allocated memory.
 	 */
 	~SmpcController();
-private:
+protected:
 	/**
 	 * Performs the dual extrapolation step with given parameter.
 	 * @param extrapolation parameter.
@@ -81,6 +81,10 @@ private:
 	 * This method executes the APG algorithm.
 	 */
 	void algorithmApg();
+	/**
+	 *
+	 */
+//private:
 	/**
 	 * Pointer to an Engine object.
 	 * The Engine is responsible for the factor step.

@@ -240,6 +240,7 @@ void Engine::initialiseSystemDevice(){
 	uint_t *nodesPerStageCumul = ptrMyScenarioTree->getNodesPerStageCumul();
 	uint_t numBlock, prevNodes;
 	uint_t matFIdx, matGIdx;
+	uint_t stateIdx, controlIdx;
 	real_t *devMatDiagPrcnd;
 	real_t *devCostMatW, *devMatvariable;
 	real_t alpha = 1, beta = 0;
@@ -264,29 +265,38 @@ void Engine::initialiseSystemDevice(){
 
 	_CUDA( cudaMemset(devSysMatF, 0, nodes*2*nx*nx*sizeof(real_t)) );
 	_CUDA( cudaMemset(devSysMatG, 0, nodes*nu*nu*sizeof(real_t)) );
+
+	for (uint_t iNodes = 0; iNodes < nodes; iNodes++){
+		_CUDA( cudaMemcpy(&devSysXmin[iNodes*nx], ptrMyNetwork->getXmin(), nx*sizeof(real_t), cudaMemcpyHostToDevice) );
+		_CUDA( cudaMemcpy(&devSysXmax[iNodes*nx], ptrMyNetwork->getXmax(), nx*sizeof(real_t), cudaMemcpyHostToDevice) );
+		_CUDA( cudaMemcpy(&devSysXs[iNodes*nx], ptrMyNetwork->getXsafe(), nx*sizeof(real_t), cudaMemcpyHostToDevice) );
+		_CUDA( cudaMemcpy(&devSysUmin[iNodes*nx], ptrMyNetwork->getUmin(), nu*sizeof(real_t), cudaMemcpyHostToDevice) );
+		_CUDA( cudaMemcpy(&devSysUmax[iNodes*nx], ptrMyNetwork->getUmax(), nu*sizeof(real_t), cudaMemcpyHostToDevice) );
+		/*_CUBLAS( cublasSscal_v2(handle, nx, &ptrMyScenarioTree->getProbArray()[iNodes], &devSysXmax[iNodes*nx], 1) );
+			_CUBLAS( cublasSscal_v2(handle, nx, &ptrMyScenarioTree->getProbArray()[iNodes], &devSysXmin[iNodes*nx], 1) );
+			_CUBLAS( cublasSscal_v2(handle, nx, &ptrMyScenarioTree->getProbArray()[iNodes], &devSysXs[iNodes*nx], 1) );
+			_CUBLAS( cublasSscal_v2(handle, nu, &ptrMyScenarioTree->getProbArray()[iNodes], &devSysUmax[iNodes*nu], 1) );
+			_CUBLAS( cublasSscal_v2(handle, nu, &ptrMyScenarioTree->getProbArray()[iNodes], &devSysUmin[iNodes*nu], 1) );*/
+		_CUDA( cudaMemcpy(&devSysCostW[iNodes*nv*nv], devCostMatW, nv*nv*sizeof(real_t), cudaMemcpyDeviceToDevice) );
+		_CUBLAS( cublasSscal_v2(handle, nv*nv, &ptrMyScenarioTree->getProbArray()[iNodes], &devSysCostW[iNodes*nv*nv], 1) );
+	}
+
 	for (uint_t iStage = 0; iStage < N; iStage++){
 		numBlock = nodesPerStage[iStage];
 		prevNodes = nodesPerStageCumul[iStage];
 		matFIdx = prevNodes*(2*nx * nx);
 		matGIdx = prevNodes*(nu * nu);
+		stateIdx = prevNodes*nx;
+		controlIdx = prevNodes*nu;
 		preconditionSystem<<<numBlock, 2*nx+nu>>>(&devSysMatF[matFIdx], &devSysMatG[matGIdx],
 				&devMatDiagPrcnd[iStage*(2*nx + nu)], &devTreeProb[prevNodes], nx, nu );
+		preconditionConstraintU<<<numBlock, nu>>>(&devSysUmax[controlIdx], &devSysUmin[controlIdx],
+				&devMatDiagPrcnd[iStage*(2*nx + nu)], &devTreeProb[prevNodes], nu, numBlock);
+		preconditionConstraintX<<<numBlock, nx>>>(&devSysXmax[stateIdx], &devSysXmin[stateIdx], &devSysXs[stateIdx],
+				&devMatDiagPrcnd[iStage*(2*nx + nu) + 2*nx], &devTreeProb[prevNodes], nx, numBlock);
 	}
 
-	for (uint_t iNodes = 0; iNodes < nodes; iNodes++){
-		_CUDA( cudaMemcpy(&devSysXmin[iNodes*nx], ptrMyNetwork->getXmin(), nx*sizeof(real_t), cudaMemcpyHostToDevice) );
-		_CUDA( cudaMemcpy(&devSysXmax[iNodes*nx], ptrMyNetwork->getXmin(), nx*sizeof(real_t), cudaMemcpyHostToDevice) );
-		_CUDA( cudaMemcpy(&devSysXs[iNodes*nx], ptrMyNetwork->getXsafe(), nx*sizeof(real_t), cudaMemcpyHostToDevice) );
-		_CUDA( cudaMemcpy(&devSysUmin[iNodes*nx], ptrMyNetwork->getUmin(), nu*sizeof(real_t), cudaMemcpyHostToDevice) );
-		_CUDA( cudaMemcpy(&devSysUmax[iNodes*nx], ptrMyNetwork->getUmax(), nu*sizeof(real_t), cudaMemcpyHostToDevice) );
-		_CUDA( cudaMemcpy(&devSysCostW[iNodes*nv*nv], devCostMatW, nv*nv*sizeof(real_t), cudaMemcpyDeviceToDevice) );
-		_CUBLAS( cublasSscal_v2(handle, nx, &ptrMyScenarioTree->getProbArray()[iNodes], &devSysXmax[iNodes*nx], 1) );
-		_CUBLAS( cublasSscal_v2(handle, nx, &ptrMyScenarioTree->getProbArray()[iNodes], &devSysXmin[iNodes*nx], 1) );
-		_CUBLAS( cublasSscal_v2(handle, nx, &ptrMyScenarioTree->getProbArray()[iNodes], &devSysXs[iNodes*nx], 1) );
-		_CUBLAS( cublasSscal_v2(handle, nu, &ptrMyScenarioTree->getProbArray()[iNodes], &devSysUmax[iNodes*nu], 1) );
-		_CUBLAS( cublasSscal_v2(handle, nu, &ptrMyScenarioTree->getProbArray()[iNodes], &devSysUmin[iNodes*nu], 1) );
-		_CUBLAS( cublasSscal_v2(handle, nv*nv, &ptrMyScenarioTree->getProbArray()[iNodes], &devSysCostW[iNodes*nv*nv], 1) );
-	}
+
 	//_CUDA(cudaMemcpy(devSysXsUpper, devSysXmax, nx*nodes*sizeof(real_t), cudaMemcpyDeviceToDevice));
 	uint_t scaleMax = pow(2, 7) - 1;
 	_CUDA( cudaMemset(devSysXsUpper, scaleMax, nx*nodes*sizeof(real_t)) );

@@ -26,6 +26,13 @@
 #define VARNAME_BBAR "Bbar"
 #define VARNAME_SYS_F "sysF"
 #define VARNAME_SYS_G "sysG"
+#define VARNAME_TEST_XMIN "xmin"
+#define VARNAME_TEST_XMAX "xmax"
+#define VARNAME_TEST_XS "xs"
+#define VARNAME_TEST_UMIN "umin"
+#define VARNAME_TEST_UMAX "umax"
+
+
 
 class Testing{
 public:
