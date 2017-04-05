@@ -42,74 +42,74 @@ DwnNetwork::DwnNetwork(string pathToFile){
 		jsonDocument.ParseStream(networkJsonStream);
 		a = jsonDocument[VARNAME_NX];
 		_ASSERT(a.IsArray());
-		nTanks = (uint_t) a[0].GetDouble();
+		nTanks = (uint_t) a[0].GetFloat();
 		a = jsonDocument[VARNAME_NU];
 		_ASSERT(a.IsArray());
-		nControl = (uint_t) a[0].GetDouble();
+		nControl = (uint_t) a[0].GetFloat();
 		a = jsonDocument[VARNAME_ND];
 		_ASSERT(a.IsArray());
-		nDemand = (uint_t) a[0].GetDouble();
+		nDemand = (uint_t) a[0].GetFloat();
 		a = jsonDocument[VARNAME_NE];
 		_ASSERT(a.IsArray());
-		nMixNodes = (uint_t) a[0].GetDouble();
+		nMixNodes = (uint_t) a[0].GetFloat();
 		/*a = jsonDocument[VARNAME_N];
 		_ASSERT(a.IsArray());
-		uint_t N = (uint_t) a[0].GetDouble();*/
+		uint_t N = (uint_t) a[0].GetFloat();*/
 		matA = new real_t[nTanks * nTanks];
 		a = jsonDocument[VARNAME_A];
 		_ASSERT(a.IsArray());
 		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
-			matA[i] = a[i].GetDouble();
+			matA[i] = a[i].GetFloat();
 		matB = new real_t[nTanks * nControl];
 		a = jsonDocument[VARNAME_B];
 		_ASSERT(a.IsArray());
 		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
-			matB[i] = a[i].GetDouble();
+			matB[i] = a[i].GetFloat();
 		matGd = new real_t[nTanks * nDemand];
 		a = jsonDocument[VARNAME_GD];
 		_ASSERT(a.IsArray());
 		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
-			matGd[i] = a[i].GetDouble();
+			matGd[i] = a[i].GetFloat();
 		matE = new real_t[nMixNodes *nControl];
 		a = jsonDocument[VARNAME_E];
 		_ASSERT(a.IsArray());
 		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
-			matE[i] = a[i].GetDouble();
+			matE[i] = a[i].GetFloat();
 		matEd = new real_t[nMixNodes *nDemand];
 		a = jsonDocument[VARNAME_ED];
 		_ASSERT(a.IsArray());
 		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
-			matEd[i] = a[i].GetDouble();
+			matEd[i] = a[i].GetFloat();
 		vecXmin = new real_t[nTanks];
 		a = jsonDocument[VARNAME_XMIN];
 		_ASSERT(a.IsArray());
 		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
-			vecXmin[i] = a[i].GetDouble();
+			vecXmin[i] = a[i].GetFloat();
 		vecXmax = new real_t[nTanks];
 		a = jsonDocument[VARNAME_XMAX];
 		_ASSERT(a.IsArray());
 		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
-			vecXmax[i] = a[i].GetDouble();
+			vecXmax[i] = a[i].GetFloat();
 		vecXsafe = new real_t[nTanks];
 		a = jsonDocument[VARNAME_XSAFE];
 		_ASSERT(a.IsArray());
 		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
-			vecXsafe[i] = a[i].GetDouble();
+			vecXsafe[i] = a[i].GetFloat();
 		vecUmin = new real_t[nControl];
 		a = jsonDocument[VARNAME_UMIN];
 		_ASSERT(a.IsArray());
 		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
-			vecUmin[i] = a[i].GetDouble();
+			vecUmin[i] = a[i].GetFloat();
 		vecUmax = new real_t[nControl];
 		a = jsonDocument[VARNAME_UMAX];
 		_ASSERT(a.IsArray());
 		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
-			vecUmax[i] = a[i].GetDouble();
+			vecUmax[i] = a[i].GetFloat();
 		vecCostAlpha1 = new real_t[nControl];
 		a = jsonDocument[VARNAME_ALPHA1];
 		_ASSERT(a.IsArray());
 		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
-			vecCostAlpha1[i] = a[i].GetDouble();
+			vecCostAlpha1[i] = a[i].GetFloat();
 		delete [] readBuffer;
 		readBuffer = NULL;
 	}

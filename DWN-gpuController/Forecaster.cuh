@@ -79,12 +79,6 @@ public:
 	 * returns the pointer of the array of nominal prices
 	 */
 	real_t* getNominalPrices();
-
-	/*TODO REMOVE Friendship */
-	friend class Engine;
-
-	/*TODO REMOVE Friendship */
-	friend class SmpcController;
 private:
 	/**
 	 * Prediction horizon

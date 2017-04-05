@@ -1,18 +1,31 @@
 /*
- * testSmpcController.cuh
+ *    GPU-accelerated scenario-based stochastic MPC for the operational
+ *    management of drinking water networks.
+ *    Copyright (C) 2017 Ajay. K. Sampathirao and P. Sopasakis
  *
- *  Created on: Apr 3, 2017
- *      Author: control
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 2.1 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ *    You should have received a copy of the GNU Lesser General Public
+ *    License along with this library; if not, write to the Free Software
+ *    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  */
+
 
 #ifndef TESTSMPCCONTROLLER_CUH_
 #define TESTSMPCCONTROLLER_CUH_
 #include "../SmpcController.cuh"
-//#include "../DwnNetwork.cuh"
-//#include "../Forecaster.cuh"
 #include "../rapidjson/document.h"
 #include "../rapidjson/rapidjson.h"
 #include "../rapidjson/filereadstream.h"
+
 #define VARNAME_TEST_EXTAPOLATION "theta"
 #define VARNAME_TEST_ACCELE_XI "acceleXi"
 #define VARNAME_TEST_ACCELE_PSI "accelePsi"
@@ -26,10 +39,13 @@
 #define VARNAME_TEST_DUALU "dualU"
 #define VARNAME_TEST_PRIMALX "primalX"
 #define VARNAME_TEST_PRIMALU "primalU"
-#define VARNAME_TEST_DUAL_UPDATE_XI "dualUpdateXi"
-#define VARNAME_TEST_DUAL_UPDATE_PSI "dualUpdatePsi"
+#define VARNAME_TEST_FINAL_UPDATE_XI "finalUpdateXi"
+#define VARNAME_TEST_FINAL_UPDATE_PSI "finalUpdatePsi"
+#define VARNAME_TEST_FINAL_XI "finalXi"
+#define VARNAME_TEST_FINAL_PSI "finalPsi"
 #define VARNAME_TEST_PRIMAL_INFS_XI "primalInfsXi"
 #define VARNAME_TEST_PRIMAL_INFS_PSI "primalInfsPsi"
+#define VARNAME_TEST_TEMP_V  "tempV"
 
 
 class TestSmpcController : public SmpcController{
@@ -62,6 +78,10 @@ public :
 	 * Function to test the dual update function
 	 */
 	uint_t testDualUpdate();
+
+	/**
+	 * Destructor
+	 */
 	~TestSmpcController();
 private:
 
@@ -79,7 +99,7 @@ private:
 	/*
 	 * path to the json file which contain the test parameters
 	 */
-	string PathToFileSmpcTest;
+	string pathToFileSmpc;
 	/**
 	 * Object to retrive the information from the json file
 	 */

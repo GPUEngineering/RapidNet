@@ -146,10 +146,6 @@ public:
  	 */
 	~DwnNetwork();
 
-	friend class Engine; /*TODO REMOVE Friendship */
-
-	friend class SmpcController; /*TODO REMOVE Friendship */
-
 private:
 
 	/**

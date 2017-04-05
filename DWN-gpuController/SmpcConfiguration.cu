@@ -38,69 +38,69 @@ SmpcConfiguration::SmpcConfiguration(string pathToFile){
 		jsonDocument.ParseStream(networkJsonStream);
 		a = jsonDocument[VARNAME_NX];
 		_ASSERT(a.IsArray());
-		NX = (uint_t) a[0].GetDouble();
+		NX = (uint_t) a[0].GetFloat();
 		a = jsonDocument[VARNAME_NU];
 		_ASSERT(a.IsArray());
-		NU = (uint_t) a[0].GetDouble();
+		NU = (uint_t) a[0].GetFloat();
 		a = jsonDocument[VARNAME_ND];
 		_ASSERT(a.IsArray());
-		ND = (uint_t) a[0].GetDouble();
+		ND = (uint_t) a[0].GetFloat();
 		a = jsonDocument[VARNAME_NV];
 		_ASSERT(a.IsArray());
-		NV = (uint_t) a[0].GetDouble();
+		NV = (uint_t) a[0].GetFloat();
 		a = jsonDocument[VARNAME_N];
 		_ASSERT(a.IsArray());
-		uint_t N = (uint_t) a[0].GetDouble();
+		uint_t N = (uint_t) a[0].GetFloat();
 		matL = new real_t[NU * NV];
 		a = jsonDocument[VARNAME_L];
 		_ASSERT(a.IsArray());
 		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
-			matL[i] = a[i].GetDouble();
+			matL[i] = a[i].GetFloat();
 		matLhat = new real_t[NU * ND];
 		a = jsonDocument[VARNAME_LHAT];
 		_ASSERT(a.IsArray());
 		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
-			matLhat[i] = a[i].GetDouble();
+			matLhat[i] = a[i].GetFloat();
 		matCostW = new real_t[NU * NU];
 		a = jsonDocument[VARNAME_COSTW];
 		_ASSERT(a.IsArray());
 		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
-			matCostW[i] = a[i].GetDouble();
+			matCostW[i] = a[i].GetFloat();
 		a = jsonDocument[VARNAME_PENALITY_X];
-		penaltyStateX = a[0].GetDouble();
+		penaltyStateX = a[0].GetFloat();
 		a = jsonDocument[VARNAME_PENALITY_XS];
-		penaltySafetyX = a[0].GetDouble();
+		penaltySafetyX = a[0].GetFloat();
 		matDiagPrecnd = new real_t[(NU + 2*NX) * N];
 		a = jsonDocument[VARNAME_DIAG_PRCND];
 		_ASSERT(a.IsArray());
 		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
-			matDiagPrecnd[i] = a[i].GetDouble();
+			matDiagPrecnd[i] = a[i].GetFloat();
 		currentX = new real_t[NX];
 		a = jsonDocument[VARNAME_CURRENT_X];
 		_ASSERT(a.IsArray());
 		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
-			currentX[i] = a[i].GetDouble();
+			currentX[i] = a[i].GetFloat();
 		prevUhat = new real_t[NU];
 		a = jsonDocument[VARNAME_PREV_UHAT];
 		_ASSERT(a.IsArray());
 		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
-			prevUhat[i] = a[i].GetDouble();
+			prevUhat[i] = a[i].GetFloat();
 		prevU = new real_t[NU];
 		a = jsonDocument[VARNAME_PREV_U];
 		_ASSERT(a.IsArray());
 		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
-			prevU[i] = a[i].GetDouble();
+			prevU[i] = a[i].GetFloat();
 		prevV = new real_t[NV];
 		a = jsonDocument[VARNAME_PREV_V];
 		_ASSERT(a.IsArray());
 		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
-			prevV[i] = (real_t) a[i].GetDouble();
+			prevV[i] = (real_t) a[i].GetFloat();
 		a = jsonDocument[VARNAME_STEP_SIZE];
 		_ASSERT(a.IsArray());
-		stepSize = (real_t) a[0].GetDouble();
+		stepSize = (real_t) a[0].GetFloat();
 		a = jsonDocument[VARNAME_MAX_ITER];
 		_ASSERT(a.IsArray());
-		maxIteration = (uint_t) a[0].GetDouble();
+		maxIteration = (uint_t) a[0].GetFloat();
 		delete [] readBuffer;
 		readBuffer = NULL;
 	}

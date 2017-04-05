@@ -42,23 +42,23 @@ Forecaster::Forecaster(string pathToFile){
 		jsonDocument.ParseStream( networkJsonStream );
 		a = jsonDocument[VARNAME_N];
 		_ASSERT( a.IsArray() );
-		nPredHorizon = (uint_t) a[0].GetDouble();
+		nPredHorizon = (uint_t) a[0].GetFloat();
 		a = jsonDocument[VARNAME_DIM_DEMAND];
 		_ASSERT( a.IsArray() );
-		dimDemand = (uint_t) a[0].GetDouble();
+		dimDemand = (uint_t) a[0].GetFloat();
 		a = jsonDocument[VARNAME_DIM_PRICES];
 		_ASSERT( a.IsArray() );
-		dimPrices = (uint_t) a[0].GetDouble();
+		dimPrices = (uint_t) a[0].GetFloat();
 		nominalDemand = new real_t[dimDemand * nPredHorizon];
 		a = jsonDocument[VARNAME_DHAT];
 		_ASSERT( a.IsArray() );
 		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
-			nominalDemand[i] = a[i].GetDouble();
+			nominalDemand[i] = a[i].GetFloat();
 		nominalPrice = new real_t[dimPrices * nPredHorizon];
 		a = jsonDocument[VARNAME_ALPHAHAT];
 		_ASSERT( a.IsArray() );
 		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
-			nominalPrice[i] = a[i].GetDouble();
+			nominalPrice[i] = a[i].GetFloat();
 		delete [] readBuffer;
 		readBuffer = NULL;
 	}

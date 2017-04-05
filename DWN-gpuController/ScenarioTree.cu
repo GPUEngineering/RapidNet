@@ -45,80 +45,80 @@ ScenarioTree::ScenarioTree( string pathToFile ){
 		jsonDocument.ParseStream( networkJsonStream );
 		a = jsonDocument[VARNAME_N];
 		_ASSERT( a.IsArray() );
-		nPredHorizon = (uint_t) a[0].GetDouble();
+		nPredHorizon = (uint_t) a[0].GetFloat();
 		a = jsonDocument[VARNAME_K];
 		_ASSERT( a.IsArray() );
-		nScenario = (uint_t) a[0].GetDouble();
+		nScenario = (uint_t) a[0].GetFloat();
 		a = jsonDocument[VARNAME_NODES];
 		_ASSERT( a.IsArray() );
-		nNodes = (uint_t) a[0].GetDouble();
+		nNodes = (uint_t) a[0].GetFloat();
 		a = jsonDocument[VARNAME_NUM_NONLEAF];
 		_ASSERT(a.IsArray());
-		nNonleafNodes = (uint_t) a[0].GetDouble();
+		nNonleafNodes = (uint_t) a[0].GetFloat();
 		a = jsonDocument[VARNAME_NUM_CHILD_TOT];
 		_ASSERT( a.IsArray() );
-		nChildrenTot = (uint_t) a[0].GetDouble();
+		nChildrenTot = (uint_t) a[0].GetFloat();
 		stageArray = new uint_t[nNodes];
 		a = jsonDocument[VARNAME_STAGES];
 		_ASSERT( a.IsArray() );
 		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
-			stageArray[i] = (uint_t) a[i].GetDouble();
+			stageArray[i] = (uint_t) a[i].GetFloat();
 		nodesPerStage = new uint_t[nPredHorizon];
 		a = jsonDocument[VARNAME_NODES_PER_STAGE];
 		_ASSERT( a.IsArray() );
 		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
-			nodesPerStage[i] = (uint_t) a[i].GetDouble();
+			nodesPerStage[i] = (uint_t) a[i].GetFloat();
 		nodesPerStageCumul = new uint_t[nPredHorizon + 1];
 		a = jsonDocument[VARNAME_NODES_PER_STAGE_CUMUL];
 		_ASSERT( a.IsArray() );
 		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
-			nodesPerStageCumul[i] = (uint_t) a[i].GetDouble();
+			nodesPerStageCumul[i] = (uint_t) a[i].GetFloat();
 		leaveArray = new uint_t[nScenario];
 		a = jsonDocument[VARNAME_LEAVES];
 		_ASSERT( a.IsArray() );
 		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
-			leaveArray[i] = (uint_t) a[i].GetDouble();
+			leaveArray[i] = (uint_t) a[i].GetFloat();
 		childArray = new uint_t[nChildrenTot];
 		a = jsonDocument[VARNAME_CHILDREN];
 		_ASSERT( a.IsArray() );
 		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
-			childArray[i] = (uint_t) a[i].GetDouble();
+			childArray[i] = (uint_t) a[i].GetFloat();
 		ancestorArray = new uint_t[nNodes];
 		a = jsonDocument[VARNAME_ANCESTOR];
 		_ASSERT( a.IsArray() );
 		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
-			ancestorArray[i] = (uint_t) a[i].GetDouble();
+			ancestorArray[i] = (uint_t) a[i].GetFloat();
 		nChildArray = new uint_t[nNonleafNodes];
 		a = jsonDocument[VARNAME_NUM_CHILDREN];
 		_ASSERT( a.IsArray() );
 		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
-			nChildArray[i] = (uint_t) a[i].GetDouble();
+			nChildArray[i] = (uint_t) a[i].GetFloat();
 		nChildCumulArray = new uint_t[nNodes];
 		a = jsonDocument[VARNAME_NUM_CHILD_CUMUL];
 		_ASSERT( a.IsArray() );
 		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
-			nChildCumulArray[i] = (uint_t) a[i].GetDouble();
+			nChildCumulArray[i] = (uint_t) a[i].GetFloat();
 		probNodeArray = new real_t[nNodes];
 		a = jsonDocument[VARNAME_PROB_NODE];
 		_ASSERT( a.IsArray() );
 		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
-			probNodeArray[i] = a[i].GetDouble();
+			probNodeArray[i] = a[i].GetFloat();
 		a = jsonDocument[VARNAME_DIM_DEMAND];
 		_ASSERT( a.IsArray() );
-		dimDemand = (uint_t) a[0].GetDouble();
+		dimDemand = (uint_t) a[0].GetFloat();
 		a = jsonDocument[VARNAME_DIM_PRICE];
 		_ASSERT( a.IsArray() );
-		dimPrice = (uint_t) a[0].GetDouble();
+		dimPrice = (uint_t) a[0].GetFloat();
 		errorDemandArray = new real_t[nNodes * dimDemand];
 		a = jsonDocument[VARNAME_DEMAND_NODE];
 		_ASSERT( a.IsArray() );
 		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
-			errorDemandArray[i] = a[i].GetDouble();
+			errorDemandArray[i] = a[i].GetFloat();
 		errorPriceArray = new real_t[nNodes * dimPrice];
 		a = jsonDocument[VARNAME_PRICE_NODE];
 		_ASSERT( a.IsArray() );
 		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
-			errorPriceArray[i] = a[i].GetDouble();
+			errorPriceArray[i] = a[i].GetFloat();
 		delete [] readBuffer;
 		readBuffer = NULL;
 	}
