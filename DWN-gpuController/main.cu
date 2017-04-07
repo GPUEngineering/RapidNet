@@ -8,10 +8,6 @@
 #include "Configuration.h"
 #include "SmpcController.cuh"
 #include "test/Testing.cuh"
-//#include "cudaKernalHeader.cuh"
-//#include "EngineHeader.cuh"
-//#include "cudaKernal.cu"
-//#include "SMPControllerClass.cuh"
 
 int main(void){
 	int runtimeVersion = -1 , driverVersion = -1;
@@ -36,21 +32,7 @@ int main(void){
 	string pathToForecastFile = "../dataFiles/forecastor.json";
 	string pathToTestFile = "../dataFiles/testVariables.json";
 	string pathToSmpcConfigFile = "../dataFiles/controllerConfig.json";
-	//DwnNetwork myNetwork( pathToNetworkFile );
-	//Forecaster myForecaster( pathToForecastFile );
-	//ScenarioTree myScenarioTree( pathToScenarioTreeFile );
-	//SmpcConfiguration mySmpcConfig( pathToSmpcConfigFile );
-	//unitTest myTestor( pathToTestfile );
-	//Engine myEngine(&myNetwork, &myForecaster, &myTestor);
-	//SMPCController myController( &myEngine);
-	//myEngine.initialiseForecastDevice();
-	//myEngine.initialiseSystemDevice();
-	//myEngine.factorStep();
-	//myController.solveStep();
-	//myEngine.testStupidFunction();
-	//myEngine.testPrecondtioningFunciton();
 
-	//myEngine.testInverse();
 	cout << "bye bye" << endl;
 	return 0;
 }

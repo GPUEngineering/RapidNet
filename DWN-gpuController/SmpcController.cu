@@ -22,6 +22,7 @@
 #include "cublas_v2.h"
 #include "SmpcController.cuh"
 
+
 SmpcController::SmpcController(Forecaster *myForecaster, Engine *myEngine, SmpcConfiguration *mySmpcConfig){
 	ptrMyForecaster = myForecaster;
 	ptrMyEngine = myEngine;
@@ -35,6 +36,7 @@ SmpcController::SmpcController(Forecaster *myForecaster, Engine *myEngine, SmpcC
 	uint_t ns = ptrMyScenarioTree->getNumScenarios();
 	uint_t nodes = ptrMyScenarioTree->getNumNodes();
 	stepSize = ptrMySmpcConfig->getStepSize();
+	FlagFactorStep = false;
 
 	_CUDA( cudaMalloc((void**)&devVecX, nx*nodes*sizeof(real_t)) );
 	_CUDA( cudaMalloc((void**)&devVecU, nu*nodes*sizeof(real_t)) );
@@ -133,6 +135,22 @@ SmpcController::SmpcController(Forecaster *myForecaster, Engine *myEngine, SmpcC
 	ptrMyScenarioTree = NULL;
 }
 
+
+void SmpcController::initialiseSmpcController(){
+	FlagFactorStep = true;
+	real_t *currentX = ptrMySmpcConfig->getCurrentX();
+	real_t *prevU = ptrMySmpcConfig->getPrevU();
+	real_t *prevDemand = ptrMySmpcConfig->getPrevDemand();
+
+	ptrMyEngine->factorStep();
+	ptrMyEngine->updateStateControl(currentX, prevU, prevDemand);
+	ptrMyEngine->eliminateInputDistubanceCoupling( ptrMyForecaster->getNominalDemand(),
+			ptrMyForecaster->getNominalPrices());
+	currentX = NULL;
+	prevU = NULL;
+	prevDemand = NULL;
+}
+
 void SmpcController::dualExtrapolationStep(real_t lambda){
 	DwnNetwork* ptrMyNetwork = ptrMyEngine->getDwnNetwork();
 	ScenarioTree* ptrMyScenarioTree = ptrMyEngine->getScenarioTree();
@@ -159,7 +177,7 @@ void SmpcController::dualExtrapolationStep(real_t lambda){
 void SmpcController::solveStep(){
 	DwnNetwork *ptrMyNetwork = ptrMyEngine->getDwnNetwork();
 	ScenarioTree *ptrMyScenarioTree = ptrMyEngine->getScenarioTree();
-	real_t *devTempVecR, *devTempVecQ;
+	real_t *devTempVecR, *devTempVecQ, *devLv;
 	uint_t nx = ptrMyNetwork->getNumTanks();
 	uint_t nu = ptrMyNetwork->getNumControls();
 	uint_t nv = ptrMySmpcConfig->getNV();
@@ -169,13 +187,18 @@ void SmpcController::solveStep(){
 	uint_t *nodesPerStage = ptrMyScenarioTree->getNodesPerStage();
 	uint_t *nodesPerStageCumul = ptrMyScenarioTree->getNodesPerStageCumul();
 	uint_t iStageCumulNodes, iStageNodes, prevStageNodes, prevStageCumulNodes;
-	real_t scale[2] = {-0.5, 1};
+	real_t scale[3] = {-0.5, 1, -1};
 	real_t alpha = 1;
 	real_t beta = 0;
 
+	if(FlagFactorStep == false){
+		initialiseSmpcController();
+		FlagFactorStep = true;
+	}
 
 	_CUDA( cudaMalloc((void**)&devTempVecQ, ns*nx*sizeof(real_t)) );
 	_CUDA( cudaMalloc((void**)&devTempVecR, ns*nv*sizeof(real_t)) );
+	_CUDA( cudaMalloc((void**)&devLv, ns*nu*sizeof(real_t)) );
 	_CUDA( cudaMemcpy(ptrMyEngine->getMatSigma(), ptrMyEngine->getVecBeta(), nv*nodes*sizeof(real_t),
 			cudaMemcpyDeviceToDevice) );
 
@@ -269,9 +292,12 @@ void SmpcController::solveStep(){
 		iStageNodes = nodesPerStage[iStage];
 		iStageCumulNodes = nodesPerStageCumul[iStage];
 		if(iStage == 0){
-			// x=p, u=h (v = v+ prevV)
-			_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), nv, &alpha, ptrMyEngine->getVecPreviousV(),
-					1, devVecV, 1));
+			// u = prevU - prevUhat
+			_CUBLAS( cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), nu, &alpha, ptrMyEngine->getVecPreviousControl(), 1,
+					devVecU, 1));
+			_CUBLAS( cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), nu, &scale[2], ptrMyEngine->getVecPreviousUhat(), 1,
+					devVecU, 1));
+			// x=p
 			_CUDA( cudaMemcpy(devVecX, ptrMyEngine->getVecCurrentState(), nx*sizeof(real_t), cudaMemcpyDeviceToDevice) );
 			// x=x+w
 			_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), nx, &alpha, ptrMyEngine->getVecE(), 1, devVecX, 1));
@@ -284,13 +310,17 @@ void SmpcController::solveStep(){
 		}else{
 			prevStageCumulNodes = nodesPerStageCumul[iStage - 1];
 			if((nodesPerStage[iStage] - nodesPerStage[iStage-1]) > 0){
-				// v_k=v_{k-1}+v_k
-				solveChildNodesUpdate<<<iStageNodes, nv>>>(&devVecV[prevStageCumulNodes*nv], &devVecV[iStageCumulNodes*nv],
-						ptrMyEngine->getTreeAncestor(), iStageCumulNodes, nv);
 				// u_k=Lv_k+\hat{u}_k
 				_CUBLAS(cublasSgemm_v2(ptrMyEngine->getCublasHandle(), CUBLAS_OP_N, CUBLAS_OP_N, nu, iStageNodes, nv,
 						&alpha, ptrMyEngine->getSysMatL(), nu, &devVecV[iStageCumulNodes*nv], nv, &alpha,
 						&devVecU[iStageCumulNodes*nu], nu));
+				// prevLv = u_{k-1} - uHat_{k-1}
+				_CUDA( cudaMemcpy(devLv, &devVecU[prevStageCumulNodes*nu], nu*nodesPerStage[iStage-1]*sizeof(real_t), cudaMemcpyDeviceToDevice));
+				_CUBLAS( cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), nu*nodesPerStage[iStage-1], &scale[2],
+						&ptrMyEngine->getVecUhat()[prevStageCumulNodes*nu], 1, devLv, 1));
+				// u_{k} = u_{k} + prevLu
+				solveChildNodesUpdate<<<iStageNodes, nu>>>(devLv, &devVecU[iStageCumulNodes*nu], ptrMyEngine->getTreeAncestor(),
+						iStageCumulNodes, nu);
 				// x=w
 				_CUDA(cudaMemcpy(&devVecX[iStageCumulNodes*nx], &ptrMyEngine->getVecE()[iStageCumulNodes*nx],
 						iStageNodes*nx*sizeof(real_t), cudaMemcpyDeviceToDevice));
@@ -301,10 +331,12 @@ void SmpcController::solveStep(){
 				solveChildNodesUpdate<<<iStageNodes, nx>>>(&devVecX[prevStageCumulNodes*nx], &devVecX[iStageCumulNodes*nx],
 						ptrMyEngine->getTreeAncestor(), iStageCumulNodes, nx);
 			}else{
-				// v_k=v_{k-1}+v_k
-				_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), nv*iStageNodes, &alpha, &devVecV[prevStageCumulNodes*nv], 1,
-						&devVecV[iStageCumulNodes*nv], 1));
-				// u_k=Lv_k+\hat{u}_k
+				// u_k = u_{k-1} - uHat_{k-1}
+				_CUBLAS( cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), nu*iStageNodes, &alpha, &devVecU[prevStageCumulNodes*nu], 1,
+						&devVecU[iStageCumulNodes*nu], 1));
+				_CUBLAS( cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), nu*iStageNodes, &scale[2], &ptrMyEngine->getVecUhat()
+						[prevStageCumulNodes*nu], 1, &devVecU[iStageCumulNodes*nu], 1));
+				// u_k=Lv_k+\hat{u}_k + u_k
 				_CUBLAS(cublasSgemm_v2(ptrMyEngine->getCublasHandle(), CUBLAS_OP_N, CUBLAS_OP_N, nu, iStageNodes, nv, &alpha,
 						ptrMyEngine->getSysMatL(), nu, &devVecV[iStageCumulNodes*nv], nv, &alpha, &devVecU[iStageCumulNodes*nu], nu));
 				// x_{k+1}=x_{k}
@@ -328,10 +360,6 @@ void SmpcController::solveStep(){
 	devTempVecR = NULL;
 	ptrMyNetwork = NULL;
 	ptrMyScenarioTree = NULL;
-
-	//free(ptr_x_c);
-	//free(x_c);
-	//free(y_c);
 }
 
 void SmpcController::proximalFunG(){
@@ -414,7 +442,7 @@ void SmpcController::dualUpdate(){
 }
 
 
-void SmpcController::algorithmApg(){
+int SmpcController::algorithmApg(){
 	DwnNetwork *ptrMyNetwork = ptrMyEngine->getDwnNetwork();
 	ScenarioTree *ptrMyScenarioTree = ptrMyEngine->getScenarioTree();
 	uint_t nodes = ptrMyScenarioTree->getNumNodes();
@@ -440,21 +468,30 @@ void SmpcController::algorithmApg(){
 		solveStep();
 		proximalFunG();
 		dualUpdate();
+		theta[0] = theta[1];
 		theta[1] = 0.5*(sqrt(pow(theta[0], 4) + 4*theta[0]) - pow(theta[0], 2));
-	}
 
-	//dualExtrapolationStep(devPtrVecAcceleratedXi, devVecXi, devVecUpdateXi, lambda, 2*nx*nodes);
-	//dualExtrapolationStep(devPtrVecAcceleratedPsi, devVecPsi, devVecUpdatePsi, lambda, nu*nodes);
-	//dualUpdate(devVecUpdateXi, devPtrVecAcceleratedXi, devPtrVecPrimalXi, devVecDualXi, stepSize, 2*nodes*nx);
-	//dualUpdate(devVecUpdatePsi, devPtrVecAcceleratedPsi, devPtrVecPrimalPsi, devVecDualPsi, stepSize, nodes*nu);
+	}
+	return 1;
 }
 
 void SmpcController::controllerSmpc(){
 	ptrMyEngine->updateStateControl(ptrMySmpcConfig->getCurrentX(), ptrMySmpcConfig->getPrevU(),
-			ptrMySmpcConfig->getPrevUhat(), ptrMySmpcConfig->getPrevV());
+			ptrMySmpcConfig->getPrevDemand());
 	ptrMyEngine->eliminateInputDistubanceCoupling(ptrMyForecaster->getNominalDemand(),
 			ptrMyForecaster->getNominalPrices());
 	algorithmApg();
+}
+
+int SmpcController::controlAction(real_t* u){
+	int Status;
+	ptrMyEngine->updateStateControl(ptrMySmpcConfig->getCurrentX(), ptrMySmpcConfig->getPrevU(),
+				ptrMySmpcConfig->getPrevDemand());
+	ptrMyEngine->eliminateInputDistubanceCoupling(ptrMyForecaster->getNominalDemand(),
+				ptrMyForecaster->getNominalPrices());
+	status = algorithmApg();
+	_CUDA( cudaMemcpy(u, devVecU, ptrMySmpcConfig->getNU()*sizeof(real_t), cudaMemcpyDeviceToHost));
+	return status;
 }
 
 SmpcController::~SmpcController(){

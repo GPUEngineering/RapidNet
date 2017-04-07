@@ -63,15 +63,12 @@ public:
 	 * Update the state and control in the device
 	 * @param   currentX      current level of tanks in the system
 	 * @param   prevU         previous control action
-	 * @param   prevUhat      previous control action particular solution
-	 * @param   prevV         previous control action in reduced dimension
-	 * TODO replace the prevUhat parameter
+	 * @param   prevDemand    previous demand
 	 */
 	void updateStateControl(
 			real_t* currentX,
 			real_t* prevU,
-			real_t* prevUhat,
-			real_t* PrevV);
+			real_t* prevDemand);
 
 	/**
 	 * Implements the Factor step that calculates all the constant
@@ -142,9 +139,13 @@ public:
 	 */
 	real_t* getVecPreviousUhat();
 	/**
+	 * previous demand
+	 */
+	real_t* getVecDemand();
+	/**
 	 * previous v reduced control dimensions
 	 */
-	real_t* getVecPreviousV();
+	//real_t* getVecPreviousV();
 
 	/** ----GETTER'S FOR FACTOR MATRICES----*/
 	/**
@@ -402,15 +403,13 @@ private:
 	 */
 	real_t  *devVecCurrentState;
 	/**
+	 * previous demand
+	 */
+	real_t *devVecPreviousDemand;
+	/**
 	 * previous uhat
 	 */
 	real_t  *devVecPreviousUhat;
-	/**
-	 * previous v (reduced dimension control)
-	 */
-	real_t *devVecPreviousV;
-
-
 	/* --- NETWORK CONSTRAINTS --- */
 
 	/**

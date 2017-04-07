@@ -37,6 +37,7 @@
 #define VARNAME_PREV_UHAT "prevUhat"
 #define VARNAME_PREV_U "prevU"
 #define VARNAME_PREV_V "prevV"
+#define VARNAME_PREV_DEMAND "prevDemand"
 #define VARNAME_STEP_SIZE "stepSize"
 #define VARNAME_MAX_ITER "maxIterations"
 class SmpcConfiguration{
@@ -94,13 +95,9 @@ public:
 	 */
 	real_t* getPrevU();
 	/**
-	 * Previous particular solution based on the previous control
+	 * Previous demand
 	 */
-	real_t* getPrevUhat();
-	/**
-	 * Previous reduced control in the reduced spaces
-	 */
-	real_t* getPrevV();
+	real_t* getPrevDemand();
 	/**
 	 * Weight that penalise the constraints on the tank level
 	 */
@@ -172,19 +169,13 @@ private:
 	 */
 	real_t *currentX;
 	/**
-	 * TODO should be replaced and calculated directly in Engine
-	 * previous control particular solution
-	 */
-	real_t *prevUhat;
-	/**
-	 * TODO should be replaced and calculated directly in the Engine
-	 * previous reduced control decision variable
-	 */
-	real_t *prevV;
-	/**
 	 * Previous control
 	 */
 	real_t *prevU;
+	/**
+	 * Previous demand
+	 */
+	real_t *prevDemand;
 	/**
 	 *  stepsize for the APG
 	 */

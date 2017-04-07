@@ -43,9 +43,18 @@ class SmpcController {
 public:
 	/**
 	 * Construct a new Controller with a given engine.
-	 * @param myEngine An instance of Engine.
+	 * @param  myForecaster   An instance of the Forecaster object
+	 * @param  myEngine       An instance of Engine object
+	 * @param  mySmpcConfig   An instance of the Smpc controller configuration object
 	 */
 	SmpcController(Forecaster *myForecaster, Engine *myEngine, SmpcConfiguration *mySmpcConfig);
+
+	/**
+	 * Performs the initialise the smpc controller
+	 *   - update the current state and previous controls in the device memory
+	 *   - perform the factor step
+	 */
+	void initialiseSmpcController();
 
 	/**
 	 * Invoke the SMPC controller on the current state of the network.
@@ -53,6 +62,13 @@ public:
 	 * and finally #algorithmApg.
 	 */
 	void controllerSmpc();
+	/**
+	 *Computes a control action and returns a status code
+	 *which is an integer (1 = success).
+	 * @param u pointer to computed control action (CPU variable)
+	 * @return status code
+	 */
+	int controlAction(real_t* u);
 	/**
 	 * Destructor. Frees allocated memory.
 	 */
@@ -78,9 +94,11 @@ protected:
 	 */
 	void dualUpdate();
 	/**
-	 * This method executes the APG algorithm.
+	 * This method executes the APG algorithm and returns 1
+	 * as success code.
+	 * @return status code; 1 = success, 0 = failure
 	 */
-	void algorithmApg();
+	int algorithmApg();
 	/**
 	 *
 	 */
@@ -207,6 +225,10 @@ protected:
 	 * step size
 	 */
 	real_t stepSize;
+	/**
+	 * Flag Factor step
+	 */
+	bool FlagFactorStep;
 };
 
 #endif /* SMPCONTROLLERCLASS_CUH_ */

@@ -80,21 +80,21 @@ SmpcConfiguration::SmpcConfiguration(string pathToFile){
 		_ASSERT(a.IsArray());
 		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
 			currentX[i] = a[i].GetFloat();
-		prevUhat = new real_t[NU];
+		/*prevUhat = new real_t[NU];
 		a = jsonDocument[VARNAME_PREV_UHAT];
 		_ASSERT(a.IsArray());
 		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
-			prevUhat[i] = a[i].GetFloat();
+			prevUhat[i] = a[i].GetFloat();*/
 		prevU = new real_t[NU];
 		a = jsonDocument[VARNAME_PREV_U];
 		_ASSERT(a.IsArray());
 		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
 			prevU[i] = a[i].GetFloat();
-		prevV = new real_t[NV];
-		a = jsonDocument[VARNAME_PREV_V];
+		prevDemand = new real_t[ND];
+		a = jsonDocument[VARNAME_PREV_DEMAND];
 		_ASSERT(a.IsArray());
 		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
-			prevV[i] = (real_t) a[i].GetFloat();
+			prevDemand[i] = (real_t) a[i].GetFloat();
 		a = jsonDocument[VARNAME_STEP_SIZE];
 		_ASSERT(a.IsArray());
 		stepSize = (real_t) a[0].GetFloat();
@@ -139,17 +139,12 @@ real_t* SmpcConfiguration::getCurrentX(){
 	return currentX;
 }
 
-
-real_t* SmpcConfiguration::getPrevUhat(){
-	return prevUhat;
-}
-
-real_t* SmpcConfiguration::getPrevV(){
-	return prevV;
-}
-
 real_t* SmpcConfiguration::getPrevU(){
 	return prevU;
+}
+
+real_t* SmpcConfiguration::getPrevDemand(){
+	return prevDemand;
 }
 
 real_t SmpcConfiguration::getPenaltyState(){
@@ -174,16 +169,15 @@ SmpcConfiguration::~SmpcConfiguration(){
 	delete [] matDiagPrecnd;
 	delete [] currentX;
 	delete [] prevU;
-	delete [] prevUhat;
-	delete [] prevV;
+	delete [] prevDemand;
+
 	matL = NULL;
 	matLhat = NULL;
 	matCostW = NULL;
 	matDiagPrecnd = NULL;
 	currentX = NULL;
-	prevUhat = NULL;
+	prevDemand = NULL;
 	prevU = NULL;
-	prevV = NULL;
 }
 
 

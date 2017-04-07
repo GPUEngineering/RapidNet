@@ -134,10 +134,9 @@ uint_t TestSmpcController::testSoveStep(){
 	// nominal forecasts and prices
 	real_t *currentX = ptrMySmpcConfig->getCurrentX();
 	real_t *prevU = ptrMySmpcConfig->getPrevU();
-	real_t *prevUhat = ptrMySmpcConfig->getPrevUhat();
-	real_t *prevV = ptrMySmpcConfig->getPrevV();
+	real_t *prevDemand = ptrMySmpcConfig->getPrevDemand();
 	this->ptrMyEngine->factorStep();
-	this->ptrMyEngine->updateStateControl(currentX, prevU, prevUhat, prevV);
+	this->ptrMyEngine->updateStateControl(currentX, prevU, prevDemand);
 	this->ptrMyEngine->eliminateInputDistubanceCoupling( ptrMyForecaster->getNominalDemand(),
 			ptrMyForecaster->getNominalPrices());
 
@@ -173,6 +172,9 @@ uint_t TestSmpcController::testSoveStep(){
 	}
 	fclose(infile);
 	infile = NULL;
+	currentX = NULL;
+	prevU = NULL;
+	prevDemand = NULL;
 	ptrDwnNetwork = NULL;
 	ptrMyScenarioTree = NULL;
 	return 1;
