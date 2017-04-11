@@ -1,0 +1,18 @@
+<map id="SmpcController::proximalFunG" name="SmpcController::proximalFunG">
+<area shape="rect" id="node2" href="$class_engine.html#af5c56254a25f6ff4ebc001bb1f9db4bf" title="Engine::getDwnNetwork" alt="" coords="275,5,439,32"/>
+<area shape="rect" id="node3" href="$class_engine.html#a40ea7ce2310db1343f45153ef88965d1" title="Engine::getScenarioTree" alt="" coords="275,56,440,83"/>
+<area shape="rect" id="node4" href="$class_scenario_tree.html#ad6a9108a9226d28588b99a637251081f" title="ScenarioTree::getNumNodes" alt="" coords="262,107,453,133"/>
+<area shape="rect" id="node5" href="$class_dwn_network.html#a4bd201487c9e524815b5c9112fcd2722" title="DwnNetwork::getNumTanks" alt="" coords="263,157,451,184"/>
+<area shape="rect" id="node6" href="$class_dwn_network.html#a6791b1fd057bac451f84192624411155" title="DwnNetwork::getNumControls" alt="" coords="257,208,458,235"/>
+<area shape="rect" id="node7" href="$class_engine.html#a96b542ee7b14510c442e3bfdd311382c" title="Engine::getCublasHandle" alt="" coords="272,259,443,285"/>
+<area shape="rect" id="node8" href="$class_engine.html#aab710a21c96346c8705721ac5f3e0d07" title="Engine::getPtrSysMatF" alt="" coords="278,309,437,336"/>
+<area shape="rect" id="node9" href="$class_engine.html#a2e49f5732ea07bd6467204ba1213c7fd" title="Engine::getPtrSysMatG" alt="" coords="277,360,437,387"/>
+<area shape="rect" id="node10" href="$class_engine.html#aab7402ace4e3bcabda14d481f63233b4" title="Engine::getSysXmin" alt="" coords="287,411,428,437"/>
+<area shape="rect" id="node11" href="$class_engine.html#a4e863110b9574e1f157c19d7542fe1cd" title="Engine::getSysXmax" alt="" coords="285,461,430,488"/>
+<area shape="rect" id="node12" href="$class_engine.html#abbb576c29276e9943eafc348c1a9a790" title="Engine::getSysXs" alt="" coords="294,512,421,539"/>
+<area shape="rect" id="node13" href="$class_engine.html#afc800fda92ad5def0a744c0cab4914df" title="Engine::getSysXsUpper" alt="" coords="276,563,439,589"/>
+<area shape="rect" id="node14" href="$class_smpc_configuration.html#a7dc9f1021869ff57ba65e7c38a4ca717" title="SmpcConfiguration::\lgetPenaltyState" alt="" coords="287,614,428,655"/>
+<area shape="rect" id="node15" href="$class_smpc_configuration.html#ae3486c795186d96806c8ad7aac57b67a" title="SmpcConfiguration::\lgetPenaltySafety" alt="" coords="287,679,428,721"/>
+<area shape="rect" id="node16" href="$class_engine.html#aab13a632a7104dfd8fc8d97d81732ec6" title="Engine::getSysUmin" alt="" coords="286,745,429,772"/>
+<area shape="rect" id="node17" href="$class_engine.html#aa6956e2e98b0ef672e14c4e13bb8bd1d" title="Engine::getSysUmax" alt="" coords="284,796,431,823"/>
+</map>

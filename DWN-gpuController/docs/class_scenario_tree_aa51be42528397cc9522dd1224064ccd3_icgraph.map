@@ -1,0 +1,4 @@
+<map id="ScenarioTree::getNumChildren" name="ScenarioTree::getNumChildren">
+<area shape="rect" id="node2" href="$class_engine.html#a4e664235e0d3dc748d3f0cb88e0aaa19" title="Engine::initialiseScenario\lTreeDevice" alt="" coords="256,5,424,46"/>
+<area shape="rect" id="node3" href="$class_engine.html#ad5b7316584c79e2db5dc5f785b0a652f" title="Engine::factorStep" alt="" coords="472,12,603,39"/>
+</map>

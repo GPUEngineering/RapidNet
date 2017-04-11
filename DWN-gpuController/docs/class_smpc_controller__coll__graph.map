@@ -1,0 +1,7 @@
+<map id="SmpcController" name="SmpcController">
+<area shape="rect" id="node2" href="$class_forecaster.html" title="Forecaster" alt="" coords="94,96,177,123"/>
+<area shape="rect" id="node3" href="$class_engine.html" title="Engine" alt="" coords="218,96,280,123"/>
+<area shape="rect" id="node4" href="$class_dwn_network.html" title="DwnNetwork" alt="" coords="5,5,104,32"/>
+<area shape="rect" id="node5" href="$class_scenario_tree.html" title="ScenarioTree" alt="" coords="128,5,227,32"/>
+<area shape="rect" id="node6" href="$class_smpc_configuration.html" title="SmpcConfiguration" alt="" coords="320,5,453,32"/>
+</map>
