@@ -176,6 +176,7 @@ void Engine::allocateSystemDevice(){
 	_CUDA( cudaMalloc((void**)&devVecCurrentState, nx*sizeof(real_t)) );
 	_CUDA( cudaMalloc((void**)&devVecPreviousControl, nu*sizeof(real_t)) );
 	_CUDA( cudaMalloc((void**)&devVecPreviousUhat, nu*sizeof(real_t)) );
+	_CUDA( cudaMalloc((void**)&devVecPreviousV, nv*sizeof(real_t)) );
 	_CUDA( cudaMalloc((void**)&devMatWv, nu*nv*sizeof(real_t)) );
 
 	_CUDA( cudaMalloc((void**)&devPtrSysMatB, nodes*sizeof(real_t*)) );
@@ -270,8 +271,8 @@ void Engine::initialiseSystemDevice(){
 		_CUDA( cudaMemcpy(&devSysXmin[iNodes*nx], ptrMyNetwork->getXmin(), nx*sizeof(real_t), cudaMemcpyHostToDevice) );
 		_CUDA( cudaMemcpy(&devSysXmax[iNodes*nx], ptrMyNetwork->getXmax(), nx*sizeof(real_t), cudaMemcpyHostToDevice) );
 		_CUDA( cudaMemcpy(&devSysXs[iNodes*nx], ptrMyNetwork->getXsafe(), nx*sizeof(real_t), cudaMemcpyHostToDevice) );
-		_CUDA( cudaMemcpy(&devSysUmin[iNodes*nx], ptrMyNetwork->getUmin(), nu*sizeof(real_t), cudaMemcpyHostToDevice) );
-		_CUDA( cudaMemcpy(&devSysUmax[iNodes*nx], ptrMyNetwork->getUmax(), nu*sizeof(real_t), cudaMemcpyHostToDevice) );
+		_CUDA( cudaMemcpy(&devSysUmin[iNodes*nu], ptrMyNetwork->getUmin(), nu*sizeof(real_t), cudaMemcpyHostToDevice) );
+		_CUDA( cudaMemcpy(&devSysUmax[iNodes*nu], ptrMyNetwork->getUmax(), nu*sizeof(real_t), cudaMemcpyHostToDevice) );
 		/*_CUBLAS( cublasSscal_v2(handle, nx, &ptrMyScenarioTree->getProbArray()[iNodes], &devSysXmax[iNodes*nx], 1) );
 			_CUBLAS( cublasSscal_v2(handle, nx, &ptrMyScenarioTree->getProbArray()[iNodes], &devSysXmin[iNodes*nx], 1) );
 			_CUBLAS( cublasSscal_v2(handle, nx, &ptrMyScenarioTree->getProbArray()[iNodes], &devSysXs[iNodes*nx], 1) );
@@ -295,7 +296,6 @@ void Engine::initialiseSystemDevice(){
 		preconditionConstraintX<<<numBlock, nx>>>(&devSysXmax[stateIdx], &devSysXmin[stateIdx], &devSysXs[stateIdx],
 				&devMatDiagPrcnd[iStage*(2*nx + nu) + 2*nx], &devTreeProb[prevNodes], nx, numBlock);
 	}
-
 
 	//_CUDA(cudaMemcpy(devSysXsUpper, devSysXmax, nx*nodes*sizeof(real_t), cudaMemcpyDeviceToDevice));
 	uint_t scaleMax = pow(2, 7) - 1;
@@ -588,6 +588,12 @@ real_t* Engine::getVecCurrentState(){
 real_t* Engine::getVecPreviousUhat(){
 	return devVecPreviousUhat;
 }
+/**
+ * previous control in reduced dimensions
+ */
+real_t* Engine::getVecPreviousV(){
+	return devVecPreviousV;
+}
 /** ----GETTER'S FOR THE SCENARIO TREE----*/
 /**
  *  Array of the stage of the nodes at the tree
@@ -836,13 +842,15 @@ void Engine::eliminateInputDistubanceCoupling(real_t* nominalDemand, real_t *nom
 	devVecZeta = NULL;
 }
 
-void Engine::updateStateControl(real_t* currentX, real_t* prevU, real_t* prevUhat){
+void Engine::updateStateControl(real_t* currentX, real_t* prevU, real_t* prevUhat, real_t* prevV){
 	_CUDA( cudaMemcpy(devVecCurrentState, currentX, ptrMyNetwork->getNumTanks()*sizeof(real_t),
 			cudaMemcpyHostToDevice) );
 	_CUDA( cudaMemcpy(devVecPreviousControl, prevU, ptrMyNetwork->getNumControls()*sizeof(real_t),
 			cudaMemcpyHostToDevice) );
 	_CUDA( cudaMemcpy(devVecPreviousUhat, prevUhat, ptrMyNetwork->getNumControls()*sizeof(real_t),
 			cudaMemcpyHostToDevice) );
+	_CUDA( cudaMemcpy(devVecPreviousV, prevV, ptrMySmpcConfig->getNV()*sizeof(real_t),
+			cudaMemcpyHostToDevice));
 }
 
 void Engine::inverseBatchMat(real_t** src, real_t** dst, uint_t n, uint_t batchSize){
@@ -904,6 +912,7 @@ void Engine::deallocateSystemDevice(){
 	_CUDA( cudaFree(devVecCurrentState));
 	_CUDA( cudaFree(devVecPreviousControl));
 	_CUDA( cudaFree(devVecPreviousUhat));
+	_CUDA( cudaFree(devVecPreviousV));
 	_CUDA( cudaFree(devMatWv) );
 
 	_CUDA( cudaFree(devPtrSysMatB) );
@@ -926,6 +935,7 @@ void Engine::deallocateSystemDevice(){
 	devVecCurrentState = NULL;
 	devVecPreviousControl = NULL;
 	devVecPreviousUhat = NULL;
+	devVecPreviousV = NULL;
 
 	devPtrSysMatB = NULL;
 	devPtrSysMatL = NULL;

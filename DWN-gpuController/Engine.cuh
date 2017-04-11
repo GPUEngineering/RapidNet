@@ -64,12 +64,14 @@ public:
 	 * @param   currentX      current level of tanks in the system
 	 * @param   prevU         previous control action
 	 * @param   prevUhat      previous control action particular solution
+	 * @param   prevV         previous control action in reduced dimension
 	 * TODO replace the prevUhat parameter
 	 */
 	void updateStateControl(
 			real_t* currentX,
 			real_t* prevU,
-			real_t* prevUhat);
+			real_t* prevUhat,
+			real_t* PrevV);
 
 	/**
 	 * Implements the Factor step that calculates all the constant
@@ -139,6 +141,10 @@ public:
 	 * previous uhat
 	 */
 	real_t* getVecPreviousUhat();
+	/**
+	 * previous v reduced control dimensions
+	 */
+	real_t* getVecPreviousV();
 
 	/** ----GETTER'S FOR FACTOR MATRICES----*/
 	/**
@@ -289,12 +295,6 @@ public:
 	 * actuator/cotrol maximum
 	 */
 	real_t* getSysUmax();
-
-	/**
-	 * @todo remove Friendship
-	 */
-	friend class SmpcController;
-
 	/**
 	 * Destructor
 	 */
@@ -405,8 +405,10 @@ private:
 	 * previous uhat
 	 */
 	real_t  *devVecPreviousUhat;
-
-
+	/**
+	 * previous v (reduced dimension control)
+	 */
+	real_t *devVecPreviousV;
 
 
 	/* --- NETWORK CONSTRAINTS --- */

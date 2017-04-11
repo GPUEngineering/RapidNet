@@ -192,6 +192,8 @@ __global__  void solveSumChildren(
 			for(uint_t iChild = 0; iChild < numChild-1; iChild++){
 				if(iChild == 0)
 					dst[tid] = src[offset + relativeParentNode] + src[offset + relativeParentNode + dim];
+				if(iChild > 0)
+					dst[tid] = dst[tid] + src[offset + relativeParentNode + (iChild+1)*dim];
 			}
 		}else{
 			dst[tid] = src[offset + relativeParentNode];
@@ -241,7 +243,9 @@ __global__ void projectionBox(
 			uint_t offset,
 			uint_t size){
 	uint_t tid = blockIdx.x*blockDim.x + threadIdx.x;
-	uint_t idVecX = blockIdx.x*dim + threadIdx.x - offset;
+	uint_t idVecX = blockIdx.x*dim + threadIdx.x + offset;
+	if(idVecX < 0)
+		printf(" %d %d %d ", blockIdx.x, threadIdx.x, idVecX);
 	if( tid < size){
 		if(vecX[idVecX] < lowerbound[tid])
 			vecX[idVecX] = lowerbound[tid];
@@ -294,7 +298,7 @@ __global__ void additionVectorOffset(
 			uint_t offset,
 			uint_t size){
 	uint_t tid = blockIdx.x*blockDim.x + threadIdx.x;
-	uint_t idVecX = blockIdx.x*dim + threadIdx.x - offset;
+	uint_t idVecX = blockIdx.x*dim + threadIdx.x + offset;
 	if(tid < size){
 		dst[idVecX] = dst[idVecX] +scale*src[idVecX];
 	}

@@ -1,16 +1,32 @@
 /*
- * Test.cuh
+ *    GPU-accelerated scenario-based stochastic MPC for the operational
+ *    management of drinking water networks.
+ *    Copyright (C) 2017 Ajay. K. Sampathirao and P. Sopasakis
  *
- *  Created on: Mar 28, 2017
- *      Author: control
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 2.1 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ *    You should have received a copy of the GNU Lesser General Public
+ *    License along with this library; if not, write to the Free Software
+ *    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  */
+
 
 #ifndef TEST_CUH_
 #define TEST_CUH_
-#include "../SmpcController.cuh"
-#include "../rapidjson/document.h"
-#include "../rapidjson/rapidjson.h"
-#include "../rapidjson/filereadstream.h"
+#include "TestSmpcController.cuh"
+//#include "../SmpcController.cuh"
+//#include "test/TestSmpcController.cuh"
+//#include "../rapidjson/document.h"
+//#include "../rapidjson/rapidjson.h"
+//#include "../rapidjson/filereadstream.h"
 #define VARNAME_BETA "beta"
 #define VARNAME_UHAT "uHat"
 #define VARNAME_VEC_E "vecE"
@@ -37,16 +53,17 @@
 class Testing{
 public:
 	Testing();
-	int testNetwork();
-	int testScenarioTree();
-	int testForecaster();
-	int testControllerConfig();
-	int testEngineTesting();
+	uint_t testNetwork();
+	uint_t testScenarioTree();
+	uint_t testForecaster();
+	uint_t testControllerConfig();
+	uint_t testEngineTesting();
+	uint_t testSmpcController();
 	~Testing();
 private:
-	template<typename T> int compareArray(T* arrayA);
-	template<typename T> int compareDeviceArray(T* arrayA);
-	template<typename T> int compareDeviceScenarioArray(T* arrayA, uint_t *nodes, uint_t dim);
+	template<typename T> uint_t compareArray(T* arrayA);
+	template<typename T> uint_t compareDeviceArray(T* arrayA);
+	template<typename T> uint_t compareDeviceScenarioArray(T* arrayA, uint_t *nodes, uint_t dim);
 	//int compareArray(real_t* arrayA);
 	string pathToFileNetwork;
 	string pathToFileForecaster;

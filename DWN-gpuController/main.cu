@@ -24,6 +24,12 @@ int main(void){
 	_ASSERT( myTesting->testForecaster() );
 	_ASSERT( myTesting->testControllerConfig() );
 	_ASSERT( myTesting->testEngineTesting() );
+	_ASSERT( myTesting->testSmpcController());
+	//try{
+		//cout << myTesting->testScenarioTree() << endl;
+	//}catch (exception &e){
+	//cout << e.what() << __LINE__ << endl;
+	//}
 
 	string pathToNetworkFile = "../dataFiles/network.json";
 	string pathToScenarioTreeFile = "../dataFiles/scenarioTree.json";
@@ -45,6 +51,6 @@ int main(void){
 	//myEngine.testPrecondtioningFunciton();
 
 	//myEngine.testInverse();
-	cout << "bye bye \n" << endl;
+	cout << "bye bye" << endl;
 	return 0;
 }
