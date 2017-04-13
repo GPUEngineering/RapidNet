@@ -139,10 +139,10 @@ SmpcController::SmpcController(Forecaster *myForecaster, Engine *myEngine, SmpcC
 }
 
 SmpcController::SmpcController(string pathToConfigFile){
-	ptrMySmpcConfig = new SmpcConfiguration(pathToConfigFile);
+	ptrMySmpcConfig = new SmpcConfiguration( pathToConfigFile );
 	string pathToForecaster = ptrMySmpcConfig->getPathToForecaster();
-	ptrMyForecaster = new Forecaster(pathToForecaster);
-	ptrMyEngine = new Engine(ptrMySmpcConfig);
+	ptrMyForecaster = new Forecaster( pathToForecaster );
+	ptrMyEngine = new Engine( ptrMySmpcConfig );
 
 	DwnNetwork* ptrMyNetwork = ptrMyEngine->getDwnNetwork();
 	ScenarioTree* ptrMyScenarioTree = ptrMyEngine->getScenarioTree();
@@ -617,6 +617,42 @@ uint_t SmpcController::controlAction(real_t* u){
 	status = algorithmApg();
 	_CUDA( cudaMemcpy(u, devVecU, ptrMySmpcConfig->getNU()*sizeof(real_t), cudaMemcpyDeviceToHost));
 	return status;
+}
+
+/**
+ * Get's the network object
+ * @return  DwnNetwork
+ */
+DwnNetwork* SmpcController::getDwnNetwork(){
+	return ptrMyEngine->getDwnNetwork();
+}
+/**
+ * Get's the scenario tree object
+ * @return scenarioTree
+ */
+ScenarioTree* SmpcController::getScenarioTree(){
+	return ptrMyEngine->getScenarioTree();
+}
+/**
+ * Get's the forecaster object
+ * @return Forecaster
+ */
+Forecaster* SmpcController::getForecaster(){
+	return ptrMyForecaster;
+}
+/**
+ * Get's the Smpc controller configuration object
+ * @return SmpcConfiguration
+ */
+SmpcConfiguration* SmpcController::getSmpcConfiguration(){
+	return ptrMySmpcConfig;
+}
+/**
+ * Get's the Engine object
+ * @return Engine
+ */
+Engine* SmpcController::getEngine(){
+	return ptrMyEngine;
 }
 
 SmpcController::~SmpcController(){

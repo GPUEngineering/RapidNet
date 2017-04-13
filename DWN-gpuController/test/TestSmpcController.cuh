@@ -62,9 +62,7 @@ public :
 	/**
 	 * Constructor that create a TestSmpcController object which is derived from the SmpcController object
 	 *
-	 * @param  myForecaster  Forecaster object
-	 * @param  myEngine      Engine object
-	 * @param  mySmpcConfig  SmpcConfiguration object that contain the controller configuration
+	 * @param  pathToConfigFile  path to the SmpcController configuration file
 	 */
 	TestSmpcController(string pathToConfigFile);
 	/**

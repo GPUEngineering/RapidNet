@@ -134,7 +134,6 @@ uint_t Testing::testNetwork(){
 uint_t Testing::testScenarioTree(){
 	const char* fileName = pathToFileScenarioTree.c_str();
 	rapidjson::Document jsonDocument;
-	//rapidjson::Value a;
 	FILE* infile = fopen(fileName, "r");
 	if(infile == NULL){
 		try{
@@ -225,18 +224,38 @@ uint_t Testing::testForecaster(){
 		a = jsonDocument[VARNAME_N];
 		_ASSERT( a.IsArray() );
 		_ASSERT( ptrMyForecaster->getPredHorizon() == (uint_t) a[0].GetFloat() );
+		a = jsonDocument[VARNAME_SIM_HORIZON];
+		_ASSERT( a.IsArray() );
+		_ASSERT( ptrMyForecaster->getSimHorizon() == (uint_t) a[0].GetFloat() );
 		a = jsonDocument[VARNAME_DIM_DEMAND];
 		_ASSERT( a.IsArray() );
 		_ASSERT( ptrMyForecaster->getDimDemand() == (uint_t) a[0].GetFloat() );
 		a = jsonDocument[VARNAME_DIM_PRICES];
 		_ASSERT( a.IsArray() );
 		_ASSERT( ptrMyForecaster->getDimPrice() == (uint_t) a[0].GetFloat() );
-		a = jsonDocument[VARNAME_DHAT];
+		uint_t timeInst = 1;
+		ptrMyForecaster->predictDemand( timeInst );
+		a = jsonDocument[VARNAME_DEMAND_SIM];
+		_ASSERT( a.IsArray() );
+		_ASSERT( compareArray<real_t>( ptrMyForecaster->getNominalDemand()) );
+		/*for(uint_t iCount = 0; iCount < a.Size(); iCount++){
+			cout << ptrMyForecaster->getNominalDemand()[iCount] << " "<< a[iCount].GetFloat()<< " ";
+		}
+		cout << endl;*/
+		ptrMyForecaster->predictPrices( timeInst );
+		a = jsonDocument[VARNAME_PRICE_SIM];
+		_ASSERT( a.IsArray() );
+		_ASSERT( compareArray<real_t>( ptrMyForecaster->getNominalPrices()) );
+		/*for(uint_t iCount = 0; iCount < a.Size(); iCount++){
+			cout << ptrMyForecaster->getNominalPrices()[iCount] << " "<< a[iCount].GetFloat()<< " ";
+		}
+		cout << endl;
+		/*a = jsonDocument[VARNAME_DHAT];
 		_ASSERT( a.IsArray() );
 		_ASSERT( compareArray<real_t>( ptrMyForecaster->getNominalDemand()) );
 		a = jsonDocument[VARNAME_ALPHAHAT];
 		_ASSERT( a.IsArray() );
-		_ASSERT( compareArray<real_t>( ptrMyForecaster->getNominalPrices()) );
+		_ASSERT( compareArray<real_t>( ptrMyForecaster->getNominalPrices()) );*/
 		delete [] readBuffer;
 		readBuffer = NULL;
 		fclose(infile);
@@ -454,12 +473,18 @@ uint_t Testing::testEngineTesting(){
 }
 
 uint_t Testing::testSmpcController(){
-	DwnNetwork *ptrMyDwnNetwork = new DwnNetwork(pathToFileNetwork);
-	ScenarioTree *ptrMyScenarioTree = new ScenarioTree( pathToFileScenarioTree );
-	SmpcConfiguration *ptrMySmpcConfig = new SmpcConfiguration( pathToFileControllerConfig );
-	Forecaster *ptrMyForecaster = new Forecaster( pathToFileForecaster );
-	Engine *ptrMyEngine = new Engine( ptrMyDwnNetwork, ptrMyScenarioTree, ptrMySmpcConfig );
-	TestSmpcController *ptrMyTestSmpc = new TestSmpcController(ptrMyForecaster, ptrMyEngine, ptrMySmpcConfig);
+	//DwnNetwork *ptrMyDwnNetwork = new DwnNetwork(pathToFileNetwork);
+	//ScenarioTree *ptrMyScenarioTree = new ScenarioTree( pathToFileScenarioTree );
+	//SmpcConfiguration *ptrMySmpcConfig = new SmpcConfiguration( pathToFileControllerConfig );
+	//Forecaster *ptrMyForecaster = new Forecaster( pathToFileForecaster );
+	//Engine *ptrMyEngine = new Engine( ptrMyDwnNetwork, ptrMyScenarioTree, ptrMySmpcConfig );
+	//TestSmpcController *ptrMyTestSmpc = new TestSmpcController(ptrMyForecaster, ptrMyEngine, ptrMySmpcConfig);
+	TestSmpcController *ptrMyTestSmpc = new TestSmpcController( pathToFileControllerConfig );
+	DwnNetwork *ptrMyDwnNetwork = ptrMyTestSmpc->getDwnNetwork();
+	ScenarioTree *ptrMyScenarioTree = ptrMyTestSmpc->getScenarioTree();
+	SmpcConfiguration *ptrMySmpcConfig = ptrMyTestSmpc->getSmpcConfiguration();
+	Forecaster *ptrMyForecaster = ptrMyTestSmpc->getForecaster();
+	Engine *ptrMyEngine = ptrMyTestSmpc->getEngine();
 
 	uint_t nx  = ptrMyDwnNetwork->getNumTanks();
 	uint_t nu  = ptrMyDwnNetwork->getNumControls();

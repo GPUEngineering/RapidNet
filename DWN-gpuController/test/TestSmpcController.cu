@@ -66,12 +66,20 @@ TestSmpcController::TestSmpcController(Forecaster *myForecaster, Engine *myEngin
 }
 
 /**
+ * Constructor that create a TestSmpcController object which is derived from the SmpcController object
+ *
+ * @param pathToConfigFile   path to the smpc configuration file
+ */
+TestSmpcController::TestSmpcController( string pathToConfigFile ): SmpcController( pathToConfigFile ){
+	pathToFileSmpc = "../test/testDataFiles/smpcTest.json";
+}
+/**
  * Function to test the dualExtrapolation function
  */
 uint_t TestSmpcController::testExtrapolation(){
 	const char* fileName = pathToFileSmpc.c_str();
-	ScenarioTree *ptrMyScenarioTree = this->ptrMyEngine->getScenarioTree();
-	DwnNetwork *ptrDwnNetwork = this->ptrMyEngine->getDwnNetwork();
+	ScenarioTree *ptrMyScenarioTree = this->getScenarioTree();
+	DwnNetwork *ptrDwnNetwork = this->getDwnNetwork();
 	uint_t nx = ptrDwnNetwork->getNumTanks();
 	uint_t nu = ptrDwnNetwork->getNumControls();
 	uint_t nv = this->ptrMySmpcConfig->getNV();
@@ -123,11 +131,11 @@ uint_t TestSmpcController::testExtrapolation(){
  */
 uint_t TestSmpcController::testSoveStep(){
 	const char* fileName = pathToFileSmpc.c_str();
-	ScenarioTree *ptrMyScenarioTree = this->ptrMyEngine->getScenarioTree();
-	DwnNetwork *ptrDwnNetwork = this->ptrMyEngine->getDwnNetwork();
+	ScenarioTree *ptrMyScenarioTree = this->getScenarioTree();
+	DwnNetwork *ptrDwnNetwork = this->getDwnNetwork();
 	uint_t nx = ptrDwnNetwork->getNumTanks();
 	uint_t nu = ptrDwnNetwork->getNumControls();
-	uint_t nv = this->ptrMySmpcConfig->getNV();
+	uint_t nv = ptrMySmpcConfig->getNV();
 	uint_t nodes = ptrMyScenarioTree->getNumNodes();
 
 	// implement the factor step, elimination of the control-disturbance constraints and updating the
@@ -185,8 +193,8 @@ uint_t TestSmpcController::testSoveStep(){
  */
 uint_t TestSmpcController::testProximalStep(){
 	const char* fileName = pathToFileSmpc.c_str();
-	ScenarioTree *ptrMyScenarioTree = this->ptrMyEngine->getScenarioTree();
-	DwnNetwork *ptrDwnNetwork = this->ptrMyEngine->getDwnNetwork();
+	ScenarioTree *ptrMyScenarioTree = this->getScenarioTree();
+	DwnNetwork *ptrDwnNetwork = this->getDwnNetwork();
 	uint_t nx = ptrDwnNetwork->getNumTanks();
 	uint_t nu = ptrDwnNetwork->getNumControls();
 	uint_t nv = this->ptrMySmpcConfig->getNV();
@@ -255,8 +263,8 @@ uint_t TestSmpcController::testProximalStep(){
  */
 uint_t TestSmpcController::testDualUpdate(){
 	const char* fileName = pathToFileSmpc.c_str();
-	ScenarioTree *ptrMyScenarioTree = this->ptrMyEngine->getScenarioTree();
-	DwnNetwork *ptrDwnNetwork = this->ptrMyEngine->getDwnNetwork();
+	ScenarioTree *ptrMyScenarioTree = this->getScenarioTree();
+	DwnNetwork *ptrDwnNetwork = this->getDwnNetwork();
 	uint_t nx = ptrDwnNetwork->getNumTanks();
 	uint_t nu = ptrDwnNetwork->getNumControls();
 	uint_t nv = this->ptrMySmpcConfig->getNV();

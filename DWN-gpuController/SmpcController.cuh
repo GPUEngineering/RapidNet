@@ -77,6 +77,31 @@ public:
 	 */
 	int controlAction(real_t* u);
 	/**
+	 * Get's the network object
+	 * @return  DwnNetwork
+	 */
+	DwnNetwork* getDwnNetwork();
+	/**
+	 * Get's the scenario tree object
+	 * @return scenarioTree
+	 */
+	ScenarioTree* getScenarioTree();
+	/**
+	 * Get's the Smpc controller configuration object
+	 * @return SmpcConfiguration
+	 */
+	SmpcConfiguration* getSmpcConfiguration();
+	/**
+	 * Get's the Forecaster object
+	 * @return Forecaster
+	 */
+	Forecaster* getForecaster();
+	/**
+	 * Get's the Engine object
+	 * @return Engine
+	 */
+	Engine* getEngine();
+	/**
 	 * Destructor. Frees allocated memory.
 	 */
 	~SmpcController();
