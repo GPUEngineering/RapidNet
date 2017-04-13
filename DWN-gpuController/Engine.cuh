@@ -51,6 +51,13 @@ public:
 			SmpcConfiguration *smpcConfig);
 
 	/**
+	 *
+	 * @param network
+	 * @param forecaster
+	 * @todo remove `SmpcConfig` from here
+	 */
+	Engine( SmpcConfiguration *smpcConfig);
+	/**
 	 * Eliminate input-demand coupling equations
 	 * @param   nominalDemand    demand predicted
 	 * @param   nominalPrice     price prediction

@@ -47,7 +47,14 @@ public:
 	 * @param  myEngine       An instance of Engine object
 	 * @param  mySmpcConfig   An instance of the Smpc controller configuration object
 	 */
-	SmpcController(Forecaster *myForecaster, Engine *myEngine, SmpcConfiguration *mySmpcConfig);
+	SmpcController( Forecaster *myForecaster,
+			Engine *myEngine,
+			SmpcConfiguration *mySmpcConfig );
+	/**
+	 * Construct a new Controller with a given engine.
+	 * @param  pathToConfigFile   path to the controller configuration file
+	 */
+	SmpcController( string pathToConfigFile );
 
 	/**
 	 * Performs the initialise the smpc controller
@@ -94,11 +101,10 @@ protected:
 	 */
 	void dualUpdate();
 	/**
-	 * This method executes the APG algorithm and returns 1
-	 * as success code.
-	 * @return status code; 1 = success, 0 = failure
+	 * This method executes the APG algorithm and returns the primal infeasibility.
+	 * @return primalInfeasibilty;
 	 */
-	int algorithmApg();
+	uint_t algorithmApg();
 	/**
 	 *
 	 */
@@ -204,7 +210,7 @@ protected:
 	/**
 	 * Pointer array for primal infeasibility Hx-z
 	 */
-	real_t *devPrimalInfeasibilty;
+	real_t *devVecPrimalInfeasibilty;
 	/**
 	 * Pointer for cost Q
 	 */
@@ -229,6 +235,10 @@ protected:
 	 * Flag Factor step
 	 */
 	bool FlagFactorStep;
+	/*
+	 * primal Infeasibilty
+	 */
+	real_t *vecPrimalInfs;
 };
 
 #endif /* SMPCONTROLLERCLASS_CUH_ */

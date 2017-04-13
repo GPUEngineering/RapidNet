@@ -87,10 +87,8 @@ uint_t Testing::testNetwork(){
 		char* readBuffer = new char[65536];
 		rapidjson::FileReadStream networkJsonStream(infile, readBuffer, sizeof(readBuffer));
 		jsonDocument.ParseStream(networkJsonStream);
-		//matA = new real_t[nTanks * nTanks];
 		a = jsonDocument[VARNAME_A];
 		_ASSERT(a.IsArray());
-		//cout<< compareArray(ptrMyDwnNetwork->getMatA()) << endl;
 		_ASSERT( compareArray<real_t>( ptrMyDwnNetwork->getMatA() ) );
 		a = jsonDocument[VARNAME_B];
 		_ASSERT(a.IsArray());
@@ -296,12 +294,6 @@ uint_t Testing::testControllerConfig(){
 		a = jsonDocument[VARNAME_CURRENT_X];
 		_ASSERT(a.IsArray());
 		_ASSERT( compareArray<real_t>( ptrMySmpcConfig->getCurrentX() ) );
-		/*a = jsonDocument[VARNAME_PREV_UHAT];
-		_ASSERT(a.IsArray());
-		_ASSERT( compareArray<real_t>( ptrMySmpcConfig->getPrevUhat() ) );
-		a = jsonDocument[VARNAME_PREV_U];
-		_ASSERT(a.IsArray());
-		_ASSERT( compareArray<real_t>( ptrMySmpcConfig->getPrevU() ) );*/
 		a = jsonDocument[VARNAME_PREV_DEMAND];
 		_ASSERT(a.IsArray());
 		_ASSERT( compareArray<real_t>( ptrMySmpcConfig->getPrevDemand() ) );
@@ -311,6 +303,15 @@ uint_t Testing::testControllerConfig(){
 		a = jsonDocument[VARNAME_MAX_ITER];
 		_ASSERT(a.IsArray());
 		_ASSERT( ptrMySmpcConfig->getMaxIterations() == (uint_t) a[0].GetFloat() );
+		a = jsonDocument[PATH_NETWORK_FILE];
+		_ASSERT(a.IsString());
+		_ASSERT( !ptrMySmpcConfig->getPathToNetwork().compare(a.GetString()));
+		a = jsonDocument[PATH_SCENARIO_TREE_FILE];
+		_ASSERT(a.IsString());
+		_ASSERT( !ptrMySmpcConfig->getPathToScenarioTree().compare(a.GetString()));
+		a = jsonDocument[PATH_FORECASTER_FILE];
+		_ASSERT(a.IsString());
+		_ASSERT( !ptrMySmpcConfig->getPathToForecaster().compare(a.GetString()));
 		delete [] readBuffer;
 		readBuffer = NULL;
 		fclose(infile);
@@ -323,12 +324,16 @@ uint_t Testing::testControllerConfig(){
 }
 
 uint_t Testing::testEngineTesting(){
-	DwnNetwork *ptrMyDwnNetwork = new DwnNetwork(pathToFileNetwork);
-	ScenarioTree *ptrMyScenarioTree = new ScenarioTree( pathToFileScenarioTree );
+	//DwnNetwork *ptrMyDwnNetwork = new DwnNetwork(pathToFileNetwork);
+	//ScenarioTree *ptrMyScenarioTree = new ScenarioTree( pathToFileScenarioTree );
 	SmpcConfiguration *ptrMySmpcConfig = new SmpcConfiguration( pathToFileControllerConfig );
 	Forecaster *ptrMyForecaster = new Forecaster( pathToFileForecaster );
 
-	Engine *ptrMyEngine = new Engine( ptrMyDwnNetwork, ptrMyScenarioTree, ptrMySmpcConfig );
+	//Engine *ptrMyEngine = new Engine( ptrMyDwnNetwork, ptrMyScenarioTree, ptrMySmpcConfig );
+	Engine *ptrMyEngine = new Engine( ptrMySmpcConfig );
+	DwnNetwork *ptrMyDwnNetwork = ptrMyEngine->getDwnNetwork();
+	ScenarioTree *ptrMyScenarioTree = ptrMyEngine->getScenarioTree();
+
 	uint_t *testNodeArray = new uint_t[ptrMyScenarioTree->getPredHorizon()];
 	uint_t dim;
 	uint_t nx  = ptrMyDwnNetwork->getNumTanks();

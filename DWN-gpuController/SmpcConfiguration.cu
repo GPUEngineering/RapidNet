@@ -80,11 +80,6 @@ SmpcConfiguration::SmpcConfiguration(string pathToFile){
 		_ASSERT(a.IsArray());
 		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
 			currentX[i] = a[i].GetFloat();
-		/*prevUhat = new real_t[NU];
-		a = jsonDocument[VARNAME_PREV_UHAT];
-		_ASSERT(a.IsArray());
-		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
-			prevUhat[i] = a[i].GetFloat();*/
 		prevU = new real_t[NU];
 		a = jsonDocument[VARNAME_PREV_U];
 		_ASSERT(a.IsArray());
@@ -101,11 +96,22 @@ SmpcConfiguration::SmpcConfiguration(string pathToFile){
 		a = jsonDocument[VARNAME_MAX_ITER];
 		_ASSERT(a.IsArray());
 		maxIteration = (uint_t) a[0].GetFloat();
+		a = jsonDocument[PATH_NETWORK_FILE];
+		_ASSERT(a.IsString());
+		pathToNetwork = a.GetString();
+		a = jsonDocument[PATH_SCENARIO_TREE_FILE];
+		_ASSERT(a.IsString());
+		pathToScenarioTree = a.GetString();
+		a = jsonDocument[PATH_FORECASTER_FILE];
+		_ASSERT(a.IsString());
+		pathToForecaster = a.GetString();
+		//_ASSERT(a.IsArray());
+		//pathToNetwork[0] = (char) a[0].GetArray();
 		delete [] readBuffer;
 		readBuffer = NULL;
+		fclose(infile);
+		infile = NULL;
 	}
-	fclose(infile);
-	infile = NULL;
 }
 
 uint_t SmpcConfiguration::getNX(){
@@ -162,6 +168,19 @@ uint_t SmpcConfiguration::getMaxIterations(){
 real_t SmpcConfiguration::getStepSize(){
 	return stepSize;
 }
+
+string SmpcConfiguration::getPathToNetwork(){
+	return pathToNetwork;
+}
+
+string SmpcConfiguration::getPathToScenarioTree(){
+	return pathToScenarioTree;
+}
+
+string SmpcConfiguration::getPathToForecaster(){
+	return pathToForecaster;
+}
+
 SmpcConfiguration::~SmpcConfiguration(){
 	delete [] matL;
 	delete [] matLhat;

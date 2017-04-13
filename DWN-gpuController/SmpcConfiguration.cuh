@@ -40,6 +40,11 @@
 #define VARNAME_PREV_DEMAND "prevDemand"
 #define VARNAME_STEP_SIZE "stepSize"
 #define VARNAME_MAX_ITER "maxIterations"
+#define PATH_NETWORK_FILE "pathToNetwork"
+#define PATH_SCENARIO_TREE_FILE "pathToScenarioTree"
+#define PATH_FORECASTER_FILE "pathToForecaster"
+
+
 class SmpcConfiguration{
 public:
 
@@ -114,6 +119,18 @@ public:
 	 * Get the step size
 	 */
 	real_t getStepSize();
+	/*
+	 * Get the path to network
+	 */
+	string getPathToNetwork();
+	/*
+	 * Get the path to scenario tree
+	 */
+	string getPathToScenarioTree();
+	/*
+	 * Get the path to forecaster
+	 */
+	string getPathToForecaster();
 	/**
 	 * Default destructor to free the memory
 	 */
@@ -177,13 +194,25 @@ private:
 	 */
 	real_t *prevDemand;
 	/**
-	 *  stepsize for the APG
+	 *  Stepsize for the APG
 	 */
 	real_t stepSize;
 	/**
-	 * maximum number of iterations of the APG algorithm
+	 * Maximum number of iterations of the APG algorithm
 	 */
 	uint_t maxIteration;
+	/*
+	 * path to network json file
+	 */
+	string pathToNetwork;
+	/*
+	 * path to scenario tree json file
+	 */
+	string pathToScenarioTree;
+	/*
+	 * path to forecaster json file
+	 */
+	string pathToForecaster;
 };
 
 
