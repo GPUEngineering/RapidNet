@@ -123,10 +123,6 @@ private:
 	 */
 	real_t *nominalPrice;
 	/**
-	 * string path that contain the nominal demands and nominal prices
-	 */
-	string pathToNominalDemand;
-	/**
 	 * Member iterator to read demand in the json file.
 	 */
 	rapidjson::Value::ConstMemberIterator itrNominalDemand;

@@ -20,6 +20,8 @@
 #include "rapidjson/document.h"
 #include "rapidjson/rapidjson.h"
 #include "rapidjson/filereadstream.h"
+#include "rapidjson/filewritestream.h"
+#include "rapidjson/prettywriter.h"
 #include "SmpcConfiguration.cuh"
 
 
@@ -34,8 +36,8 @@ SmpcConfiguration::SmpcConfiguration(string pathToFile){
 		exit(100);
 	}else{
 		char* readBuffer = new char[65536];
-		rapidjson::FileReadStream networkJsonStream(infile, readBuffer, sizeof(readBuffer));
-		jsonDocument.ParseStream(networkJsonStream);
+		rapidjson::FileReadStream configurationJsonStream(infile, readBuffer, sizeof(readBuffer));
+		jsonDocument.ParseStream(configurationJsonStream);
 		a = jsonDocument[VARNAME_NX];
 		_ASSERT(a.IsArray());
 		NX = (uint_t) a[0].GetFloat();
@@ -105,8 +107,7 @@ SmpcConfiguration::SmpcConfiguration(string pathToFile){
 		a = jsonDocument[PATH_FORECASTER_FILE];
 		_ASSERT(a.IsString());
 		pathToForecaster = a.GetString();
-		//_ASSERT(a.IsArray());
-		//pathToNetwork[0] = (char) a[0].GetArray();
+		pathToConfiguration = pathToFile;
 		delete [] readBuffer;
 		readBuffer = NULL;
 		fclose(infile);
@@ -179,6 +180,96 @@ string SmpcConfiguration::getPathToScenarioTree(){
 
 string SmpcConfiguration::getPathToForecaster(){
 	return pathToForecaster;
+}
+
+/*
+ * Get the path to the controller configuration file
+ */
+string SmpcConfiguration::getPathToControllerConfig(){
+	return pathToConfiguration;
+}
+
+/**
+ * update the level in the tanks
+ * @param   state    updated state
+ */
+void SmpcConfiguration::setCurrentState(real_t* state){
+	for(uint_t iSize = 0; iSize < NX ; iSize++)
+		currentX[iSize] = state[iSize];
+}
+/**
+ * update the previous control actions
+ * @param    control  previous control action
+ */
+void SmpcConfiguration::setPreviousControl(real_t* control){
+	for(uint_t iSize = 0; iSize < NU ; iSize++)
+		prevU[iSize] = control[iSize];
+}
+/**
+ * update the previous demand
+ * @param    demand    previous demand
+ */
+void SmpcConfiguration::setpreviousdemand(real_t* demand){
+	for(uint_t iSize = 0; iSize < NX ; iSize++)
+		prevDemand[iSize] = demand[iSize];
+}
+/*
+ * update the current state from the controller
+ * configuration file
+ */
+void SmpcConfiguration::setCurrentState(){
+	const char* fileName = pathToConfiguration.c_str();
+	rapidjson::Document jsonDocument;
+	rapidjson::Value currentStateJson;
+	FILE* configurationFile = fopen(fileName, "r");
+	char* readBuffer = new char[65536];
+	rapidjson::FileReadStream configurationJsonStream(configurationFile, readBuffer, sizeof(readBuffer));
+	jsonDocument.ParseStream(configurationJsonStream);
+	currentStateJson = jsonDocument[VARNAME_CURRENT_X];
+	_ASSERT(currentStateJson.IsArray());
+	for (rapidjson::SizeType i = 0; i < currentStateJson.Size(); i++)
+		currentX[i] = currentStateJson[i].GetFloat();
+	delete [] readBuffer;
+	readBuffer = NULL;
+}
+/*
+ * update the previous control from the controller
+ * configuration file
+ */
+void SmpcConfiguration::setPreviousControl(){
+	const char* fileName = pathToConfiguration.c_str();
+	rapidjson::Document jsonDocument;
+	rapidjson::Value previousControlJson;
+	FILE* configurationFile = fopen(fileName, "r");
+	char* readBuffer = new char[65536];
+	rapidjson::FileReadStream configurationJsonStream(configurationFile, readBuffer, sizeof(readBuffer));
+	jsonDocument.ParseStream(configurationJsonStream);
+	previousControlJson = jsonDocument[VARNAME_PREV_U];
+	_ASSERT(previousControlJson.IsArray());
+	for (rapidjson::SizeType i = 0; i < previousControlJson.Size(); i++)
+		prevU[i] = previousControlJson[i].GetFloat();
+	delete [] readBuffer;
+	readBuffer = NULL;
+}
+
+/*
+ * update the previous demand from the controller
+ * configuration file
+ */
+void SmpcConfiguration::setPreviousDemand(){
+	const char* fileName = pathToConfiguration.c_str();
+	rapidjson::Document jsonDocument;
+	rapidjson::Value previousDemandJson;
+	FILE* configurationFile = fopen(fileName, "r");
+	char* readBuffer = new char[65536];
+	rapidjson::FileReadStream configurationJsonStream(configurationFile, readBuffer, sizeof(readBuffer));
+	jsonDocument.ParseStream(configurationJsonStream);
+	previousDemandJson = jsonDocument[VARNAME_PREV_DEMAND];
+	_ASSERT(previousDemandJson.IsArray());
+	for (rapidjson::SizeType i = 0; i < previousDemandJson.Size(); i++)
+		prevU[i] = previousDemandJson[i].GetFloat();
+	delete [] readBuffer;
+	readBuffer = NULL;
 }
 
 SmpcConfiguration::~SmpcConfiguration(){

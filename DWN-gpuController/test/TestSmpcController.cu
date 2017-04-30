@@ -143,6 +143,9 @@ uint_t TestSmpcController::testSoveStep(){
 	real_t *currentX = ptrMySmpcConfig->getCurrentX();
 	real_t *prevU = ptrMySmpcConfig->getPrevU();
 	real_t *prevDemand = ptrMySmpcConfig->getPrevDemand();
+	uint_t timeInst = 1;
+	ptrMyForecaster->predictDemand( timeInst );
+	ptrMyForecaster->predictPrices( timeInst );
 	this->ptrMyEngine->factorStep();
 	this->ptrMyEngine->updateStateControl(currentX, prevU, prevDemand);
 	this->ptrMyEngine->eliminateInputDistubanceCoupling( ptrMyForecaster->getNominalDemand(),

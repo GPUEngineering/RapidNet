@@ -69,13 +69,22 @@ public:
 	 * and finally #algorithmApg.
 	 */
 	void controllerSmpc();
+
 	/**
-	 *Computes a control action and returns a status code
-	 *which is an integer (1 = success).
-	 * @param u pointer to computed control action (CPU variable)
+	 * Computes a control action and returns a status code
+	 * which is an integer (1 = success).
+	 * @param  u      pointer to computed control action (CPU variable)
 	 * @return status code
 	 */
-	int controlAction(real_t* u);
+	uint_t controlAction(real_t* u);
+
+	/**
+	 * Compute the control action, stores in the json file
+	 * provided to it and returns a status code (1 = success).
+	 * @param   controlJson   file pointer to the output json file
+	 * @return  status        code
+	 */
+	uint_t controlAction(fstream& controlOutputJson);
 	/**
 	 * Get's the network object
 	 * @return  DwnNetwork
@@ -101,6 +110,17 @@ public:
 	 * @return Engine
 	 */
 	Engine* getEngine();
+	/*
+	 * During the closed-loop of the controller,
+	 * the controller moves to the next time instance. It checks
+	 * for the flag SIMULATOR_FLAG, 1 corresponds to an in-build
+	 * simulator call given by `updateSmpcConfiguration()` and
+	 * 0 corresponds to external simulator.
+	 *
+	 * Reads the smpcControlConfiguration file for currentState,
+	 * previousDemand and previousControl action.
+	 */
+	void moveForewardInTime();
 	/**
 	 * Destructor. Frees allocated memory.
 	 */
@@ -131,8 +151,19 @@ protected:
 	 */
 	uint_t algorithmApg();
 	/**
-	 *
+	 * When the SIMULATOR FLAG is set to 1, the previousControl,
+	 * currentState and previousDemand vectors in the smpc controller
+	 * configuration file are set.
+	 * @param    updateState   update the currentX in the controller
+	 *                         configuration json
+	 * @param    control       update the prevU in the controller
+	 *                         configuration json
+	 * @param    demand        update the prevDemand in the controller
+	 *                         configuration json
 	 */
+	void updateSmpcConfiguration(real_t* updateState,
+			real_t* control,
+			real_t* demand);
 //private:
 	/**
 	 * Pointer to an Engine object.
@@ -252,6 +283,15 @@ protected:
 	 * Pointer array for device pointers of cost R
 	 */
 	real_t **devPtrVecR;
+	/*
+	 * Final control output calculated after a projection on the
+	 * feasible set to ensure feasibility
+	 */
+	real_t *devControlAction;
+	/**
+	 * Updated state for the simulator
+	 */
+	real_t *devStateUpdate;
 	/**
 	 * step size
 	 */
@@ -259,7 +299,11 @@ protected:
 	/**
 	 * Flag Factor step
 	 */
-	bool FlagFactorStep;
+	bool factorStepFlag;
+	/*
+	 * flag for the simulator flag (default is set to 1 or true);
+	 */
+	bool simulatorFlag;
 	/*
 	 * primal Infeasibilty
 	 */

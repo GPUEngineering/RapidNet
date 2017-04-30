@@ -91,10 +91,10 @@ real_t* Forecaster::getNominalPrices(){
 }
 
 uint_t Forecaster::predictDemand(uint_t simTime){
-	itrNominalDemand = jsonDocument.MemberBegin() + 6 + 2*simTime;
+	itrNominalDemand = jsonDocument.MemberBegin() + 4 + 2*simTime;
 	if(itrNominalDemand != jsonDocument.MemberEnd() ){
 		jsonValue = jsonDocument[itrNominalDemand->name.GetString()];
-		cout<< " size of the nominal demand "<<jsonValue.Size() << " " << itrNominalDemand->name.GetString() << endl;
+		//cout<< " size of the nominal demand "<<jsonValue.Size() << " " << itrNominalDemand->name.GetString() << endl;
 		for(uint_t iCount = 0; iCount < jsonValue.Size(); iCount++){
 			nominalDemand[iCount]= jsonValue[iCount].GetFloat();
 		}
@@ -105,10 +105,10 @@ uint_t Forecaster::predictDemand(uint_t simTime){
 }
 
 uint_t Forecaster::predictPrices(uint_t simTime){
-	itrNominalPrices = jsonDocument.MemberBegin() + 7 + 2*simTime;
+	itrNominalPrices = jsonDocument.MemberBegin() + 5 + 2*simTime;
 	if(itrNominalDemand != jsonDocument.MemberEnd() ){
 		jsonValue = jsonDocument[itrNominalPrices->name.GetString()];
-		cout<< " size of the nominal prices "<< jsonValue.Size()<< " " << itrNominalPrices->name.GetString() << endl;
+		//cout<< " size of the nominal prices "<< jsonValue.Size()<< " " << itrNominalPrices->name.GetString() << endl;
 		for(uint_t iCount = 0; iCount < jsonValue.Size(); iCount++){
 			nominalPrice[iCount]= jsonValue[iCount].GetFloat();
 		}

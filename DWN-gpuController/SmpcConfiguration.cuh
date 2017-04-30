@@ -120,6 +120,10 @@ public:
 	 */
 	real_t getStepSize();
 	/*
+	 * Get the path to the controller configuration file
+	 */
+	string getPathToControllerConfig();
+	/*
 	 * Get the path to network
 	 */
 	string getPathToNetwork();
@@ -131,6 +135,37 @@ public:
 	 * Get the path to forecaster
 	 */
 	string getPathToForecaster();
+	/** SETTER'S FOR THE CONTROLLER CONFIGURATION OBJECT**/
+	/*
+	 * update the current state from the controller
+	 * configuration file
+	 */
+	void setCurrentState();
+	/*
+	 * update the previous control from the controller
+	 * configuration file
+	 */
+	void setPreviousControl();
+	/*
+	 * update the previous demand from the controller
+	 * configuration file
+	 */
+	void setPreviousDemand();
+	/**
+	 * update the level in the tanks
+	 * @param   state    updated state
+	 */
+	void setCurrentState(real_t* state);
+	/**
+	 * update the previous control actions
+	 * @param    control  previous control action
+	 */
+	void setPreviousControl(real_t* control);
+	/**
+	 * update the previous demand
+	 * @param    demand    previous demand
+	 */
+	void setpreviousdemand(real_t* demand);
 	/**
 	 * Default destructor to free the memory
 	 */
@@ -201,6 +236,10 @@ private:
 	 * Maximum number of iterations of the APG algorithm
 	 */
 	uint_t maxIteration;
+	/*
+	 * path to the controller configuration json file
+	 */
+	string pathToConfiguration;
 	/*
 	 * path to network json file
 	 */

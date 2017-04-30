@@ -9,9 +9,8 @@
 #include "test/Testing.cuh"
 
 int main(void){
-	uint_t TESTING = 1;
+	uint_t TESTING = 0;
 	startTicToc();
-	tic();
 	if (TESTING){
 		Testing *myTesting = new Testing();
 		_ASSERT( myTesting->testNetwork() );
@@ -21,41 +20,56 @@ int main(void){
 		_ASSERT( myTesting->testEngineTesting() );
 		_ASSERT( myTesting->testSmpcController());
 	}
-	real_t time = toc();
-	cout << "time lapsed " << time << "in milliseconds" << endl;
-	/*
-	string pathToNetworkFile = "../dataFiles/network.json";
-	const char* fileName = pathToNetworkFile.c_str();
-	rapidjson::Document jsonDocument;
-	rapidjson::Value a;
-	FILE* infile = fopen(fileName, "r");
-	if(infile == NULL){
-		cout << pathToNetworkFile << infile << endl;
-		cerr << "Error in opening the file " <<__LINE__ << endl;
-		exit(100);
-	}else{
-		char* readBuffer = new char[65536];
-		rapidjson::FileReadStream networkJsonStream(infile, readBuffer, sizeof(readBuffer));
-		jsonDocument.ParseStream(networkJsonStream);
-		/*for (rapidjson::Value::ConstMemberIterator itr = jsonDocument.MemberBegin();
-		    itr != jsonDocument.MemberEnd(); ++itr){
-			cout << "Type of member  " << itr->name.GetString() << endl;
-		}
-		rapidjson::Value::ConstMemberIterator itr = jsonDocument.MemberBegin();
-		cout << "Let's find the first object " << itr->name.GetString() << endl;
-		a = jsonDocument[itr->name.GetString()];
-		_ASSERT(a.IsArray());
-		real_t nTanks = (uint_t) a[0].GetFloat();
-		cout << "nTanks " << nTanks << endl;
-		itr = itr+2;
-		a = jsonDocument[itr->name.GetString()];
-		_ASSERT(a.IsArray());
-		real_t n = (uint_t) a[0].GetFloat();
-		cout << "string " << itr->name.GetString() << n << endl;
-		delete [] readBuffer;
-		readBuffer = NULL;
-		fclose(infile);
-	}*/
+	real_t time;
+	string pathToControlOutput = "../systemData/controlOutput.json";
+	string pathToControllerConfig = "../systemData/controllerConfig32.json";
+	//fstream controlOutputJson( pathToControlOutput.c_str(), ios::out);
+	fstream controlOutputJson;
+	controlOutputJson.open( pathToControlOutput.c_str(), fstream::out);
+	/*real_t a[2] = {1, 2};
+	controlOutputJson << " control " << a << endl;
+	controlOutputJson << " next control " << 2 << endl;*/
+
+	SmpcController *dwnController = new SmpcController( pathToControllerConfig );
+	uint_t timeInstance = 0;
+	dwnController->getForecaster()->predictDemand( timeInstance );
+	dwnController->getForecaster()->predictPrices( timeInstance );
+	dwnController->initialiseSmpcController();
+	tic();
+	dwnController->controlAction( controlOutputJson );
+	time = toc();
+	cout << "time lapsed " << time << " milliseconds" << endl;
+	uint_t nx = dwnController->getDwnNetwork()->getNumTanks();
+	uint_t nu = dwnController->getDwnNetwork()->getNumControls();
+	uint_t nd = dwnController->getDwnNetwork()->getNumDemands();
+	real_t *currentState = new real_t[nx];
+	real_t *prevControl = new real_t[nu];
+	real_t *prevDemand = new real_t[nd];
+
+	for(uint_t iSize = 0; iSize < nx; iSize++)
+		currentState[iSize] = dwnController->getSmpcConfiguration()->getCurrentX()[iSize];
+	for(uint_t iSize = 0; iSize < nu; iSize++)
+		prevControl[iSize] = dwnController->getSmpcConfiguration()->getPrevU()[iSize];
+	for(uint_t iSize = 0; iSize < nd; iSize++)
+		prevDemand[iSize] = dwnController->getSmpcConfiguration()->getPrevDemand()[iSize];
+	dwnController->moveForewardInTime();
+
+	cout << "State "<< endl;
+	for(uint_t iSize = 0; iSize < nx; iSize++)
+		cout << currentState[iSize] - dwnController->getSmpcConfiguration()->getCurrentX()[iSize] << " ";
+	cout << "Control" << endl;
+	for(uint_t iSize = 0; iSize < nu; iSize++)
+		cout<< prevControl[iSize] - dwnController->getSmpcConfiguration()->getPrevU()[iSize] << " ";
+	cout << "Demand" << endl;
+	for(uint_t iSize = 0; iSize < nd; iSize++)
+		cout << prevDemand[iSize] - dwnController->getSmpcConfiguration()->getPrevDemand()[iSize] << " ";
+	cout << nx << " " << nu << " " << nd << endl;
+	delete dwnController;
+	controlOutputJson.close();
+	delete [] currentState;
+	delete [] prevControl;
+	delete [] prevDemand;
+	/**/
 	//try{
 		//cout << myTesting->testScenarioTree() << endl;
 	//}catch (exception &e){

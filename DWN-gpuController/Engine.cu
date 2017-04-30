@@ -111,6 +111,7 @@ Engine::Engine(SmpcConfiguration *smpcConfig){
 	string pathToScenarioTree = ptrMySmpcConfig->getPathToScenarioTree();
 	ptrMyNetwork = new DwnNetwork( pathToNetwork );
 	ptrMyScenarioTree = new ScenarioTree( pathToScenarioTree );
+
 	uint_t nx = ptrMyNetwork->getNumTanks();
 	uint_t nu = ptrMyNetwork->getNumControls();
 	uint_t nv = ptrMySmpcConfig->getNV();
@@ -167,6 +168,7 @@ Engine::Engine(SmpcConfiguration *smpcConfig){
 	_CUDA( cudaMemcpy(devPtrMatD, ptrMatD, nodes*sizeof(real_t*), cudaMemcpyHostToDevice) );
 	_CUDA( cudaMemcpy(devPtrMatF, ptrMatF, nodes*sizeof(real_t*), cudaMemcpyHostToDevice) );
 	_CUDA( cudaMemcpy(devPtrMatG, ptrMatG, nodes*sizeof(real_t*), cudaMemcpyHostToDevice) );
+
 
 	delete [] ptrMatPhi;
 	delete [] ptrMatPsi;
@@ -374,7 +376,7 @@ void Engine::initialiseSystemDevice(){
 		preconditionConstraintU<<<numBlock, nu>>>(&devSysUmax[controlIdx], &devSysUmin[controlIdx],
 				&devMatDiagPrcnd[iStage*(2*nx + nu)], &devTreeProb[prevNodes], nu, numBlock);
 		preconditionConstraintX<<<numBlock, nx>>>(&devSysXmax[stateIdx], &devSysXmin[stateIdx], &devSysXs[stateIdx],
-				&devMatDiagPrcnd[iStage*(2*nx + nu) + 2*nx], &devTreeProb[prevNodes], nx, numBlock);
+				&devMatDiagPrcnd[iStage*(2*nx + nu) + nu], &devTreeProb[prevNodes], nx, numBlock);
 	}
 
 	//_CUDA(cudaMemcpy(devSysXsUpper, devSysXmax, nx*nodes*sizeof(real_t), cudaMemcpyDeviceToDevice));
@@ -883,6 +885,7 @@ void Engine::eliminateInputDistubanceCoupling(real_t* nominalDemand, real_t *nom
 		real_t scale = ptrMyScenarioTree->getProbArray()[iNode];
 		_CUBLAS( cublasSaxpy_v2(handle, nv, &scale, &devVecAlphaBar[nv*iNode], 1, &devVecBeta[nv*iNode],1) );
 	}
+
 	delete [] ptrMatGd;
 	delete [] ptrVecE;
 	delete [] ptrVecDemand;
@@ -923,7 +926,7 @@ void Engine::eliminateInputDistubanceCoupling(real_t* nominalDemand, real_t *nom
 }
 
 void Engine::updateStateControl(real_t* currentX, real_t* prevU, real_t* prevDemand){
-	real_t alpha = 3600;
+	real_t alpha = 1;
 	real_t beta = 0;
 	uint_t nu = ptrMyNetwork->getNumControls();
 	uint_t nx = ptrMyNetwork->getNumTanks();
