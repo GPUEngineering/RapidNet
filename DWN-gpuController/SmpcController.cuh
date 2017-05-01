@@ -121,6 +121,31 @@ public:
 	 * previousDemand and previousControl action.
 	 */
 	void moveForewardInTime();
+	/*
+	 * Get the economical KPI upto the simulation horizon
+	 * @param    simualtionTime  simulation horizon
+	 */
+	real_t getEconomicKpi( uint_t simulationTime);
+	/*
+	 * Get the smooth KPI upto the simulation horizon
+	 * @param    simulationTime   simulation horizon
+	 */
+	real_t getSmoothKpi( uint_t simulationTime);
+	/*
+	 * Get the  network KPI upto the simulation horizon
+	 * @param   simulationTime    simulation horizon
+	 */
+	real_t getNetworkKpi( uint_t simulationTime);
+	/*
+	 * Get the safety KPI upto the simulation horizon
+	 * @param   simulationTime    simulation horizon
+	 */
+	real_t getSafetyKpi( uint_t simulationTime);
+	/**
+	 * update the KPI at the current time instance
+	 */
+	void updateKpi(real_t* state,
+			real_t* control);
 	/**
 	 * Destructor. Frees allocated memory.
 	 */
@@ -293,7 +318,7 @@ protected:
 	 */
 	real_t *devStateUpdate;
 	/**
-	 * step size
+	 * Step size
 	 */
 	real_t stepSize;
 	/**
@@ -301,13 +326,29 @@ protected:
 	 */
 	bool factorStepFlag;
 	/*
-	 * flag for the simulator flag (default is set to 1 or true);
+	 * Flag for the simulator flag (default is set to 1 or true);
 	 */
 	bool simulatorFlag;
 	/*
 	 * primal Infeasibilty
 	 */
 	real_t *vecPrimalInfs;
+	/*
+	 * KPI to measure the economical cost
+	 */
+	real_t economicKpi;
+	/*
+	 * KPI to measure the smooth operation of the controller
+	 */
+	real_t smoothKpi;
+	/*
+	 * KPI to measure the safe operation of the controller
+	 */
+	real_t safeKpi;
+	/*
+	 * KPI to measure the network utility of the system
+	 */
+	real_t networkKpi;
 };
 
 #endif /* SMPCONTROLLERCLASS_CUH_ */

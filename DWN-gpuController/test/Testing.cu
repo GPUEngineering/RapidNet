@@ -365,6 +365,9 @@ uint_t Testing::testEngineTesting(){
 	real_t *prevU = ptrMySmpcConfig->getPrevU();
 	real_t *prevDemand = ptrMySmpcConfig->getPrevDemand();
 
+	uint_t timeInst = 1;
+	ptrMyForecaster->predictDemand( timeInst );
+	ptrMyForecaster->predictPrices( timeInst );
 	ptrMyEngine->factorStep();
 	ptrMyEngine->updateStateControl(currentX, prevU, prevDemand);
 	ptrMyEngine->eliminateInputDistubanceCoupling( ptrMyForecaster->getNominalDemand(),

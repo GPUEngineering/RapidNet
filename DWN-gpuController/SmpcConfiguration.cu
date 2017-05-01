@@ -210,7 +210,7 @@ void SmpcConfiguration::setPreviousControl(real_t* control){
  * @param    demand    previous demand
  */
 void SmpcConfiguration::setpreviousdemand(real_t* demand){
-	for(uint_t iSize = 0; iSize < NX ; iSize++)
+	for(uint_t iSize = 0; iSize < ND ; iSize++)
 		prevDemand[iSize] = demand[iSize];
 }
 /*

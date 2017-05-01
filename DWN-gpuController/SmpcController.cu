@@ -127,6 +127,11 @@ SmpcController::SmpcController(Forecaster *myForecaster, Engine *myEngine, SmpcC
 
 	vecPrimalInfs = new real_t[ptrMySmpcConfig->getMaxIterations()];
 
+	economicKpi = 0;
+	smoothKpi = 0;
+	safeKpi = 0;
+	networkKpi = 0;
+
 	delete [] ptrVecX;
 	delete [] ptrVecU;
 	delete [] ptrVecV;
@@ -252,6 +257,11 @@ SmpcController::SmpcController(string pathToConfigFile){
 	_CUDA( cudaMemcpy(devPtrVecR, ptrVecR, ns*sizeof(real_t*), cudaMemcpyHostToDevice));
 
 	vecPrimalInfs = new real_t[ptrMySmpcConfig->getMaxIterations()];
+
+	economicKpi = 0;
+	smoothKpi = 0;
+	safeKpi = 0;
+	networkKpi = 0;
 
 	delete [] ptrVecX;
 	delete [] ptrVecU;
@@ -631,6 +641,7 @@ uint_t SmpcController::algorithmApg(){
 	_CUDA( cudaMemset(devVecDualXi, 0, 2*nx*nodes*sizeof(real_t)));
 	_CUDA( cudaMemset(devVecDualPsi, 0, nu*nodes*sizeof(real_t)) );
 
+	//cout << "number of nodes " <<nodes << endl;
 	real_t theta[2] = {1, 1};
 	real_t lambda;
 	uint_t maxIndex;
@@ -708,7 +719,7 @@ uint_t SmpcController::controlAction(fstream& controlOutputJson){
 				cudaMemcpyDeviceToDevice) );
 		projectionBox<<<1, nu>>>(devControlAction, ptrMyEngine->getSysUmin(), ptrMyEngine->getSysUmax(), nu, 0, nu);
 		_CUDA( cudaMemcpy(currentControl, devControlAction, nu*sizeof(real_t), cudaMemcpyDeviceToHost));
-		controlOutputJson << " control : [" ;
+		controlOutputJson << "\"control\" : [" ;
 		for(uint_t iControl = 0; iControl < nu; iControl++ ){
 			//cout << currentControl[iControl] << " " ;
 			controlOutputJson << currentControl[iControl] << ", ";
@@ -733,7 +744,6 @@ uint_t SmpcController::controlAction(fstream& controlOutputJson){
  */
 void SmpcController::moveForewardInTime(){
 	if(simulatorFlag){
-		//@todo complete the implementation of the simulator
 		//compute get the control from the devControl, apply the projection,
 		// compute x+Bu+e to get updated state
 		uint_t nx = this->ptrMyEngine->getDwnNetwork()->getNumTanks();
@@ -741,9 +751,9 @@ void SmpcController::moveForewardInTime(){
 		uint_t nd = this->ptrMyEngine->getDwnNetwork()->getNumDemands();
 		real_t *previousControl = new real_t[nu];
 		real_t *stateUpdate = new real_t[nx];
-		real_t *previousDemand = new real_t[nd];
+		real_t *previousDemand;
 		real_t alpha = 1;
-		real_t beta = 0;
+
 		//x = p
 		_CUDA( cudaMemcpy( devStateUpdate, ptrMyEngine->getVecCurrentState(), nx*sizeof(real_t),
 				cudaMemcpyDeviceToDevice) );
@@ -756,9 +766,15 @@ void SmpcController::moveForewardInTime(){
 		_CUDA( cudaMemcpy(previousControl, devControlAction, nu*sizeof(real_t), cudaMemcpyDeviceToHost) );
 		previousDemand = this->ptrMyForecaster->getNominalDemand();
 		//updateSmpcConfiguration(stateUpdate, previousControl, previousDemand);
+		updateKpi( stateUpdate, previousControl );
 		this->ptrMySmpcConfig->setCurrentState( stateUpdate );
 		this->ptrMySmpcConfig->setPreviousControl( previousControl );
 		this->ptrMySmpcConfig->setpreviousdemand( previousDemand );
+		delete [] previousControl;
+		delete [] stateUpdate;
+		previousControl = NULL;
+		stateUpdate = NULL;
+		previousDemand = NULL;
 	}else{
 		this->ptrMySmpcConfig->setCurrentState();
 		this->ptrMySmpcConfig->setPreviousControl();
@@ -820,6 +836,91 @@ void SmpcController::updateSmpcConfiguration(real_t* updateState,
 	fclose(outfile);
 	delete [] readBuffer;
 	delete [] writeBuffer;
+}
+
+/**
+ * update the KPI at the current time instance
+ */
+void SmpcController::updateKpi(real_t* state, real_t* control){
+	uint_t nx = this->ptrMySmpcConfig->getNX();
+	uint_t nu = this->ptrMySmpcConfig->getNU();
+
+	real_t *safeX = this->ptrMyEngine->getDwnNetwork()->getXsafe();
+	real_t *constantPrice = this->ptrMyEngine->getDwnNetwork()->getAlpha();
+	real_t *variablePrice = this->ptrMyForecaster->getNominalPrices();
+	real_t *previousControl = this->ptrMySmpcConfig->getPrevU();
+	real_t *deltaU = new real_t[nu];
+	real_t *waterLevel = new real_t[nx];
+
+	real_t ecoKpi = 0;
+	real_t smKpi = 0;
+	real_t saKpi = 0;
+	real_t netKpi = 0;
+	real_t safeValue = 0;
+
+	for(uint_t iSize = 0; iSize < nu; iSize++){
+		ecoKpi = ecoKpi + (constantPrice[iSize] + variablePrice[iSize])*abs(control[iSize]);
+		deltaU[iSize] = previousControl[iSize] - control[iSize];
+		smKpi = smKpi + deltaU[iSize]*deltaU[iSize];
+	}
+	for(uint_t iSize = 0; iSize < nx; iSize++){
+		waterLevel[iSize] = state[iSize] - safeX[iSize];
+		if( waterLevel[iSize] > 0 ){
+			waterLevel[iSize] = 0;
+		}
+		safeValue = safeValue + abs( safeX[iSize] );
+		saKpi = saKpi + abs( waterLevel[iSize] );
+		netKpi = netKpi + abs( state[iSize] );
+	}
+
+	economicKpi = economicKpi + ecoKpi;
+	smoothKpi = smoothKpi + smKpi;
+	safeKpi = safeKpi + saKpi;
+	networkKpi = networkKpi + netKpi;
+	cout << saKpi << " "<< netKpi << " " << safeValue << endl;
+	delete [] deltaU;
+	delete [] waterLevel;
+}
+
+/*
+ * Get the economical KPI upto the simulation horizon
+ * @param    simualtionTime  simulation horizon
+ */
+real_t SmpcController::getEconomicKpi( uint_t simulationTime){
+	real_t economicValue = economicKpi/(3600);
+	return economicValue/simulationTime;
+}
+
+/*
+ * Get the smooth KPI upto the simulation horizon
+ * @param    simulationTime   simulation horizon
+ */
+real_t SmpcController::getSmoothKpi( uint_t simulationTime){
+	real_t smoothValue = economicKpi/(3600*3600);
+	return smoothValue/simulationTime;
+}
+
+/*
+ * Get the  network KPI upto the simulation horizon
+ * @param   simulationTime    simulation horizon
+ */
+real_t SmpcController::getNetworkKpi( uint_t simulationTime){
+	real_t networkKpiTime = networkKpi;
+	real_t safeLevelNorm = 0;
+	uint_t nx = this->ptrMySmpcConfig->getNX();
+	for(uint_t iSize = 0; iSize < nx; iSize++){
+		safeLevelNorm = safeLevelNorm + this->getDwnNetwork()->getXsafe()[iSize];
+	}
+	networkKpiTime = 100*simulationTime*safeLevelNorm/networkKpiTime;
+	return networkKpiTime;
+}
+
+/*
+ * Get the safety KPI upto the simulation horizon
+ * @param   simulationTime    simulation horizon
+ */
+real_t SmpcController::getSafetyKpi( uint_t simulationTime){
+	return safeKpi;
 }
 
 /**

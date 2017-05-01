@@ -21,7 +21,7 @@ int main(void){
 		_ASSERT( myTesting->testSmpcController());
 	}
 	real_t time;
-	string pathToControlOutput = "../systemData/controlOutput.json";
+	string pathToControlOutput = "../systemData/controlOutput32.json";
 	string pathToControllerConfig = "../systemData/controllerConfig32.json";
 	//fstream controlOutputJson( pathToControlOutput.c_str(), ios::out);
 	fstream controlOutputJson;
@@ -32,20 +32,34 @@ int main(void){
 
 	SmpcController *dwnController = new SmpcController( pathToControllerConfig );
 	uint_t timeInstance = 0;
-	dwnController->getForecaster()->predictDemand( timeInstance );
-	dwnController->getForecaster()->predictPrices( timeInstance );
-	dwnController->initialiseSmpcController();
-	tic();
-	dwnController->controlAction( controlOutputJson );
-	time = toc();
-	cout << "time lapsed " << time << " milliseconds" << endl;
+
+	while (timeInstance < 10){
+		dwnController->getForecaster()->predictDemand( timeInstance );
+		dwnController->getForecaster()->predictPrices( timeInstance );
+		if( timeInstance == 0){
+			dwnController->initialiseSmpcController();
+		}
+		tic();
+		dwnController->controlAction( controlOutputJson );
+		time = toc();
+		cout << "time lapsed " << time << " milliseconds" << endl;
+		controlOutputJson << "\"time" << timeInstance <<"\": [" << time << "]" << endl;
+		timeInstance = timeInstance + 1;
+		dwnController->moveForewardInTime();
+	}
+
+	cout << "economic kpi " << dwnController->getEconomicKpi(timeInstance) << endl;
+	cout << "smooth kpi " << dwnController->getSmoothKpi(timeInstance) << endl;
+	cout << "safety kpi " << dwnController->getSafetyKpi(timeInstance) << endl;
+	cout << "network utility kpi " << dwnController->getNetworkKpi(timeInstance) << endl;
+
 	uint_t nx = dwnController->getDwnNetwork()->getNumTanks();
 	uint_t nu = dwnController->getDwnNetwork()->getNumControls();
 	uint_t nd = dwnController->getDwnNetwork()->getNumDemands();
 	real_t *currentState = new real_t[nx];
 	real_t *prevControl = new real_t[nu];
 	real_t *prevDemand = new real_t[nd];
-
+	/*
 	for(uint_t iSize = 0; iSize < nx; iSize++)
 		currentState[iSize] = dwnController->getSmpcConfiguration()->getCurrentX()[iSize];
 	for(uint_t iSize = 0; iSize < nu; iSize++)
@@ -62,8 +76,9 @@ int main(void){
 		cout<< prevControl[iSize] - dwnController->getSmpcConfiguration()->getPrevU()[iSize] << " ";
 	cout << "Demand" << endl;
 	for(uint_t iSize = 0; iSize < nd; iSize++)
-		cout << prevDemand[iSize] - dwnController->getSmpcConfiguration()->getPrevDemand()[iSize] << " ";
-	cout << nx << " " << nu << " " << nd << endl;
+		cout << iSize << " " << prevDemand[iSize] -
+		dwnController->getSmpcConfiguration()->getPrevDemand()[iSize] << " ";
+	cout << nx << " " << nu << " " << nd << endl;*/
 	delete dwnController;
 	controlOutputJson.close();
 	delete [] currentState;
