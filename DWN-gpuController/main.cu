@@ -21,8 +21,8 @@ int main(void){
 		_ASSERT( myTesting->testSmpcController());
 	}
 	real_t time;
-	string pathToControlOutput = "../systemData/controlOutput32.json";
-	string pathToControllerConfig = "../systemData/controllerConfig32.json";
+	string pathToControlOutput = "../systemData/controlOutput10844.json";
+	string pathToControllerConfig = "../systemData/controllerConfig10844.json";
 	//fstream controlOutputJson( pathToControlOutput.c_str(), ios::out);
 	fstream controlOutputJson;
 	controlOutputJson.open( pathToControlOutput.c_str(), fstream::out);
@@ -46,7 +46,9 @@ int main(void){
 		controlOutputJson << "\"time" << timeInstance <<"\": [" << time << "]" << endl;
 		timeInstance = timeInstance + 1;
 		dwnController->moveForewardInTime();
+		cout << timeInstance << " ";
 	}
+	cout << endl;
 
 	cout << "economic kpi " << dwnController->getEconomicKpi(timeInstance) << endl;
 	cout << "smooth kpi " << dwnController->getSmoothKpi(timeInstance) << endl;

@@ -877,7 +877,7 @@ void SmpcController::updateKpi(real_t* state, real_t* control){
 	smoothKpi = smoothKpi + smKpi;
 	safeKpi = safeKpi + saKpi;
 	networkKpi = networkKpi + netKpi;
-	cout << saKpi << " "<< netKpi << " " << safeValue << endl;
+	//cout << saKpi << " "<< netKpi << " " << safeValue << endl;
 	delete [] deltaU;
 	delete [] waterLevel;
 }
