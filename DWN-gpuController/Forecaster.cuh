@@ -21,11 +21,17 @@
 #ifndef FORECASTCLASS_CUH_
 #define FORECASTCLASS_CUH_
 #define VARNAME_N  "N"
+#define VARNAME_SIM_HORIZON "simHorizon"
 #define VARNAME_DIM_DEMAND "dimDemand"
 #define VARNAME_DIM_PRICES "dimPrices"
 #define VARNAME_DHAT "dHat"
 #define VARNAME_ALPHAHAT "alphaHat"
+#define VARNAME_DEMAND_SIM "timeIdDemand4876"
+#define VARNAME_PRICE_SIM "timeIdPrice4876"
 #include "Configuration.h"
+#include "rapidjson/document.h"
+#include "rapidjson/rapidjson.h"
+#include "rapidjson/filereadstream.h"
 
 /**
  * The uncertainty in the network are water demand and electricity
@@ -35,7 +41,6 @@
  * A forecaster class contains:
  *    - nominal water demand
  *    - nominal electricity prices
- * @todo remove print statements
  * @todo sanity check (check that the given file is well formed)
  * @todo new char[65536]: is this good practice?
  */
@@ -51,35 +56,52 @@ public:
 	 */
 	Forecaster(
 		string pathToFile);
-	/**
-	 * Default destructor.
-	 */
-	~Forecaster();
-
 	/*
-	 * returns the prediction horizon
+	 * @return the prediction horizon
 	 */
 	uint_t getPredHorizon();
-
+	/**
+	 * @return simulation Horizon of the nominal forecaster
+	 */
+	uint_t getSimHorizon();
 	/*
-	 * returns the dimension of the demand
+	 * @returns the dimension of the demand
 	 */
 	uint_t getDimDemand();
-
 	/*
-	 * return the dimension of the prices
+	 * @return the dimension of the prices
 	 */
 	uint_t getDimPrice();
 	/*
-	 * returns the pointer of the array of nominal demands
+	 *@returns the pointer of the array of nominal demands
 	 */
 	real_t* getNominalDemand();
 
 	/*
-	 * returns the pointer of the array of nominal prices
+	 * @returns the pointer of the array of nominal prices
 	 */
 	real_t* getNominalPrices();
+	/**
+	 * Predicts the water demand. The base class forecaster
+	 * reads the nominal demand from a json file.
+	 * @return status  1 success and 0 failure
+	 */
+	virtual uint_t predictDemand(uint_t simTime);
+	/**
+	 * Predicts the prices. The base class forecaster
+	 * reads the nominal prices from a json file.
+	 * @return status  1 success and 0 failure
+	 */
+	virtual uint_t predictPrices(uint_t simTime);
+	/**
+	 * Default destructor.
+	 */
+	virtual ~Forecaster();
 private:
+	/**
+	 * simulation horizon used in the forecaster
+	 */
+	uint_t simHorizon;
 	/**
 	 * Prediction horizon
 	 */
@@ -100,6 +122,22 @@ private:
 	 * Nominal electricity prices
 	 */
 	real_t *nominalPrice;
+	/**
+	 * Member iterator to read demand in the json file.
+	 */
+	rapidjson::Value::ConstMemberIterator itrNominalDemand;
+	/**
+	 * Member iterator to read demand in the json file.
+	 */
+	rapidjson::Value::ConstMemberIterator itrNominalPrices;
+	/**
+	 * Document (rapidjson) object to read the json file
+	 */
+	rapidjson::Document jsonDocument;
+	/**
+	 * Value (rapidjson) object to find the value of a member in the json file
+	 */
+	rapidjson::Value jsonValue;
 };
 
 

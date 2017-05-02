@@ -20,7 +20,14 @@
 #include <cuda_device_runtime_api.h>
 #include "cuda_runtime.h"
 #include "cublas_v2.h"
+#include "rapidjson/document.h"
+#include "rapidjson/rapidjson.h"
+#include "rapidjson/filereadstream.h"
+#include "rapidjson/filewritestream.h"
+#include "rapidjson/prettywriter.h"
 #include "SmpcController.cuh"
+
+
 
 SmpcController::SmpcController(Forecaster *myForecaster, Engine *myEngine, SmpcConfiguration *mySmpcConfig){
 	ptrMyForecaster = myForecaster;
@@ -35,6 +42,8 @@ SmpcController::SmpcController(Forecaster *myForecaster, Engine *myEngine, SmpcC
 	uint_t ns = ptrMyScenarioTree->getNumScenarios();
 	uint_t nodes = ptrMyScenarioTree->getNumNodes();
 	stepSize = ptrMySmpcConfig->getStepSize();
+	factorStepFlag = false;
+	simulatorFlag = true;
 
 	_CUDA( cudaMalloc((void**)&devVecX, nx*nodes*sizeof(real_t)) );
 	_CUDA( cudaMalloc((void**)&devVecU, nu*nodes*sizeof(real_t)) );
@@ -49,9 +58,142 @@ SmpcController::SmpcController(Forecaster *myForecaster, Engine *myEngine, SmpcC
 	_CUDA( cudaMalloc((void**)&devVecDualPsi, nu*nodes*sizeof(real_t)) );
 	_CUDA( cudaMalloc((void**)&devVecUpdateXi, 2*nx*nodes*sizeof(real_t)) );
 	_CUDA( cudaMalloc((void**)&devVecUpdatePsi, nu*nodes*sizeof(real_t)) );
-	_CUDA( cudaMalloc((void**)&devPrimalInfeasibilty, (2*nx + nu)*nodes*sizeof(real_t)) );
+	_CUDA( cudaMalloc((void**)&devVecPrimalInfeasibilty, (2*nx + nu)*nodes*sizeof(real_t)) );
 	_CUDA( cudaMalloc((void**)&devVecQ, ns*nx*sizeof(real_t)) );
 	_CUDA( cudaMalloc((void**)&devVecR, ns*nv*sizeof(real_t)) );
+
+	_CUDA( cudaMalloc((void**)&devPtrVecX, nodes*sizeof(real_t*)) );
+	_CUDA( cudaMalloc((void**)&devPtrVecU, nodes*sizeof(real_t*)) );
+	_CUDA( cudaMalloc((void**)&devPtrVecV, nodes*sizeof(real_t*)) );
+	_CUDA( cudaMalloc((void**)&devPtrVecAcceleratedXi, nodes*sizeof(real_t*)) );
+	_CUDA( cudaMalloc((void**)&devPtrVecAcceleratedPsi, nodes*sizeof(real_t*)) );
+	_CUDA( cudaMalloc((void**)&devPtrVecPrimalXi, nodes*sizeof(real_t*)) );
+	_CUDA( cudaMalloc((void**)&devPtrVecPrimalPsi, nodes*sizeof(real_t*)) );
+	_CUDA( cudaMalloc((void**)&devPtrVecQ, ns*sizeof(real_t*)) );
+	_CUDA( cudaMalloc((void**)&devPtrVecR, ns*sizeof(real_t*)) );
+	_CUDA( cudaMalloc((void**)&devControlAction, nu*sizeof(real_t)) );
+	_CUDA( cudaMalloc((void**)&devStateUpdate, nx*sizeof(real_t)) );
+
+	real_t** ptrVecX = new real_t*[nodes];
+	real_t** ptrVecU = new real_t*[nodes];
+	real_t** ptrVecV = new real_t*[nodes];
+	real_t** ptrVecAcceleratedXi = new real_t*[nodes];
+	real_t** ptrVecAcceleratedPsi = new real_t*[nodes];
+	real_t** ptrVecPrimalXi = new real_t*[nodes];
+	real_t** ptrVecPrimalPsi = new real_t*[nodes];
+	real_t** ptrVecQ = new real_t*[ns];
+	real_t** ptrVecR = new real_t*[ns];
+
+	for(uint_t iScenario = 0; iScenario < ns; iScenario++){
+		ptrVecQ[iScenario] = &devVecQ[iScenario*nx];
+		ptrVecR[iScenario] = &devVecR[iScenario*nv];
+	}
+	for(uint_t iNode = 0; iNode < nodes; iNode++){
+		ptrVecX[iNode] = &devVecX[iNode*nx];
+		ptrVecU[iNode] = &devVecU[iNode*nu];
+		ptrVecV[iNode] = &devVecV[iNode*nv];
+		ptrVecAcceleratedXi[iNode] = &devVecAcceleratedXi[2*iNode*nx];
+		ptrVecAcceleratedPsi[iNode] = &devVecAcceleratedPsi[iNode*nu];
+		ptrVecPrimalXi[iNode] = &devVecPrimalXi[2*iNode*nx];
+		ptrVecPrimalPsi[iNode] = &devVecPrimalPsi[iNode*nu];
+	}
+
+	_CUDA( cudaMemset(devVecU, 0, nu*nodes*sizeof(real_t)) );
+	_CUDA( cudaMemset(devVecXi, 0, 2*nx*nodes*sizeof(real_t)) );
+	_CUDA( cudaMemset(devVecPsi, 0, nu*nodes*sizeof(real_t)) );
+	_CUDA( cudaMemset(devVecAcceleratedXi, 0, 2*nx*nodes*sizeof(real_t)) );
+	_CUDA( cudaMemset(devVecAcceleratedPsi, 0, nu*nodes*sizeof(real_t)) );
+	_CUDA( cudaMemset(devVecUpdateXi, 0, 2*nx*nodes*sizeof(real_t)) );
+	_CUDA( cudaMemset(devVecUpdatePsi, 0, nu*nodes*sizeof(real_t)) );
+	_CUDA( cudaMemset(devVecPrimalXi, 0, 2*nx*nodes*sizeof(real_t)) );
+	_CUDA( cudaMemset(devVecPrimalPsi, 0, nu*nodes*sizeof(real_t)) );
+	_CUDA( cudaMemset(devVecDualXi, 0, 2*nx*nodes*sizeof(real_t)));
+	_CUDA( cudaMemset(devVecDualPsi, 0, nu*nodes*sizeof(real_t)) );
+	_CUDA( cudaMemset(devVecPrimalInfeasibilty, 0, (2*nx + nu)*nodes*sizeof(real_t)) );
+	_CUDA( cudaMemset(devVecR, 0, ns*nv*sizeof(real_t)) );
+	_CUDA( cudaMemset(devVecQ, 0, ns*nx*sizeof(real_t)) );
+	_CUDA( cudaMemset(devControlAction, 0, nu*sizeof(real_t)) );
+	_CUDA( cudaMemset(devStateUpdate, 0, nx*sizeof(real_t)) );
+
+	_CUDA( cudaMemcpy(devPtrVecX, ptrVecX, nodes*sizeof(real_t*), cudaMemcpyHostToDevice) );
+	_CUDA( cudaMemcpy(devPtrVecU, ptrVecU, nodes*sizeof(real_t*), cudaMemcpyHostToDevice) );
+	_CUDA( cudaMemcpy(devPtrVecV, ptrVecV, nodes*sizeof(real_t*), cudaMemcpyHostToDevice) );
+	_CUDA( cudaMemcpy(devPtrVecAcceleratedXi, ptrVecAcceleratedXi, nodes*sizeof(real_t*), cudaMemcpyHostToDevice) );
+	_CUDA( cudaMemcpy(devPtrVecAcceleratedPsi, ptrVecAcceleratedPsi, nodes*sizeof(real_t*), cudaMemcpyHostToDevice) );
+	_CUDA( cudaMemcpy(devPtrVecPrimalXi, ptrVecPrimalXi, nodes*sizeof(real_t*),cudaMemcpyHostToDevice) );
+	_CUDA( cudaMemcpy(devPtrVecPrimalPsi, ptrVecPrimalPsi, nodes*sizeof(real_t*),cudaMemcpyHostToDevice) );
+	_CUDA( cudaMemcpy(devPtrVecQ, ptrVecQ, ns*sizeof(real_t*), cudaMemcpyHostToDevice));
+	_CUDA( cudaMemcpy(devPtrVecR, ptrVecR, ns*sizeof(real_t*), cudaMemcpyHostToDevice));
+
+	vecPrimalInfs = new real_t[ptrMySmpcConfig->getMaxIterations()];
+
+	economicKpi = 0;
+	smoothKpi = 0;
+	safeKpi = 0;
+	networkKpi = 0;
+
+	delete [] ptrVecX;
+	delete [] ptrVecU;
+	delete [] ptrVecV;
+	delete [] ptrVecAcceleratedXi;
+	delete [] ptrVecAcceleratedPsi;
+	delete [] ptrVecPrimalXi;
+	delete [] ptrVecPrimalPsi;
+	delete [] ptrVecQ;
+	delete [] ptrVecR;
+	ptrVecX = NULL;
+	ptrVecU = NULL;
+	ptrVecV = NULL;
+	ptrVecAcceleratedXi = NULL;
+	ptrVecAcceleratedPsi = NULL;
+	ptrVecPrimalXi = NULL;
+	ptrVecPrimalPsi = NULL;
+	ptrVecQ = NULL;
+	ptrVecR = NULL;
+	ptrMyNetwork = NULL;
+	ptrMyScenarioTree = NULL;
+}
+
+/**
+ * Construct a new Controller with a given engine.
+ * @param  pathToConfigFile   path to the controller configuration file
+ */
+SmpcController::SmpcController(string pathToConfigFile){
+	ptrMySmpcConfig = new SmpcConfiguration( pathToConfigFile );
+	string pathToForecaster = ptrMySmpcConfig->getPathToForecaster();
+	ptrMyForecaster = new Forecaster( pathToForecaster );
+	ptrMyEngine = new Engine( ptrMySmpcConfig );
+
+	DwnNetwork* ptrMyNetwork = ptrMyEngine->getDwnNetwork();
+	ScenarioTree* ptrMyScenarioTree = ptrMyEngine->getScenarioTree();
+
+	uint_t nx = ptrMyNetwork->getNumTanks();
+	uint_t nu = ptrMyNetwork->getNumControls();
+	uint_t nv = ptrMySmpcConfig->getNV();
+	uint_t ns = ptrMyScenarioTree->getNumScenarios();
+	uint_t nodes = ptrMyScenarioTree->getNumNodes();
+	stepSize = ptrMySmpcConfig->getStepSize();
+	factorStepFlag = false;
+	simulatorFlag = true;
+
+	_CUDA( cudaMalloc((void**)&devVecX, nx*nodes*sizeof(real_t)) );
+	_CUDA( cudaMalloc((void**)&devVecU, nu*nodes*sizeof(real_t)) );
+	_CUDA( cudaMalloc((void**)&devVecV, nv*nodes*sizeof(real_t)) );
+	_CUDA( cudaMalloc((void**)&devVecXi, 2*nx*nodes*sizeof(real_t)) );
+	_CUDA( cudaMalloc((void**)&devVecPsi, nu*nodes*sizeof(real_t)) );
+	_CUDA( cudaMalloc((void**)&devVecAcceleratedXi, 2*nx*nodes*sizeof(real_t)) );
+	_CUDA( cudaMalloc((void**)&devVecAcceleratedPsi, nu*nodes*sizeof(real_t)) );
+	_CUDA( cudaMalloc((void**)&devVecPrimalXi, 2*nx*nodes*sizeof(real_t)) );
+	_CUDA( cudaMalloc((void**)&devVecPrimalPsi, nu*nodes*sizeof(real_t)) );
+	_CUDA( cudaMalloc((void**)&devVecDualXi, 2*nx*nodes*sizeof(real_t)) );
+	_CUDA( cudaMalloc((void**)&devVecDualPsi, nu*nodes*sizeof(real_t)) );
+	_CUDA( cudaMalloc((void**)&devVecUpdateXi, 2*nx*nodes*sizeof(real_t)) );
+	_CUDA( cudaMalloc((void**)&devVecUpdatePsi, nu*nodes*sizeof(real_t)) );
+	_CUDA( cudaMalloc((void**)&devVecPrimalInfeasibilty, (2*nx + nu)*nodes*sizeof(real_t)) );
+	_CUDA( cudaMalloc((void**)&devVecQ, ns*nx*sizeof(real_t)) );
+	_CUDA( cudaMalloc((void**)&devVecR, ns*nv*sizeof(real_t)) );
+	_CUDA( cudaMalloc((void**)&devControlAction, nu*sizeof(real_t)) );
+	_CUDA( cudaMalloc((void**)&devStateUpdate, nx*sizeof(real_t)) );
 
 	_CUDA( cudaMalloc((void**)&devPtrVecX, nodes*sizeof(real_t*)) );
 	_CUDA( cudaMalloc((void**)&devPtrVecU, nodes*sizeof(real_t*)) );
@@ -98,8 +240,11 @@ SmpcController::SmpcController(Forecaster *myForecaster, Engine *myEngine, SmpcC
 	_CUDA( cudaMemset(devVecPrimalPsi, 0, nu*nodes*sizeof(real_t)) );
 	_CUDA( cudaMemset(devVecDualXi, 0, 2*nx*nodes*sizeof(real_t)));
 	_CUDA( cudaMemset(devVecDualPsi, 0, nu*nodes*sizeof(real_t)) );
+	_CUDA( cudaMemset(devVecPrimalInfeasibilty, 0, (2*nx + nu)*nodes*sizeof(real_t)) );
 	_CUDA( cudaMemset(devVecR, 0, ns*nv*sizeof(real_t)) );
 	_CUDA( cudaMemset(devVecQ, 0, ns*nx*sizeof(real_t)) );
+	_CUDA( cudaMemset(devControlAction, 0, nu*sizeof(real_t)) );
+	_CUDA( cudaMemset(devStateUpdate, 0, nx*sizeof(real_t)) );
 
 	_CUDA( cudaMemcpy(devPtrVecX, ptrVecX, nodes*sizeof(real_t*), cudaMemcpyHostToDevice) );
 	_CUDA( cudaMemcpy(devPtrVecU, ptrVecU, nodes*sizeof(real_t*), cudaMemcpyHostToDevice) );
@@ -110,6 +255,13 @@ SmpcController::SmpcController(Forecaster *myForecaster, Engine *myEngine, SmpcC
 	_CUDA( cudaMemcpy(devPtrVecPrimalPsi, ptrVecPrimalPsi, nodes*sizeof(real_t*),cudaMemcpyHostToDevice) );
 	_CUDA( cudaMemcpy(devPtrVecQ, ptrVecQ, ns*sizeof(real_t*), cudaMemcpyHostToDevice));
 	_CUDA( cudaMemcpy(devPtrVecR, ptrVecR, ns*sizeof(real_t*), cudaMemcpyHostToDevice));
+
+	vecPrimalInfs = new real_t[ptrMySmpcConfig->getMaxIterations()];
+
+	economicKpi = 0;
+	smoothKpi = 0;
+	safeKpi = 0;
+	networkKpi = 0;
 
 	delete [] ptrVecX;
 	delete [] ptrVecU;
@@ -133,6 +285,36 @@ SmpcController::SmpcController(Forecaster *myForecaster, Engine *myEngine, SmpcC
 	ptrMyScenarioTree = NULL;
 }
 
+/**
+ * Performs the initialise the smpc controller
+ *   - update the current state and previous controls in the device memory
+ *   - perform the factor step
+ */
+void SmpcController::initialiseSmpcController(){
+	factorStepFlag = true;
+	real_t *currentX = ptrMySmpcConfig->getCurrentX();
+	real_t *prevU = ptrMySmpcConfig->getPrevU();
+	real_t *prevDemand = ptrMySmpcConfig->getPrevDemand();
+
+	ptrMyEngine->factorStep();
+	ptrMyEngine->updateStateControl(currentX, prevU, prevDemand);
+	ptrMyEngine->eliminateInputDistubanceCoupling( ptrMyForecaster->getNominalDemand(),
+			ptrMyForecaster->getNominalPrices());
+	uint_t nx = ptrMySmpcConfig->getNX();
+	uint_t nu = ptrMySmpcConfig->getNU();
+	uint_t nv = ptrMySmpcConfig->getNV();
+	uint_t nodes = this->getScenarioTree()->getNumNodes();
+	uint_t N = ptrMyForecaster->getPredHorizon();
+
+	currentX = NULL;
+	prevU = NULL;
+	prevDemand = NULL;
+}
+
+/**
+ * Performs the dual extrapolation step with given parameter.
+ * @param extrapolation parameter.
+ */
 void SmpcController::dualExtrapolationStep(real_t lambda){
 	DwnNetwork* ptrMyNetwork = ptrMyEngine->getDwnNetwork();
 	ScenarioTree* ptrMyScenarioTree = ptrMyEngine->getScenarioTree();
@@ -156,10 +338,14 @@ void SmpcController::dualExtrapolationStep(real_t lambda){
 	ptrMyScenarioTree = NULL;
 }
 
+/**
+ * Computes the dual gradient.This is the main computational
+ * algorithm for the proximal gradient algorithm
+ */
 void SmpcController::solveStep(){
 	DwnNetwork *ptrMyNetwork = ptrMyEngine->getDwnNetwork();
 	ScenarioTree *ptrMyScenarioTree = ptrMyEngine->getScenarioTree();
-	real_t *devTempVecR, *devTempVecQ;
+	real_t *devTempVecR, *devTempVecQ, *devLv;
 	uint_t nx = ptrMyNetwork->getNumTanks();
 	uint_t nu = ptrMyNetwork->getNumControls();
 	uint_t nv = ptrMySmpcConfig->getNV();
@@ -169,13 +355,18 @@ void SmpcController::solveStep(){
 	uint_t *nodesPerStage = ptrMyScenarioTree->getNodesPerStage();
 	uint_t *nodesPerStageCumul = ptrMyScenarioTree->getNodesPerStageCumul();
 	uint_t iStageCumulNodes, iStageNodes, prevStageNodes, prevStageCumulNodes;
-	real_t scale[2] = {-0.5, 1};
+	real_t scale[3] = {-0.5, 1, -1};
 	real_t alpha = 1;
 	real_t beta = 0;
 
+	if(factorStepFlag == false){
+		initialiseSmpcController();
+		factorStepFlag = true;
+	}
 
 	_CUDA( cudaMalloc((void**)&devTempVecQ, ns*nx*sizeof(real_t)) );
 	_CUDA( cudaMalloc((void**)&devTempVecR, ns*nv*sizeof(real_t)) );
+	_CUDA( cudaMalloc((void**)&devLv, ns*nu*sizeof(real_t)) );
 	_CUDA( cudaMemcpy(ptrMyEngine->getMatSigma(), ptrMyEngine->getVecBeta(), nv*nodes*sizeof(real_t),
 			cudaMemcpyDeviceToDevice) );
 
@@ -269,9 +460,12 @@ void SmpcController::solveStep(){
 		iStageNodes = nodesPerStage[iStage];
 		iStageCumulNodes = nodesPerStageCumul[iStage];
 		if(iStage == 0){
-			// x=p, u=h (v = v+ prevV)
-			_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), nv, &alpha, ptrMyEngine->getVecPreviousV(),
-					1, devVecV, 1));
+			// u = prevU - prevUhat
+			_CUBLAS( cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), nu, &alpha, ptrMyEngine->getVecPreviousControl(), 1,
+					devVecU, 1));
+			_CUBLAS( cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), nu, &scale[2], ptrMyEngine->getVecPreviousUhat(), 1,
+					devVecU, 1));
+			// x=p
 			_CUDA( cudaMemcpy(devVecX, ptrMyEngine->getVecCurrentState(), nx*sizeof(real_t), cudaMemcpyDeviceToDevice) );
 			// x=x+w
 			_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), nx, &alpha, ptrMyEngine->getVecE(), 1, devVecX, 1));
@@ -284,13 +478,17 @@ void SmpcController::solveStep(){
 		}else{
 			prevStageCumulNodes = nodesPerStageCumul[iStage - 1];
 			if((nodesPerStage[iStage] - nodesPerStage[iStage-1]) > 0){
-				// v_k=v_{k-1}+v_k
-				solveChildNodesUpdate<<<iStageNodes, nv>>>(&devVecV[prevStageCumulNodes*nv], &devVecV[iStageCumulNodes*nv],
-						ptrMyEngine->getTreeAncestor(), iStageCumulNodes, nv);
 				// u_k=Lv_k+\hat{u}_k
 				_CUBLAS(cublasSgemm_v2(ptrMyEngine->getCublasHandle(), CUBLAS_OP_N, CUBLAS_OP_N, nu, iStageNodes, nv,
 						&alpha, ptrMyEngine->getSysMatL(), nu, &devVecV[iStageCumulNodes*nv], nv, &alpha,
 						&devVecU[iStageCumulNodes*nu], nu));
+				// prevLv = u_{k-1} - uHat_{k-1}
+				_CUDA( cudaMemcpy(devLv, &devVecU[prevStageCumulNodes*nu], nu*nodesPerStage[iStage-1]*sizeof(real_t), cudaMemcpyDeviceToDevice));
+				_CUBLAS( cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), nu*nodesPerStage[iStage-1], &scale[2],
+						&ptrMyEngine->getVecUhat()[prevStageCumulNodes*nu], 1, devLv, 1));
+				// u_{k} = u_{k} + prevLu
+				solveChildNodesUpdate<<<iStageNodes, nu>>>(devLv, &devVecU[iStageCumulNodes*nu], ptrMyEngine->getTreeAncestor(),
+						iStageCumulNodes, nu);
 				// x=w
 				_CUDA(cudaMemcpy(&devVecX[iStageCumulNodes*nx], &ptrMyEngine->getVecE()[iStageCumulNodes*nx],
 						iStageNodes*nx*sizeof(real_t), cudaMemcpyDeviceToDevice));
@@ -301,10 +499,12 @@ void SmpcController::solveStep(){
 				solveChildNodesUpdate<<<iStageNodes, nx>>>(&devVecX[prevStageCumulNodes*nx], &devVecX[iStageCumulNodes*nx],
 						ptrMyEngine->getTreeAncestor(), iStageCumulNodes, nx);
 			}else{
-				// v_k=v_{k-1}+v_k
-				_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), nv*iStageNodes, &alpha, &devVecV[prevStageCumulNodes*nv], 1,
-						&devVecV[iStageCumulNodes*nv], 1));
-				// u_k=Lv_k+\hat{u}_k
+				// u_k = u_{k-1} - uHat_{k-1}
+				_CUBLAS( cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), nu*iStageNodes, &alpha, &devVecU[prevStageCumulNodes*nu], 1,
+						&devVecU[iStageCumulNodes*nu], 1));
+				_CUBLAS( cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), nu*iStageNodes, &scale[2], &ptrMyEngine->getVecUhat()
+						[prevStageCumulNodes*nu], 1, &devVecU[iStageCumulNodes*nu], 1));
+				// u_k=Lv_k+\hat{u}_k + u_k
 				_CUBLAS(cublasSgemm_v2(ptrMyEngine->getCublasHandle(), CUBLAS_OP_N, CUBLAS_OP_N, nu, iStageNodes, nv, &alpha,
 						ptrMyEngine->getSysMatL(), nu, &devVecV[iStageCumulNodes*nv], nv, &alpha, &devVecU[iStageCumulNodes*nu], nu));
 				// x_{k+1}=x_{k}
@@ -328,12 +528,12 @@ void SmpcController::solveStep(){
 	devTempVecR = NULL;
 	ptrMyNetwork = NULL;
 	ptrMyScenarioTree = NULL;
-
-	//free(ptr_x_c);
-	//free(x_c);
-	//free(y_c);
 }
 
+/**
+ * Computes the proximal operator of g at the current point and updates
+ * (primal psi, primal xi) - Hx, (dual psi, dual xi) - z.
+ */
 void SmpcController::proximalFunG(){
 	DwnNetwork *ptrMyNetwork = ptrMyEngine->getDwnNetwork();
 	ScenarioTree *ptrMyScenarioTree = ptrMyEngine->getScenarioTree();
@@ -374,15 +574,18 @@ void SmpcController::proximalFunG(){
 	//distance with constraints X
 	_CUBLAS(cublasSnrm2_v2(ptrMyEngine->getCublasHandle(), nx*nodes, devSuffleVecXi, 1, &distanceXcst));
 	if(distanceXcst > invLambda*ptrMySmpcConfig->getPenaltyState()){
+		cout << " prox distance ";
 		penaltyScalar = 1 - invLambda*ptrMySmpcConfig->getPenaltyState()/distanceXcst;
 		additionVectorOffset<<<nodes, nx>>>(devVecDualXi, devVecDiffXi, penaltyScalar, 2*nx, 0, nx*nodes);
 	}
 	//distance with Xsafe
 	_CUBLAS(cublasSnrm2_v2(ptrMyEngine->getCublasHandle(), nx*nodes, &devSuffleVecXi[nx*nodes], 1, &distanceXs));
 	if(distanceXs > invLambda*ptrMySmpcConfig->getPenaltySafety()){
+		cout << " prox distance ";
 		penaltyScalar = 1-invLambda*ptrMySmpcConfig->getPenaltySafety()/distanceXs;
 		additionVectorOffset<<<nodes, nx>>>(devVecDualXi, devVecDiffXi, penaltyScalar, 2*nx, nx, nx*nodes);
 	}
+	//cout << " distance is " << distanceXcst << " " << distanceXs << endl;
 	/**/
 	projectionBox<<<nodes, nu>>>(devVecDualPsi, ptrMyEngine->getSysUmin(), ptrMyEngine->getSysUmax(), nu, 0, nu*nodes);
 	_CUDA( cudaFree(devSuffleVecXi) );
@@ -393,6 +596,9 @@ void SmpcController::proximalFunG(){
 	ptrMyScenarioTree = NULL;
 }
 
+/**
+ * Performs the update of the dual vector.
+ */
 void SmpcController::dualUpdate(){
 	DwnNetwork *ptrMyNetwork = ptrMyEngine->getDwnNetwork();
 	ScenarioTree *ptrMyScenarioTree = ptrMyEngine->getScenarioTree();
@@ -401,20 +607,24 @@ void SmpcController::dualUpdate(){
 	uint_t nu = ptrMyNetwork->getNumControls();
 	real_t negAlpha = -1;
 	//Hx - z
-	_CUDA(cudaMemcpy(devPrimalInfeasibilty, devVecPrimalXi, 2*nx*nodes*sizeof(real_t), cudaMemcpyDeviceToDevice));
-	_CUDA(cudaMemcpy(&devPrimalInfeasibilty[2*nx*nodes], devVecPrimalPsi, nu*nodes*sizeof(real_t), cudaMemcpyDeviceToDevice));
-	_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), 2*nx*nodes, &negAlpha, devVecDualXi, 1, devPrimalInfeasibilty, 1));
-	_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), nu*nodes, &negAlpha, devVecDualPsi, 1, &devPrimalInfeasibilty[2*nx*nodes], 1));
+	_CUDA(cudaMemcpy(devVecPrimalInfeasibilty, devVecPrimalXi, 2*nx*nodes*sizeof(real_t), cudaMemcpyDeviceToDevice));
+	_CUDA(cudaMemcpy(&devVecPrimalInfeasibilty[2*nx*nodes], devVecPrimalPsi, nu*nodes*sizeof(real_t), cudaMemcpyDeviceToDevice));
+	_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), 2*nx*nodes, &negAlpha, devVecDualXi, 1, devVecPrimalInfeasibilty, 1));
+	_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), nu*nodes, &negAlpha, devVecDualPsi, 1, &devVecPrimalInfeasibilty[2*nx*nodes], 1));
 	// y = w + \lambda(Hx - z)
 	_CUDA( cudaMemcpy(devVecUpdateXi, devVecAcceleratedXi, 2*nx*nodes*sizeof(real_t), cudaMemcpyDeviceToDevice));
 	_CUDA( cudaMemcpy(devVecUpdatePsi, devVecAcceleratedPsi, nu*nodes*sizeof(real_t), cudaMemcpyDeviceToDevice));
-	_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), 2*nx*nodes, &stepSize, devPrimalInfeasibilty, 1, devVecUpdateXi, 1) );
-	_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), nu*nodes, &stepSize, &devPrimalInfeasibilty[2*nx*nodes], 1,
+	_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), 2*nx*nodes, &stepSize, devVecPrimalInfeasibilty, 1, devVecUpdateXi, 1) );
+	_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), nu*nodes, &stepSize, &devVecPrimalInfeasibilty[2*nx*nodes], 1,
 			devVecUpdatePsi, 1) );
+
 }
 
-
-void SmpcController::algorithmApg(){
+/**
+ * This method executes the APG algorithm and returns the primal infeasibility.
+ * @return primalInfeasibilty;
+ */
+uint_t SmpcController::algorithmApg(){
 	DwnNetwork *ptrMyNetwork = ptrMyEngine->getDwnNetwork();
 	ScenarioTree *ptrMyScenarioTree = ptrMyEngine->getScenarioTree();
 	uint_t nodes = ptrMyScenarioTree->getNumNodes();
@@ -431,30 +641,322 @@ void SmpcController::algorithmApg(){
 	_CUDA( cudaMemset(devVecDualXi, 0, 2*nx*nodes*sizeof(real_t)));
 	_CUDA( cudaMemset(devVecDualPsi, 0, nu*nodes*sizeof(real_t)) );
 
+	//cout << "number of nodes " <<nodes << endl;
 	real_t theta[2] = {1, 1};
 	real_t lambda;
-
+	uint_t maxIndex;
 	for (uint_t iter = 0; iter < ptrMySmpcConfig->getMaxIterations(); iter++){
+	//for (uint_t iter = 0; iter < 2; iter++){
 		lambda = theta[1]*(1/theta[0] - 1);
+		//cout << theta[0] << " " << theta[1] << " " << lambda << " ";
 		dualExtrapolationStep(lambda);
 		solveStep();
 		proximalFunG();
 		dualUpdate();
-		theta[1] = 0.5*(sqrt(pow(theta[0], 4) + 4*theta[0]) - pow(theta[0], 2));
-	}
 
-	//dualExtrapolationStep(devPtrVecAcceleratedXi, devVecXi, devVecUpdateXi, lambda, 2*nx*nodes);
-	//dualExtrapolationStep(devPtrVecAcceleratedPsi, devVecPsi, devVecUpdatePsi, lambda, nu*nodes);
-	//dualUpdate(devVecUpdateXi, devPtrVecAcceleratedXi, devPtrVecPrimalXi, devVecDualXi, stepSize, 2*nodes*nx);
-	//dualUpdate(devVecUpdatePsi, devPtrVecAcceleratedPsi, devPtrVecPrimalPsi, devVecDualPsi, stepSize, nodes*nu);
+		theta[0] = theta[1];
+		theta[1] = 0.5*(sqrt(pow(theta[1], 4) + 4*pow(theta[1], 2)) - pow(theta[1], 2));
+		_CUBLAS( cublasIsamax_v2(ptrMyEngine->getCublasHandle(), (2*nx + nu)*nodes, devVecPrimalInfeasibilty,
+				1, &maxIndex));
+		_CUDA( cudaMemcpy(&vecPrimalInfs[iter], &devVecPrimalInfeasibilty[maxIndex - 1], sizeof(real_t),
+				cudaMemcpyDeviceToHost));
+		/*cout<< vecPrimalInfs[iter] << " " << endl;
+				*/
+	}
+	//cout << endl;
+	return 1;
 }
 
+/**
+ * Invoke the SMPC controller on the current state of the network.
+ * This method invokes #updateStateControl, eliminateInputDistubanceCoupling
+ * and finally #algorithmApg.
+ */
 void SmpcController::controllerSmpc(){
 	ptrMyEngine->updateStateControl(ptrMySmpcConfig->getCurrentX(), ptrMySmpcConfig->getPrevU(),
-			ptrMySmpcConfig->getPrevUhat(), ptrMySmpcConfig->getPrevV());
+			ptrMySmpcConfig->getPrevDemand());
 	ptrMyEngine->eliminateInputDistubanceCoupling(ptrMyForecaster->getNominalDemand(),
 			ptrMyForecaster->getNominalPrices());
 	algorithmApg();
+}
+
+/**
+ * Computes a control action and returns a status code
+ * which is an integer (1 = success).
+ * @param u pointer to computed control action (CPU variable)
+ * @return status code
+ */
+uint_t SmpcController::controlAction(real_t* u){
+	uint_t status;
+	//real_t hostPrimalInfs = new real_t[];
+	ptrMyEngine->updateStateControl(ptrMySmpcConfig->getCurrentX(), ptrMySmpcConfig->getPrevU(),
+			ptrMySmpcConfig->getPrevDemand());
+	ptrMyEngine->eliminateInputDistubanceCoupling(ptrMyForecaster->getNominalDemand(),
+			ptrMyForecaster->getNominalPrices());
+	status = algorithmApg();
+	_CUDA( cudaMemcpy(u, devVecU, ptrMySmpcConfig->getNU()*sizeof(real_t), cudaMemcpyDeviceToHost));
+	return status;
+}
+
+/**
+ * Compute the control action, stores in the json file
+ * provided to it and returns a status code (1 = success).
+ * @param   controlJson   file pointer to the output json file
+ * @return  status        code
+ */
+uint_t SmpcController::controlAction(fstream& controlOutputJson){
+	if( controlOutputJson.is_open()){
+		uint_t status;
+		uint_t nu = ptrMySmpcConfig->getNU();
+		real_t *currentControl = new real_t[nu];
+
+		ptrMyEngine->updateStateControl(ptrMySmpcConfig->getCurrentX(), ptrMySmpcConfig->getPrevU(),
+				ptrMySmpcConfig->getPrevDemand());
+		ptrMyEngine->eliminateInputDistubanceCoupling(ptrMyForecaster->getNominalDemand(),
+				ptrMyForecaster->getNominalPrices());
+		status = algorithmApg();
+		_CUDA( cudaMemcpy(devControlAction, devVecU, nu*sizeof(real_t),
+				cudaMemcpyDeviceToDevice) );
+		projectionBox<<<1, nu>>>(devControlAction, ptrMyEngine->getSysUmin(), ptrMyEngine->getSysUmax(), nu, 0, nu);
+		_CUDA( cudaMemcpy(currentControl, devControlAction, nu*sizeof(real_t), cudaMemcpyDeviceToHost));
+		controlOutputJson << "\"control\" : [" ;
+		for(uint_t iControl = 0; iControl < nu; iControl++ ){
+			//cout << currentControl[iControl] << " " ;
+			controlOutputJson << currentControl[iControl] << ", ";
+		}
+		//cout << endl;
+		controlOutputJson << "]" << endl;
+		delete [] currentControl;
+		return status;
+	}else
+		return 0;
+}
+
+/*
+ * During the closed-loop of the controller,
+ * the controller moves to the next time instance. It checks
+ * for the flag SIMULATOR_FLAG, 1 corresponds to an in-build
+ * simulator call given by `updateSmpcConfiguration()` and
+ * 0 corresponds to external simulator.
+ *
+ * Reads the smpcControlConfiguration file for currentState,
+ * previousDemand and previousControl action.
+ */
+void SmpcController::moveForewardInTime(){
+	if(simulatorFlag){
+		//compute get the control from the devControl, apply the projection,
+		// compute x+Bu+e to get updated state
+		uint_t nx = this->ptrMyEngine->getDwnNetwork()->getNumTanks();
+		uint_t nu = this->ptrMyEngine->getDwnNetwork()->getNumControls();
+		uint_t nd = this->ptrMyEngine->getDwnNetwork()->getNumDemands();
+		real_t *previousControl = new real_t[nu];
+		real_t *stateUpdate = new real_t[nx];
+		real_t *previousDemand;
+		real_t alpha = 1;
+
+		//x = p
+		_CUDA( cudaMemcpy( devStateUpdate, ptrMyEngine->getVecCurrentState(), nx*sizeof(real_t),
+				cudaMemcpyDeviceToDevice) );
+		// x = x+w
+		_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), nx, &alpha, ptrMyEngine->getVecE(), 1, devVecX, 1));
+		// x = x+Bu
+		_CUBLAS(cublasSgemv_v2(ptrMyEngine->getCublasHandle(), CUBLAS_OP_N, nx, nu, &alpha,
+				ptrMyEngine->getSysMatB(), nx, devControlAction, 1, &alpha, devStateUpdate, 1) );
+		_CUDA( cudaMemcpy(stateUpdate, devStateUpdate, nx*sizeof(real_t), cudaMemcpyDeviceToHost) );
+		_CUDA( cudaMemcpy(previousControl, devControlAction, nu*sizeof(real_t), cudaMemcpyDeviceToHost) );
+		previousDemand = this->ptrMyForecaster->getNominalDemand();
+		//updateSmpcConfiguration(stateUpdate, previousControl, previousDemand);
+		updateKpi( stateUpdate, previousControl );
+		this->ptrMySmpcConfig->setCurrentState( stateUpdate );
+		this->ptrMySmpcConfig->setPreviousControl( previousControl );
+		this->ptrMySmpcConfig->setpreviousdemand( previousDemand );
+		delete [] previousControl;
+		delete [] stateUpdate;
+		previousControl = NULL;
+		stateUpdate = NULL;
+		previousDemand = NULL;
+	}else{
+		this->ptrMySmpcConfig->setCurrentState();
+		this->ptrMySmpcConfig->setPreviousControl();
+		this->ptrMySmpcConfig->setPreviousDemand();
+	}
+}
+
+/**
+ * Update tje json file using the commands from rapidJson functions
+ * When the SIMULATOR FLAG is set to 1, the previousControl,
+ * currentState and previousDemand vectors in the smpc controller
+ * configuration file are set.
+ */
+void SmpcController::updateSmpcConfiguration(real_t* updateState,
+		real_t* control,
+		real_t* demand){
+	//const char* fileName = ptrMySmpcConfig->getPathToControllerConfig().c_str();
+	string pathToFileString = "../systemData/testControl.json";
+	const char* fileName = pathToFileString.c_str();
+	rapidjson::Document jsonDocument;
+	//rapidjson::Value valueJson;
+	uint_t nx = ptrMySmpcConfig->getNX();
+	uint_t nu = ptrMySmpcConfig->getNU();
+	uint_t nd = ptrMySmpcConfig->getND();
+	FILE* infile = fopen(fileName, "r");
+	char* readBuffer = new char[65536];
+	rapidjson::FileReadStream configurationJsonStream(infile, readBuffer, sizeof(readBuffer));
+	jsonDocument.ParseStream(configurationJsonStream);
+	//jsonDocument.RemoveMember(VARNAME_CURRENT_X);
+	//jsonDocument.RemoveMember(VARNAME_PREV_U);
+	//jsonDocument.RemoveMember(VARNAME_PREV_DEMAND);
+
+	rapidjson::Value currentXjson(rapidjson::kArrayType);
+	rapidjson::Value previousUjson(rapidjson::kArrayType);
+	rapidjson::Value previousDemandJson(rapidjson::kArrayType);
+	rapidjson::Document::AllocatorType& allocator = jsonDocument.GetAllocator();
+
+	for(uint_t iSize = 0; iSize < nx; iSize++){
+		currentXjson.PushBack(rapidjson::Value().SetFloat( updateState[iSize] ), allocator);
+		cout << updateState[iSize] << " ";
+	}
+	cout << endl;
+	for(uint_t iSize = 0; iSize < nu; iSize++){
+		previousUjson.PushBack(rapidjson::Value().SetFloat( control[iSize] ), allocator);
+	}
+	for(uint_t iSize = 0; iSize < nd; iSize++){
+		previousDemandJson.PushBack(rapidjson::Value().SetFloat( demand[iSize] ), allocator);
+	}
+	jsonDocument.AddMember(VARNAME_CURRENT_X, currentXjson, jsonDocument.GetAllocator());
+	jsonDocument.AddMember(VARNAME_PREV_U, previousUjson, jsonDocument.GetAllocator());
+	jsonDocument.AddMember(VARNAME_PREV_DEMAND, previousDemandJson, jsonDocument.GetAllocator());
+
+	FILE* outfile = fopen(fileName, "w");
+	char* writeBuffer = new char[65536];
+	rapidjson::FileWriteStream os(outfile, writeBuffer, sizeof(writeBuffer));
+
+	rapidjson::Writer<rapidjson::FileWriteStream> writer(os);
+	jsonDocument.Accept(writer);
+	fclose(outfile);
+	delete [] readBuffer;
+	delete [] writeBuffer;
+}
+
+/**
+ * update the KPI at the current time instance
+ */
+void SmpcController::updateKpi(real_t* state, real_t* control){
+	uint_t nx = this->ptrMySmpcConfig->getNX();
+	uint_t nu = this->ptrMySmpcConfig->getNU();
+
+	real_t *safeX = this->ptrMyEngine->getDwnNetwork()->getXsafe();
+	real_t *constantPrice = this->ptrMyEngine->getDwnNetwork()->getAlpha();
+	real_t *variablePrice = this->ptrMyForecaster->getNominalPrices();
+	real_t *previousControl = this->ptrMySmpcConfig->getPrevU();
+	real_t *deltaU = new real_t[nu];
+	real_t *waterLevel = new real_t[nx];
+
+	real_t ecoKpi = 0;
+	real_t smKpi = 0;
+	real_t saKpi = 0;
+	real_t netKpi = 0;
+	real_t safeValue = 0;
+
+	for(uint_t iSize = 0; iSize < nu; iSize++){
+		ecoKpi = ecoKpi + (constantPrice[iSize] + variablePrice[iSize])*abs(control[iSize]);
+		deltaU[iSize] = previousControl[iSize] - control[iSize];
+		smKpi = smKpi + deltaU[iSize]*deltaU[iSize];
+	}
+	for(uint_t iSize = 0; iSize < nx; iSize++){
+		waterLevel[iSize] = state[iSize] - safeX[iSize];
+		if( waterLevel[iSize] > 0 ){
+			waterLevel[iSize] = 0;
+		}
+		safeValue = safeValue + abs( safeX[iSize] );
+		saKpi = saKpi + abs( waterLevel[iSize] );
+		netKpi = netKpi + abs( state[iSize] );
+	}
+
+	economicKpi = economicKpi + ecoKpi;
+	smoothKpi = smoothKpi + smKpi;
+	safeKpi = safeKpi + saKpi;
+	networkKpi = networkKpi + netKpi;
+	//cout << saKpi << " "<< netKpi << " " << safeValue << endl;
+	delete [] deltaU;
+	delete [] waterLevel;
+}
+
+/*
+ * Get the economical KPI upto the simulation horizon
+ * @param    simualtionTime  simulation horizon
+ */
+real_t SmpcController::getEconomicKpi( uint_t simulationTime){
+	real_t economicValue = economicKpi/(3600);
+	return economicValue/simulationTime;
+}
+
+/*
+ * Get the smooth KPI upto the simulation horizon
+ * @param    simulationTime   simulation horizon
+ */
+real_t SmpcController::getSmoothKpi( uint_t simulationTime){
+	real_t smoothValue = economicKpi/(3600*3600);
+	return smoothValue/simulationTime;
+}
+
+/*
+ * Get the  network KPI upto the simulation horizon
+ * @param   simulationTime    simulation horizon
+ */
+real_t SmpcController::getNetworkKpi( uint_t simulationTime){
+	real_t networkKpiTime = networkKpi;
+	real_t safeLevelNorm = 0;
+	uint_t nx = this->ptrMySmpcConfig->getNX();
+	for(uint_t iSize = 0; iSize < nx; iSize++){
+		safeLevelNorm = safeLevelNorm + this->getDwnNetwork()->getXsafe()[iSize];
+	}
+	networkKpiTime = 100*simulationTime*safeLevelNorm/networkKpiTime;
+	return networkKpiTime;
+}
+
+/*
+ * Get the safety KPI upto the simulation horizon
+ * @param   simulationTime    simulation horizon
+ */
+real_t SmpcController::getSafetyKpi( uint_t simulationTime){
+	return safeKpi;
+}
+
+/**
+ * Get's the network object
+ * @return  DwnNetwork
+ */
+DwnNetwork* SmpcController::getDwnNetwork(){
+	return ptrMyEngine->getDwnNetwork();
+}
+/**
+ * Get's the scenario tree object
+ * @return scenarioTree
+ */
+ScenarioTree* SmpcController::getScenarioTree(){
+	return ptrMyEngine->getScenarioTree();
+}
+/**
+ * Get's the forecaster object
+ * @return Forecaster
+ */
+Forecaster* SmpcController::getForecaster(){
+	return ptrMyForecaster;
+}
+/**
+ * Get's the Smpc controller configuration object
+ * @return SmpcConfiguration
+ */
+SmpcConfiguration* SmpcController::getSmpcConfiguration(){
+	return ptrMySmpcConfig;
+}
+/**
+ * Get's the Engine object
+ * @return Engine
+ */
+Engine* SmpcController::getEngine(){
+	return ptrMyEngine;
 }
 
 SmpcController::~SmpcController(){
@@ -471,7 +973,10 @@ SmpcController::~SmpcController(){
 	_CUDA( cudaFree(devVecDualPsi) );
 	_CUDA( cudaFree(devVecUpdateXi) );
 	_CUDA( cudaFree(devVecUpdatePsi) );
-	_CUDA( cudaFree(devPrimalInfeasibilty) );
+	_CUDA( cudaFree(devVecPrimalInfeasibilty) );
+	_CUDA( cudaFree(devVecQ) );
+	_CUDA( cudaFree(devVecR) );
+	_CUDA( cudaFree(devControlAction) );
 
 	_CUDA( cudaFree(devPtrVecX) );
 	_CUDA( cudaFree(devPtrVecU) );
@@ -482,4 +987,35 @@ SmpcController::~SmpcController(){
 	_CUDA( cudaFree(devPtrVecPrimalPsi) );
 	_CUDA( cudaFree(devPtrVecQ));
 	_CUDA( cudaFree(devPtrVecR));
+
+	free(vecPrimalInfs);
+	devVecX = NULL;
+	devVecU = NULL;
+	devVecV = NULL;
+	devVecXi = NULL;
+	devVecPsi = NULL;
+	devVecAcceleratedXi = NULL;
+	devVecAcceleratedPsi = NULL;
+	devVecPrimalXi = NULL;
+	devVecPrimalPsi = NULL;
+	devVecDualXi = NULL;
+	devVecDualPsi = NULL;
+	devVecUpdateXi = NULL;
+	devVecUpdatePsi = NULL;
+	devVecPrimalInfeasibilty = NULL;
+	devVecQ = NULL;
+	devVecR = NULL;
+	devControlAction = NULL;
+
+	devPtrVecX = NULL;
+	devPtrVecU = NULL;
+	devPtrVecV = NULL;
+	devPtrVecAcceleratedXi = NULL;
+	devPtrVecAcceleratedPsi = NULL;
+	devPtrVecPrimalXi = NULL;
+	devPtrVecPrimalPsi = NULL;
+	devPtrVecQ = NULL;
+	devPtrVecR = NULL;
+
+	vecPrimalInfs = NULL;
 }
