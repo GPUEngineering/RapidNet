@@ -37,8 +37,14 @@
 #define VARNAME_PREV_UHAT "prevUhat"
 #define VARNAME_PREV_U "prevU"
 #define VARNAME_PREV_V "prevV"
+#define VARNAME_PREV_DEMAND "prevDemand"
 #define VARNAME_STEP_SIZE "stepSize"
 #define VARNAME_MAX_ITER "maxIterations"
+#define PATH_NETWORK_FILE "pathToNetwork"
+#define PATH_SCENARIO_TREE_FILE "pathToScenarioTree"
+#define PATH_FORECASTER_FILE "pathToForecaster"
+
+
 class SmpcConfiguration{
 public:
 
@@ -94,13 +100,9 @@ public:
 	 */
 	real_t* getPrevU();
 	/**
-	 * Previous particular solution based on the previous control
+	 * Previous demand
 	 */
-	real_t* getPrevUhat();
-	/**
-	 * Previous reduced control in the reduced spaces
-	 */
-	real_t* getPrevV();
+	real_t* getPrevDemand();
 	/**
 	 * Weight that penalise the constraints on the tank level
 	 */
@@ -117,6 +119,53 @@ public:
 	 * Get the step size
 	 */
 	real_t getStepSize();
+	/*
+	 * Get the path to the controller configuration file
+	 */
+	string getPathToControllerConfig();
+	/*
+	 * Get the path to network
+	 */
+	string getPathToNetwork();
+	/*
+	 * Get the path to scenario tree
+	 */
+	string getPathToScenarioTree();
+	/*
+	 * Get the path to forecaster
+	 */
+	string getPathToForecaster();
+	/** SETTER'S FOR THE CONTROLLER CONFIGURATION OBJECT**/
+	/*
+	 * update the current state from the controller
+	 * configuration file
+	 */
+	void setCurrentState();
+	/*
+	 * update the previous control from the controller
+	 * configuration file
+	 */
+	void setPreviousControl();
+	/*
+	 * update the previous demand from the controller
+	 * configuration file
+	 */
+	void setPreviousDemand();
+	/**
+	 * update the level in the tanks
+	 * @param   state    updated state
+	 */
+	void setCurrentState(real_t* state);
+	/**
+	 * update the previous control actions
+	 * @param    control  previous control action
+	 */
+	void setPreviousControl(real_t* control);
+	/**
+	 * update the previous demand
+	 * @param    demand    previous demand
+	 */
+	void setpreviousdemand(real_t* demand);
 	/**
 	 * Default destructor to free the memory
 	 */
@@ -172,27 +221,37 @@ private:
 	 */
 	real_t *currentX;
 	/**
-	 * TODO should be replaced and calculated directly in Engine
-	 * previous control particular solution
-	 */
-	real_t *prevUhat;
-	/**
-	 * TODO should be replaced and calculated directly in the Engine
-	 * previous reduced control decision variable
-	 */
-	real_t *prevV;
-	/**
 	 * Previous control
 	 */
 	real_t *prevU;
 	/**
-	 *  stepsize for the APG
+	 * Previous demand
+	 */
+	real_t *prevDemand;
+	/**
+	 *  Stepsize for the APG
 	 */
 	real_t stepSize;
 	/**
-	 * maximum number of iterations of the APG algorithm
+	 * Maximum number of iterations of the APG algorithm
 	 */
 	uint_t maxIteration;
+	/*
+	 * path to the controller configuration json file
+	 */
+	string pathToConfiguration;
+	/*
+	 * path to network json file
+	 */
+	string pathToNetwork;
+	/*
+	 * path to scenario tree json file
+	 */
+	string pathToScenarioTree;
+	/*
+	 * path to forecaster json file
+	 */
+	string pathToForecaster;
 };
 
 

@@ -75,7 +75,6 @@ uint_t Testing::compareDeviceScenarioArray(T* arrayA, uint_t *nodes, uint_t dim)
 }
 
 uint_t Testing::testNetwork(){
-	DwnNetwork *ptrMyDwnNetwork = new DwnNetwork(pathToFileNetwork);
 	const char* fileName = pathToFileNetwork.c_str();
 	rapidjson::Document jsonDocument;
 	FILE* infile = fopen(fileName, "r");
@@ -84,13 +83,12 @@ uint_t Testing::testNetwork(){
 		cerr << "Error in opening the file " <<__LINE__ << endl;
 		exit(100);
 	}else{
+		DwnNetwork *ptrMyDwnNetwork = new DwnNetwork(pathToFileNetwork);
 		char* readBuffer = new char[65536];
 		rapidjson::FileReadStream networkJsonStream(infile, readBuffer, sizeof(readBuffer));
 		jsonDocument.ParseStream(networkJsonStream);
-		//matA = new real_t[nTanks * nTanks];
 		a = jsonDocument[VARNAME_A];
 		_ASSERT(a.IsArray());
-		//cout<< compareArray(ptrMyDwnNetwork->getMatA()) << endl;
 		_ASSERT( compareArray<real_t>( ptrMyDwnNetwork->getMatA() ) );
 		a = jsonDocument[VARNAME_B];
 		_ASSERT(a.IsArray());
@@ -124,11 +122,11 @@ uint_t Testing::testNetwork(){
 		_ASSERT( compareArray<real_t>( ptrMyDwnNetwork->getAlpha()) );
 		delete [] readBuffer;
 		readBuffer = NULL;
+		fclose(infile);
+		infile = NULL;
+		delete ptrMyDwnNetwork;
+		ptrMyDwnNetwork = NULL;
 	}
-	fclose(infile);
-	infile = NULL;
-	delete ptrMyDwnNetwork;
-	ptrMyDwnNetwork = NULL;
 	cout<< "Completed testing of the DWN network" << endl;
 	return 1;
 }
@@ -136,7 +134,6 @@ uint_t Testing::testNetwork(){
 uint_t Testing::testScenarioTree(){
 	const char* fileName = pathToFileScenarioTree.c_str();
 	rapidjson::Document jsonDocument;
-	//rapidjson::Value a;
 	FILE* infile = fopen(fileName, "r");
 	if(infile == NULL){
 		try{
@@ -146,11 +143,6 @@ uint_t Testing::testScenarioTree(){
 			//cout << e.what() << __LINE__ << endl;
 		}
 		return 0;
-		/*
-		catch (exception &e){
-			cout << pathToFileScenarioTree << infile << endl;
-			cerr << "Error in opening the file " <<__LINE__ << fileName << endl;
-		}*/
 		//exit(100); /*TODO never use `exit`; throw an exception instead */
 	}else{
 		ScenarioTree *ptrMyScenarioTree = new ScenarioTree( pathToFileScenarioTree );
@@ -217,7 +209,6 @@ uint_t Testing::testScenarioTree(){
 }
 
 uint_t Testing::testForecaster(){
-	Forecaster *ptrMyForecaster = new Forecaster( pathToFileForecaster );
 	const char* fileName = pathToFileForecaster.c_str();
 	rapidjson::Document jsonDocument;
 	FILE* infile = fopen(fileName, "r");
@@ -226,37 +217,57 @@ uint_t Testing::testForecaster(){
 		cerr << "Error in opening the file " <<__LINE__ << fileName << endl;
 		exit(100);
 	}else{
+		Forecaster *ptrMyForecaster = new Forecaster( pathToFileForecaster );
 		char* readBuffer = new char[65536]; /*TODO Make sure this is a good practice */
 		rapidjson::FileReadStream networkJsonStream( infile, readBuffer, sizeof(readBuffer) );
 		jsonDocument.ParseStream( networkJsonStream );
 		a = jsonDocument[VARNAME_N];
 		_ASSERT( a.IsArray() );
 		_ASSERT( ptrMyForecaster->getPredHorizon() == (uint_t) a[0].GetFloat() );
+		a = jsonDocument[VARNAME_SIM_HORIZON];
+		_ASSERT( a.IsArray() );
+		_ASSERT( ptrMyForecaster->getSimHorizon() == (uint_t) a[0].GetFloat() );
 		a = jsonDocument[VARNAME_DIM_DEMAND];
 		_ASSERT( a.IsArray() );
 		_ASSERT( ptrMyForecaster->getDimDemand() == (uint_t) a[0].GetFloat() );
 		a = jsonDocument[VARNAME_DIM_PRICES];
 		_ASSERT( a.IsArray() );
 		_ASSERT( ptrMyForecaster->getDimPrice() == (uint_t) a[0].GetFloat() );
-		a = jsonDocument[VARNAME_DHAT];
+		uint_t timeInst = 1;
+		ptrMyForecaster->predictDemand( timeInst );
+		a = jsonDocument[VARNAME_DEMAND_SIM];
+		_ASSERT( a.IsArray() );
+		_ASSERT( compareArray<real_t>( ptrMyForecaster->getNominalDemand()) );
+		/*for(uint_t iCount = 0; iCount < a.Size(); iCount++){
+			cout << ptrMyForecaster->getNominalDemand()[iCount] << " "<< a[iCount].GetFloat()<< " ";
+		}
+		cout << endl;*/
+		ptrMyForecaster->predictPrices( timeInst );
+		a = jsonDocument[VARNAME_PRICE_SIM];
+		_ASSERT( a.IsArray() );
+		_ASSERT( compareArray<real_t>( ptrMyForecaster->getNominalPrices()) );
+		/*for(uint_t iCount = 0; iCount < a.Size(); iCount++){
+			cout << ptrMyForecaster->getNominalPrices()[iCount] << " "<< a[iCount].GetFloat()<< " ";
+		}
+		cout << endl;
+		/*a = jsonDocument[VARNAME_DHAT];
 		_ASSERT( a.IsArray() );
 		_ASSERT( compareArray<real_t>( ptrMyForecaster->getNominalDemand()) );
 		a = jsonDocument[VARNAME_ALPHAHAT];
 		_ASSERT( a.IsArray() );
-		_ASSERT( compareArray<real_t>( ptrMyForecaster->getNominalPrices()) );
+		_ASSERT( compareArray<real_t>( ptrMyForecaster->getNominalPrices()) );*/
 		delete [] readBuffer;
 		readBuffer = NULL;
+		fclose(infile);
+		delete ptrMyForecaster;
+		ptrMyForecaster = NULL;
+		infile = NULL;
+		cout<< "Completed testing of the Forecaster" << endl;
 	}
-	fclose(infile);
-	delete ptrMyForecaster;
-	ptrMyForecaster = NULL;
-	infile = NULL;
-	cout<< "Completed testing of the Forecaster" << endl;
 	return 1;
 }
 
 uint_t Testing::testControllerConfig(){
-	SmpcConfiguration *ptrMySmpcConfig = new SmpcConfiguration( pathToFileControllerConfig );
 	const char* fileName = pathToFileControllerConfig.c_str();
 	rapidjson::Document jsonDocument;
 	FILE* infile = fopen(fileName, "r");
@@ -265,6 +276,7 @@ uint_t Testing::testControllerConfig(){
 		cerr << "Error in opening the file " <<__LINE__ << endl;
 		exit(100);
 	}else{
+		SmpcConfiguration *ptrMySmpcConfig = new SmpcConfiguration( pathToFileControllerConfig );
 		char* readBuffer = new char[65536];
 		rapidjson::FileReadStream networkJsonStream(infile, readBuffer, sizeof(readBuffer));
 		jsonDocument.ParseStream(networkJsonStream);
@@ -301,53 +313,63 @@ uint_t Testing::testControllerConfig(){
 		a = jsonDocument[VARNAME_CURRENT_X];
 		_ASSERT(a.IsArray());
 		_ASSERT( compareArray<real_t>( ptrMySmpcConfig->getCurrentX() ) );
-		a = jsonDocument[VARNAME_PREV_UHAT];
+		a = jsonDocument[VARNAME_PREV_DEMAND];
 		_ASSERT(a.IsArray());
-		_ASSERT( compareArray<real_t>( ptrMySmpcConfig->getPrevUhat() ) );
-		a = jsonDocument[VARNAME_PREV_U];
-		_ASSERT(a.IsArray());
-		_ASSERT( compareArray<real_t>( ptrMySmpcConfig->getPrevU() ) );
-		a = jsonDocument[VARNAME_PREV_V];
-		_ASSERT(a.IsArray());
-		_ASSERT( compareArray<real_t>( ptrMySmpcConfig->getPrevV() ) );
+		_ASSERT( compareArray<real_t>( ptrMySmpcConfig->getPrevDemand() ) );
 		a = jsonDocument[VARNAME_STEP_SIZE];
 		_ASSERT(a.IsArray());
 		_ASSERT( ptrMySmpcConfig->getStepSize() == (real_t) a[0].GetFloat() );
 		a = jsonDocument[VARNAME_MAX_ITER];
 		_ASSERT(a.IsArray());
 		_ASSERT( ptrMySmpcConfig->getMaxIterations() == (uint_t) a[0].GetFloat() );
+		a = jsonDocument[PATH_NETWORK_FILE];
+		_ASSERT(a.IsString());
+		_ASSERT( !ptrMySmpcConfig->getPathToNetwork().compare(a.GetString()));
+		a = jsonDocument[PATH_SCENARIO_TREE_FILE];
+		_ASSERT(a.IsString());
+		_ASSERT( !ptrMySmpcConfig->getPathToScenarioTree().compare(a.GetString()));
+		a = jsonDocument[PATH_FORECASTER_FILE];
+		_ASSERT(a.IsString());
+		_ASSERT( !ptrMySmpcConfig->getPathToForecaster().compare(a.GetString()));
 		delete [] readBuffer;
 		readBuffer = NULL;
+		fclose(infile);
+		delete ptrMySmpcConfig;
+		ptrMySmpcConfig = NULL;
+		infile = NULL;
+		cout << "Completed testing the SmpcConfiguration" << endl;
 	}
-	fclose(infile);
-	delete ptrMySmpcConfig;
-	ptrMySmpcConfig = NULL;
-	infile = NULL;
-	cout << "Completed testing the SmpcConfiguration" << endl;
 	return 1;
 }
 
 uint_t Testing::testEngineTesting(){
-	DwnNetwork *ptrMyDwnNetwork = new DwnNetwork(pathToFileNetwork);
-	ScenarioTree *ptrMyScenarioTree = new ScenarioTree( pathToFileScenarioTree );
+	//DwnNetwork *ptrMyDwnNetwork = new DwnNetwork(pathToFileNetwork);
+	//ScenarioTree *ptrMyScenarioTree = new ScenarioTree( pathToFileScenarioTree );
 	SmpcConfiguration *ptrMySmpcConfig = new SmpcConfiguration( pathToFileControllerConfig );
 	Forecaster *ptrMyForecaster = new Forecaster( pathToFileForecaster );
 
-	Engine *ptrMyEngine = new Engine( ptrMyDwnNetwork, ptrMyScenarioTree, ptrMySmpcConfig );
+	//Engine *ptrMyEngine = new Engine( ptrMyDwnNetwork, ptrMyScenarioTree, ptrMySmpcConfig );
+	Engine *ptrMyEngine = new Engine( ptrMySmpcConfig );
+	DwnNetwork *ptrMyDwnNetwork = ptrMyEngine->getDwnNetwork();
+	ScenarioTree *ptrMyScenarioTree = ptrMyEngine->getScenarioTree();
+
 	uint_t *testNodeArray = new uint_t[ptrMyScenarioTree->getPredHorizon()];
 	uint_t dim;
 	uint_t nx  = ptrMyDwnNetwork->getNumTanks();
 	uint_t nu  = ptrMyDwnNetwork->getNumControls();
+	uint_t nd  = ptrMyDwnNetwork->getNumDemands();
 	uint_t nv  = ptrMySmpcConfig->getNV();
 	uint_t nodes = ptrMyScenarioTree->getNumNodes();
 	real_t *y = new real_t[ptrMyScenarioTree->getNumNodes()*nu*nu];
 	real_t *currentX = ptrMySmpcConfig->getCurrentX();
 	real_t *prevU = ptrMySmpcConfig->getPrevU();
-	real_t *prevUhat = ptrMySmpcConfig->getPrevUhat();
-	real_t *prevV = ptrMySmpcConfig->getPrevV();
+	real_t *prevDemand = ptrMySmpcConfig->getPrevDemand();
 
+	uint_t timeInst = 1;
+	ptrMyForecaster->predictDemand( timeInst );
+	ptrMyForecaster->predictPrices( timeInst );
 	ptrMyEngine->factorStep();
-	ptrMyEngine->updateStateControl(currentX, prevU, prevUhat, prevV);
+	ptrMyEngine->updateStateControl(currentX, prevU, prevDemand);
 	ptrMyEngine->eliminateInputDistubanceCoupling( ptrMyForecaster->getNominalDemand(),
 			ptrMyForecaster->getNominalPrices());
 	const char* fileName = pathToFileEnigne.c_str();
@@ -454,12 +476,18 @@ uint_t Testing::testEngineTesting(){
 }
 
 uint_t Testing::testSmpcController(){
-	DwnNetwork *ptrMyDwnNetwork = new DwnNetwork(pathToFileNetwork);
-	ScenarioTree *ptrMyScenarioTree = new ScenarioTree( pathToFileScenarioTree );
-	SmpcConfiguration *ptrMySmpcConfig = new SmpcConfiguration( pathToFileControllerConfig );
-	Forecaster *ptrMyForecaster = new Forecaster( pathToFileForecaster );
-	Engine *ptrMyEngine = new Engine( ptrMyDwnNetwork, ptrMyScenarioTree, ptrMySmpcConfig );
-	TestSmpcController *ptrMyTestSmpc = new TestSmpcController(ptrMyForecaster, ptrMyEngine, ptrMySmpcConfig);
+	//DwnNetwork *ptrMyDwnNetwork = new DwnNetwork(pathToFileNetwork);
+	//ScenarioTree *ptrMyScenarioTree = new ScenarioTree( pathToFileScenarioTree );
+	//SmpcConfiguration *ptrMySmpcConfig = new SmpcConfiguration( pathToFileControllerConfig );
+	//Forecaster *ptrMyForecaster = new Forecaster( pathToFileForecaster );
+	//Engine *ptrMyEngine = new Engine( ptrMyDwnNetwork, ptrMyScenarioTree, ptrMySmpcConfig );
+	//TestSmpcController *ptrMyTestSmpc = new TestSmpcController(ptrMyForecaster, ptrMyEngine, ptrMySmpcConfig);
+	TestSmpcController *ptrMyTestSmpc = new TestSmpcController( pathToFileControllerConfig );
+	DwnNetwork *ptrMyDwnNetwork = ptrMyTestSmpc->getDwnNetwork();
+	ScenarioTree *ptrMyScenarioTree = ptrMyTestSmpc->getScenarioTree();
+	SmpcConfiguration *ptrMySmpcConfig = ptrMyTestSmpc->getSmpcConfiguration();
+	Forecaster *ptrMyForecaster = ptrMyTestSmpc->getForecaster();
+	Engine *ptrMyEngine = ptrMyTestSmpc->getEngine();
 
 	uint_t nx  = ptrMyDwnNetwork->getNumTanks();
 	uint_t nu  = ptrMyDwnNetwork->getNumControls();
@@ -468,11 +496,10 @@ uint_t Testing::testSmpcController(){
 	real_t *y = new real_t[ptrMyScenarioTree->getNumNodes()*nu*nu];
 	real_t *currentX = ptrMySmpcConfig->getCurrentX();
 	real_t *prevU = ptrMySmpcConfig->getPrevU();
-	real_t *prevUhat = ptrMySmpcConfig->getPrevUhat();
-	real_t *prevV = ptrMySmpcConfig->getPrevV();
+	real_t *prevDemand = ptrMySmpcConfig->getPrevDemand();
 
 	ptrMyEngine->factorStep();
-	ptrMyEngine->updateStateControl(currentX, prevU, prevUhat, prevV);
+	ptrMyEngine->updateStateControl(currentX, prevU, prevDemand);
 	ptrMyEngine->eliminateInputDistubanceCoupling( ptrMyForecaster->getNominalDemand(),
 			ptrMyForecaster->getNominalPrices());
 	_ASSERT( ptrMyTestSmpc->testExtrapolation() );
