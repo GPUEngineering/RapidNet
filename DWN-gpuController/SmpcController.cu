@@ -281,8 +281,8 @@ SmpcController::SmpcController(string pathToConfigFile){
 	ptrVecPrimalPsi = NULL;
 	ptrVecQ = NULL;
 	ptrVecR = NULL;
-	ptrMyNetwork = NULL;
-	ptrMyScenarioTree = NULL;
+	//ptrMyNetwork = NULL;
+	//ptrMyScenarioTree = NULL;
 }
 
 /**
@@ -300,6 +300,7 @@ void SmpcController::initialiseSmpcController(){
 	ptrMyEngine->updateStateControl(currentX, prevU, prevDemand);
 	ptrMyEngine->eliminateInputDistubanceCoupling( ptrMyForecaster->getNominalDemand(),
 			ptrMyForecaster->getNominalPrices());
+	/*
 	uint_t nx = ptrMySmpcConfig->getNX();
 	uint_t nu = ptrMySmpcConfig->getNU();
 	uint_t nv = ptrMySmpcConfig->getNV();
@@ -309,6 +310,7 @@ void SmpcController::initialiseSmpcController(){
 	currentX = NULL;
 	prevU = NULL;
 	prevDemand = NULL;
+	*/
 }
 
 /**
@@ -334,8 +336,8 @@ void SmpcController::dualExtrapolationStep(real_t lambda){
 	// y_{k} = y_{k-1}
 	_CUDA(cudaMemcpy(devVecXi, devVecUpdateXi, 2*nx*nodes*sizeof(real_t), cudaMemcpyDeviceToDevice));
 	_CUDA(cudaMemcpy(devVecPsi, devVecUpdatePsi, nu*nodes*sizeof(real_t), cudaMemcpyDeviceToDevice));
-	ptrMyNetwork = NULL;
-	ptrMyScenarioTree = NULL;
+	//ptrMyNetwork = NULL;
+	//ptrMyScenarioTree = NULL;
 }
 
 /**
@@ -524,10 +526,12 @@ void SmpcController::solveStep(){
 
 	_CUDA(cudaFree(devTempVecQ));
 	_CUDA(cudaFree(devTempVecR));
+	_CUDA(cudaFree(devLv) );
 	devTempVecQ = NULL;
 	devTempVecR = NULL;
-	ptrMyNetwork = NULL;
-	ptrMyScenarioTree = NULL;
+	devLv = NULL;
+	//ptrMyNetwork = NULL;
+	//ptrMyScenarioTree = NULL;
 }
 
 /**
@@ -592,8 +596,8 @@ void SmpcController::proximalFunG(){
 	_CUDA( cudaFree(devVecDiffXi) );
 	devSuffleVecXi = NULL;
 	devVecDiffXi = NULL;
-	ptrMyNetwork = NULL;
-	ptrMyScenarioTree = NULL;
+	//ptrMyNetwork = NULL;
+	//ptrMyScenarioTree = NULL;
 }
 
 /**
@@ -617,7 +621,8 @@ void SmpcController::dualUpdate(){
 	_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), 2*nx*nodes, &stepSize, devVecPrimalInfeasibilty, 1, devVecUpdateXi, 1) );
 	_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), nu*nodes, &stepSize, &devVecPrimalInfeasibilty[2*nx*nodes], 1,
 			devVecUpdatePsi, 1) );
-
+	ptrMyNetwork = NULL;
+	ptrMyScenarioTree = NULL;
 }
 
 /**
@@ -646,24 +651,20 @@ uint_t SmpcController::algorithmApg(){
 	real_t lambda;
 	uint_t maxIndex;
 	for (uint_t iter = 0; iter < ptrMySmpcConfig->getMaxIterations(); iter++){
-	//for (uint_t iter = 0; iter < 2; iter++){
 		lambda = theta[1]*(1/theta[0] - 1);
-		//cout << theta[0] << " " << theta[1] << " " << lambda << " ";
 		dualExtrapolationStep(lambda);
 		solveStep();
 		proximalFunG();
 		dualUpdate();
-
 		theta[0] = theta[1];
 		theta[1] = 0.5*(sqrt(pow(theta[1], 4) + 4*pow(theta[1], 2)) - pow(theta[1], 2));
 		_CUBLAS( cublasIsamax_v2(ptrMyEngine->getCublasHandle(), (2*nx + nu)*nodes, devVecPrimalInfeasibilty,
 				1, &maxIndex));
 		_CUDA( cudaMemcpy(&vecPrimalInfs[iter], &devVecPrimalInfeasibilty[maxIndex - 1], sizeof(real_t),
 				cudaMemcpyDeviceToHost));
-		/*cout<< vecPrimalInfs[iter] << " " << endl;
-				*/
 	}
 	//cout << endl;
+
 	return 1;
 }
 
@@ -688,14 +689,22 @@ void SmpcController::controllerSmpc(){
  */
 uint_t SmpcController::controlAction(real_t* u){
 	uint_t status;
-	//real_t hostPrimalInfs = new real_t[];
+	size_t initialFreeBytes;
+	size_t totalBytes;
+	size_t finalFreeBytes;
+	_CUDA( cudaMemGetInfo(&initialFreeBytes, &totalBytes) );
 	ptrMyEngine->updateStateControl(ptrMySmpcConfig->getCurrentX(), ptrMySmpcConfig->getPrevU(),
 			ptrMySmpcConfig->getPrevDemand());
 	ptrMyEngine->eliminateInputDistubanceCoupling(ptrMyForecaster->getNominalDemand(),
 			ptrMyForecaster->getNominalPrices());
 	status = algorithmApg();
 	_CUDA( cudaMemcpy(u, devVecU, ptrMySmpcConfig->getNU()*sizeof(real_t), cudaMemcpyDeviceToHost));
-	return status;
+	_CUDA( cudaMemGetInfo(&finalFreeBytes, &totalBytes) );
+	if( abs(finalFreeBytes - initialFreeBytes) > 0 ){
+		cout << "RUNTIME ERROR: MEMORY LEAKS" << endl;
+		return 0;
+	}else
+		return status;
 }
 
 /**
@@ -709,7 +718,10 @@ uint_t SmpcController::controlAction(fstream& controlOutputJson){
 		uint_t status;
 		uint_t nu = ptrMySmpcConfig->getNU();
 		real_t *currentControl = new real_t[nu];
-
+		size_t initialFreeBytes;
+		size_t totalBytes;
+		size_t finalFreeBytes;
+		_CUDA( cudaMemGetInfo(&initialFreeBytes, &totalBytes) );
 		ptrMyEngine->updateStateControl(ptrMySmpcConfig->getCurrentX(), ptrMySmpcConfig->getPrevU(),
 				ptrMySmpcConfig->getPrevDemand());
 		ptrMyEngine->eliminateInputDistubanceCoupling(ptrMyForecaster->getNominalDemand(),
@@ -725,9 +737,14 @@ uint_t SmpcController::controlAction(fstream& controlOutputJson){
 			controlOutputJson << currentControl[iControl] << ", ";
 		}
 		//cout << endl;
+		_CUDA( cudaMemGetInfo(&finalFreeBytes, &totalBytes) );
 		controlOutputJson << "]" << endl;
 		delete [] currentControl;
-		return status;
+		if( abs(finalFreeBytes - initialFreeBytes) > 0 ){
+			cout << "RUNTIME ERROR: MEMORY LEAKS" << endl;
+			return 0;
+		}else
+			return status;
 	}else
 		return 0;
 }
@@ -774,7 +791,7 @@ void SmpcController::moveForewardInTime(){
 		delete [] stateUpdate;
 		previousControl = NULL;
 		stateUpdate = NULL;
-		previousDemand = NULL;
+		//previousDemand = NULL;
 	}else{
 		this->ptrMySmpcConfig->setCurrentState();
 		this->ptrMySmpcConfig->setPreviousControl();
@@ -977,6 +994,7 @@ SmpcController::~SmpcController(){
 	_CUDA( cudaFree(devVecQ) );
 	_CUDA( cudaFree(devVecR) );
 	_CUDA( cudaFree(devControlAction) );
+	_CUDA( cudaFree(devStateUpdate) );
 
 	_CUDA( cudaFree(devPtrVecX) );
 	_CUDA( cudaFree(devPtrVecU) );
@@ -1006,6 +1024,7 @@ SmpcController::~SmpcController(){
 	devVecQ = NULL;
 	devVecR = NULL;
 	devControlAction = NULL;
+	devStateUpdate = NULL;
 
 	devPtrVecX = NULL;
 	devPtrVecU = NULL;

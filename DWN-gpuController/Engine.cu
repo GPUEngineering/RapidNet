@@ -1025,6 +1025,7 @@ void Engine::deallocateSystemDevice(){
 	devVecPreviousControl = NULL;
 	devVecPreviousUhat = NULL;
 	devVecPreviousDemand = NULL;
+	devMatWv = NULL;
 
 	devPtrSysMatB = NULL;
 	devPtrSysMatL = NULL;

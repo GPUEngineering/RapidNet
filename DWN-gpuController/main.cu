@@ -21,8 +21,8 @@ int main(void){
 		_ASSERT( myTesting->testSmpcController());
 	}
 	real_t time;
-	string pathToControlOutput = "../systemData/controlOutput10844.json";
-	string pathToControllerConfig = "../systemData/controllerConfig10844.json";
+	string pathToControlOutput = "../systemData/controlOutput653.json";
+	string pathToControllerConfig = "../systemData/controllerConfig653.json";
 	//fstream controlOutputJson( pathToControlOutput.c_str(), ios::out);
 	fstream controlOutputJson;
 	controlOutputJson.open( pathToControlOutput.c_str(), fstream::out);
@@ -33,7 +33,12 @@ int main(void){
 	SmpcController *dwnController = new SmpcController( pathToControllerConfig );
 	uint_t timeInstance = 0;
 
-	while (timeInstance < 10){
+	size_t freeByte;
+	size_t totalByte;
+	_CUDA( cudaMemGetInfo(&freeByte, &totalByte) );
+	cout<< "free bytes in MB "<< freeByte/1024/1024 << "total bytes in MB "<< totalByte/1024/1024 <<endl;
+
+	while (timeInstance < 20){
 		dwnController->getForecaster()->predictDemand( timeInstance );
 		dwnController->getForecaster()->predictPrices( timeInstance );
 		if( timeInstance == 0){
