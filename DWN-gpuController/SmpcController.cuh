@@ -43,9 +43,25 @@ class SmpcController {
 public:
 	/**
 	 * Construct a new Controller with a given engine.
-	 * @param myEngine An instance of Engine.
+	 * @param  myForecaster   An instance of the Forecaster object
+	 * @param  myEngine       An instance of Engine object
+	 * @param  mySmpcConfig   An instance of the Smpc controller configuration object
 	 */
-	SmpcController(Forecaster *myForecaster, Engine *myEngine, SmpcConfiguration *mySmpcConfig);
+	SmpcController( Forecaster *myForecaster,
+			Engine *myEngine,
+			SmpcConfiguration *mySmpcConfig );
+	/**
+	 * Construct a new Controller with a given engine.
+	 * @param  pathToConfigFile   path to the controller configuration file
+	 */
+	SmpcController( string pathToConfigFile );
+
+	/**
+	 * Performs the initialise the smpc controller
+	 *   - update the current state and previous controls in the device memory
+	 *   - perform the factor step
+	 */
+	void initialiseSmpcController();
 
 	/**
 	 * Invoke the SMPC controller on the current state of the network.
@@ -53,6 +69,83 @@ public:
 	 * and finally #algorithmApg.
 	 */
 	void controllerSmpc();
+
+	/**
+	 * Computes a control action and returns a status code
+	 * which is an integer (1 = success).
+	 * @param  u      pointer to computed control action (CPU variable)
+	 * @return status code
+	 */
+	uint_t controlAction(real_t* u);
+
+	/**
+	 * Compute the control action, stores in the json file
+	 * provided to it and returns a status code (1 = success).
+	 * @param   controlJson   file pointer to the output json file
+	 * @return  status        code
+	 */
+	uint_t controlAction(fstream& controlOutputJson);
+	/**
+	 * Get's the network object
+	 * @return  DwnNetwork
+	 */
+	DwnNetwork* getDwnNetwork();
+	/**
+	 * Get's the scenario tree object
+	 * @return scenarioTree
+	 */
+	ScenarioTree* getScenarioTree();
+	/**
+	 * Get's the Smpc controller configuration object
+	 * @return SmpcConfiguration
+	 */
+	SmpcConfiguration* getSmpcConfiguration();
+	/**
+	 * Get's the Forecaster object
+	 * @return Forecaster
+	 */
+	Forecaster* getForecaster();
+	/**
+	 * Get's the Engine object
+	 * @return Engine
+	 */
+	Engine* getEngine();
+	/*
+	 * During the closed-loop of the controller,
+	 * the controller moves to the next time instance. It checks
+	 * for the flag SIMULATOR_FLAG, 1 corresponds to an in-build
+	 * simulator call given by `updateSmpcConfiguration()` and
+	 * 0 corresponds to external simulator.
+	 *
+	 * Reads the smpcControlConfiguration file for currentState,
+	 * previousDemand and previousControl action.
+	 */
+	void moveForewardInTime();
+	/*
+	 * Get the economical KPI upto the simulation horizon
+	 * @param    simualtionTime  simulation horizon
+	 */
+	real_t getEconomicKpi( uint_t simulationTime);
+	/*
+	 * Get the smooth KPI upto the simulation horizon
+	 * @param    simulationTime   simulation horizon
+	 */
+	real_t getSmoothKpi( uint_t simulationTime);
+	/*
+	 * Get the  network KPI upto the simulation horizon
+	 * @param   simulationTime    simulation horizon
+	 */
+	real_t getNetworkKpi( uint_t simulationTime);
+	/*
+	 * Get the safety KPI upto the simulation horizon
+	 * @param   simulationTime    simulation horizon
+	 */
+	real_t getSafetyKpi( uint_t simulationTime);
+	/**
+	 * update the KPI at the current time instance
+	 */
+	void updateKpi(real_t* state,
+			real_t* control);
 	/**
 	 * Destructor. Frees allocated memory.
 	 */
@@ -78,12 +171,24 @@ protected:
 	 */
 	void dualUpdate();
 	/**
-	 * This method executes the APG algorithm.
+	 * This method executes the APG algorithm and returns the primal infeasibility.
+	 * @return primalInfeasibilty;
 	 */
-	void algorithmApg();
+	uint_t algorithmApg();
 	/**
-	 *
+	 * When the SIMULATOR FLAG is set to 1, the previousControl,
+	 * currentState and previousDemand vectors in the smpc controller
+	 * configuration file are set.
+	 * @param    updateState   update the currentX in the controller
+	 *                         configuration json
+	 * @param    control       update the prevU in the controller
+	 *                         configuration json
+	 * @param    demand        update the prevDemand in the controller
+	 *                         configuration json
 	 */
+	void updateSmpcConfiguration(real_t* updateState,
+			real_t* control,
+			real_t* demand);
 //private:
 	/**
 	 * Pointer to an Engine object.
@@ -186,7 +291,7 @@ protected:
 	/**
 	 * Pointer array for primal infeasibility Hx-z
 	 */
-	real_t *devPrimalInfeasibilty;
+	real_t *devVecPrimalInfeasibilty;
 	/**
 	 * Pointer for cost Q
 	 */
@@ -203,10 +308,47 @@ protected:
 	 * Pointer array for device pointers of cost R
 	 */
 	real_t **devPtrVecR;
+	/*
+	 * Final control output calculated after a projection on the
+	 * feasible set to ensure feasibility
+	 */
+	real_t *devControlAction;
 	/**
-	 * step size
+	 * Updated state for the simulator
+	 */
+	real_t *devStateUpdate;
+	/**
+	 * Step size
 	 */
 	real_t stepSize;
+	/**
+	 * Flag Factor step
+	 */
+	bool factorStepFlag;
+	/*
+	 * Flag for the simulator flag (default is set to 1 or true);
+	 */
+	bool simulatorFlag;
+	/*
+	 * primal Infeasibilty
+	 */
+	real_t *vecPrimalInfs;
+	/*
+	 * KPI to measure the economical cost
+	 */
+	real_t economicKpi;
+	/*
+	 * KPI to measure the smooth operation of the controller
+	 */
+	real_t smoothKpi;
+	/*
+	 * KPI to measure the safe operation of the controller
+	 */
+	real_t safeKpi;
+	/*
+	 * KPI to measure the network utility of the system
+	 */
+	real_t networkKpi;
 };
 
 #endif /* SMPCONTROLLERCLASS_CUH_ */

@@ -60,6 +60,12 @@ public :
 	TestSmpcController(Forecaster *myForecaster, Engine *myEngine, SmpcConfiguration *mySmpcConfig);
 
 	/**
+	 * Constructor that create a TestSmpcController object which is derived from the SmpcController object
+	 *
+	 * @param  pathToConfigFile  path to the SmpcController configuration file
+	 */
+	TestSmpcController(string pathToConfigFile);
+	/**
 	 * Function to test the dualExtrapolation function
 	 */
 	uint_t testExtrapolation();

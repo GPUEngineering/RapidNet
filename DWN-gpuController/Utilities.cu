@@ -18,8 +18,7 @@
  *    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include <cuda_device_runtime_api.h>
-#include "cuda_runtime.h"
+
 #include "Configuration.h"
 #include "Utilities.cuh"
 /**
@@ -404,4 +403,51 @@ __global__ void preconditionConstraintU(
 		devUmin[tid] = scaleU * devUmin[tid];
 	}
 
+}
+
+
+
+void startTicToc() {
+	_CUDA(cudaEventCreate(&start));
+	_CUDA(cudaEventCreate(&stop));
+	timer_running = 1;
+}
+
+void tic() {
+	if (timer_running) {
+		_CUDA(cudaEventRecord(start, 0));
+		tic_called = 1;
+	} else {
+		cout << "WARNING: tic() called without a timer running!\n";
+	}
+}
+
+float toc() {
+	float elapsed_time;
+	if (tic_called == 0) {
+		cout << "WARNING: toc() called without a previous tic()!\n";
+		return -1;
+	}
+	if (timer_running == 1) {
+		_CUDA(cudaEventRecord(stop, 0));
+		_CUDA(cudaEventSynchronize(stop));
+		_CUDA(cudaEventElapsedTime(&elapsed_time, start, stop));
+		tic_called = 0;
+		return elapsed_time;
+	} else {
+		cout << "WARNING: toc() called without a timer running!\n";
+		return -2;
+	}
+
+}
+
+void stopTicToc()
+{
+	if (timer_running == 1){
+		_CUDA(cudaEventDestroy(start));
+		_CUDA(cudaEventDestroy(stop));
+		timer_running = 0;
+	} else{
+		cout << "WARNING: stop_tictoc() called without a timer running!\n";
+	}
 }
