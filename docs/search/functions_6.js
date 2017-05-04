@@ -1,6 +1,4 @@
 var searchData=
 [
-  ['initialisescenariotreedevice',['initialiseScenarioTreeDevice',['../class_engine.html#a4e664235e0d3dc748d3f0cb88e0aaa19',1,'Engine']]],
-  ['initialisesystemdevice',['initialiseSystemDevice',['../class_engine.html#ac9d6cb7d673e625256bead5e786e65a5',1,'Engine']]],
-  ['inversebatchmat',['inverseBatchMat',['../class_engine.html#a933446e347b77e350b3755b324ca099c',1,'Engine']]]
+  ['initialisesmpccontroller',['initialiseSmpcController',['../class_smpc_controller.html#ac11e4145e513a95a5114c7296a0416e1',1,'SmpcController']]]
 ];

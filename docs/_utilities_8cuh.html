@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.6"/>
-<title>APG: Utilities.cuh File Reference</title>
+<title>RapidNet: Utilities.cuh File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -22,8 +22,9 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">APG
+   <div id="projectname">RapidNet
    </div>
+   <div id="projectbrief">Fast Stochastic MPC for Drinking Water Networks</div>
   </td>
  </tr>
  </tbody>
@@ -82,12 +83,22 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="header">
   <div class="summary">
 <a href="#define-members">Macros</a> &#124;
-<a href="#func-members">Functions</a>  </div>
+<a href="#func-members">Functions</a> &#124;
+<a href="#var-members">Variables</a>  </div>
   <div class="headertitle">
 <div class="title">Utilities.cuh File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><div class="dynheader">
+<div class="textblock"><code>#include &lt;cuda_device_runtime_api.h&gt;</code><br/>
+<code>#include &quot;cuda_runtime.h&quot;</code><br/>
+</div><div class="textblock"><div class="dynheader">
+Include dependency graph for Utilities.cuh:</div>
+<div class="dyncontent">
+<div class="center"><img src="_utilities_8cuh__incl.png" border="0" usemap="#_utilities_8cuh" alt=""/></div>
+<map name="_utilities_8cuh" id="_utilities_8cuh">
+</map>
+</div>
+</div><div class="textblock"><div class="dynheader">
 This graph shows which files directly or indirectly include this file:</div>
 <div class="dyncontent">
 <div class="center"><img src="_utilities_8cuh__dep__incl.png" border="0" usemap="#_utilities_8cuhdep" alt=""/></div>
@@ -128,6 +139,25 @@ Functions</h2></td></tr>
 <tr class="separator:acee2686288bcc77910d88a2851d21450"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab1870140bc1a0a908e13c93abc923326"><td class="memItemLeft" align="right" valign="top">__global__ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_utilities_8cuh.html#ab1870140bc1a0a908e13c93abc923326">preconditionConstraintU</a> (<a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> *devUmax, <a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> *devUmin, <a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> *matPrcndDiag, <a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> *probNode, <a class="el" href="_configuration_8h.html#a6c06fdeafc128178f45859699c0fc09b">uint_t</a> dim, <a class="el" href="_configuration_8h.html#a6c06fdeafc128178f45859699c0fc09b">uint_t</a> numBlock)</td></tr>
 <tr class="separator:ab1870140bc1a0a908e13c93abc923326"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a22d40116f721ca22914850d997ac1208"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_utilities_8cuh.html#a22d40116f721ca22914850d997ac1208">startTicToc</a> ()</td></tr>
+<tr class="separator:a22d40116f721ca22914850d997ac1208"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5ba73899fe15846cc99820005d978e24"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_utilities_8cuh.html#a5ba73899fe15846cc99820005d978e24">tic</a> ()</td></tr>
+<tr class="separator:a5ba73899fe15846cc99820005d978e24"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a83adf8e26e2c33497523a260bb6e42d8"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_utilities_8cuh.html#a83adf8e26e2c33497523a260bb6e42d8">toc</a> ()</td></tr>
+<tr class="separator:a83adf8e26e2c33497523a260bb6e42d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1b7a1708febb98288a00e4257d5fc7fd"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_utilities_8cuh.html#a1b7a1708febb98288a00e4257d5fc7fd">stopTicToc</a> ()</td></tr>
+<tr class="separator:a1b7a1708febb98288a00e4257d5fc7fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:ac12384e371607d235ed59acbc1b1f54b"><td class="memItemLeft" align="right" valign="top">static cudaEvent_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_utilities_8cuh.html#ac12384e371607d235ed59acbc1b1f54b">start</a></td></tr>
+<tr class="separator:ac12384e371607d235ed59acbc1b1f54b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2988e6268ff1eb45f70f7ae1cd48b2de"><td class="memItemLeft" align="right" valign="top">static cudaEvent_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_utilities_8cuh.html#a2988e6268ff1eb45f70f7ae1cd48b2de">stop</a></td></tr>
+<tr class="separator:a2988e6268ff1eb45f70f7ae1cd48b2de"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9cc6fa4f577649a54547b6fb8256b6fb"><td class="memItemLeft" align="right" valign="top">static short&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_utilities_8cuh.html#a9cc6fa4f577649a54547b6fb8256b6fb">timer_running</a> = 0</td></tr>
+<tr class="separator:a9cc6fa4f577649a54547b6fb8256b6fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a868ab0b14575f8597473e2dc00439c7b"><td class="memItemLeft" align="right" valign="top">static short&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_utilities_8cuh.html#a868ab0b14575f8597473e2dc00439c7b">tic_called</a> = 0</td></tr>
+<tr class="separator:a868ab0b14575f8597473e2dc00439c7b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
 <a class="anchor" id="a3cb4624660208a8df8379f98b6955f24"></a>
@@ -374,7 +404,7 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000003">Todo:</a></b></dt><dd>change int into uint_t <dl class="params"><dt>Parameters</dt><dd>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000004">Todo:</a></b></dt><dd>change int into uint_t <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">vecDualW</td><td></td></tr>
     <tr><td class="paramname">vecPrevDual</td><td></td></tr>
@@ -702,7 +732,7 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000004">Todo:</a></b></dt><dd>change int into uint_t <dl class="params"><dt>Parameters</dt><dd>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000005">Todo:</a></b></dt><dd>change int into uint_t <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">vecX</td><td></td></tr>
     <tr><td class="paramname">lowerbound</td><td></td></tr>
@@ -816,7 +846,7 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000005">Todo:</a></b></dt><dd>change int into uint_t <dl class="params"><dt>Parameters</dt><dd>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000006">Todo:</a></b></dt><dd>change int into uint_t <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">dst</td><td></td></tr>
     <tr><td class="paramname">src</td><td></td></tr>
@@ -969,10 +999,185 @@ Functions</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="a22d40116f721ca22914850d997ac1208"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void startTicToc </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Sets up the timer.</p>
+<p>Must be called before any invocation to <a class="el" href="_utilities_8cuh.html#a5ba73899fe15846cc99820005d978e24">tic()</a> or <a class="el" href="_utilities_8cuh.html#a83adf8e26e2c33497523a260bb6e42d8">toc()</a>, preferrably at the beginning of your application. </p>
+
+<p><div class="dynheader">
+Here is the caller graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="_utilities_8cuh_a22d40116f721ca22914850d997ac1208_icgraph.png" border="0" usemap="#_utilities_8cuh_a22d40116f721ca22914850d997ac1208_icgraph" alt=""/></div>
+<map name="_utilities_8cuh_a22d40116f721ca22914850d997ac1208_icgraph" id="_utilities_8cuh_a22d40116f721ca22914850d997ac1208_icgraph">
+<area shape="rect" id="node2" href="main_8cu.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="141,5,192,32"/></map>
+</div>
+</p>
+
+</div>
+</div>
+<a class="anchor" id="a1b7a1708febb98288a00e4257d5fc7fd"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void stopTicToc </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>This function should be called when the time will not be being used any more. It destroys the events used to time CUDA kernels. If the timer is not running, this function does nothing and prints a warning message. </p>
+
+</div>
+</div>
+<a class="anchor" id="a5ba73899fe15846cc99820005d978e24"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void tic </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Starts the timer.</p>
+<p>Use <code><a class="el" href="_utilities_8cuh.html#a83adf8e26e2c33497523a260bb6e42d8">toc()</a></code> to get the elapsed time; <code><a class="el" href="_utilities_8cuh.html#a5ba73899fe15846cc99820005d978e24">tic()</a></code> must be called before a <code><a class="el" href="_utilities_8cuh.html#a83adf8e26e2c33497523a260bb6e42d8">toc()</a></code>. </p>
+
+<p><div class="dynheader">
+Here is the caller graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="_utilities_8cuh_a5ba73899fe15846cc99820005d978e24_icgraph.png" border="0" usemap="#_utilities_8cuh_a5ba73899fe15846cc99820005d978e24_icgraph" alt=""/></div>
+<map name="_utilities_8cuh_a5ba73899fe15846cc99820005d978e24_icgraph" id="_utilities_8cuh_a5ba73899fe15846cc99820005d978e24_icgraph">
+<area shape="rect" id="node2" href="main_8cu.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="93,5,144,32"/></map>
+</div>
+</p>
+
+</div>
+</div>
+<a class="anchor" id="a83adf8e26e2c33497523a260bb6e42d8"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">float toc </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Returns the elapsed time between its invocation and a previous invocation of <code><a class="el" href="_utilities_8cuh.html#a83adf8e26e2c33497523a260bb6e42d8">toc()</a></code>. Returns <code>-1</code> and prints a warning message if <code><a class="el" href="_utilities_8cuh.html#a83adf8e26e2c33497523a260bb6e42d8">toc()</a></code> was not previously called. Returns <code>-2</code> and prints and error message if <code>start_tictoc()</code> has not been called.</p>
+<dl class="section return"><dt>Returns</dt><dd>Elapsed time between <code><a class="el" href="_utilities_8cuh.html#a5ba73899fe15846cc99820005d978e24">tic()</a></code> and <code><a class="el" href="_utilities_8cuh.html#a83adf8e26e2c33497523a260bb6e42d8">toc()</a></code> in milliseconds with a resolution of <code>0.5</code> microseconds. </dd></dl>
+
+<p><div class="dynheader">
+Here is the caller graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="_utilities_8cuh_a83adf8e26e2c33497523a260bb6e42d8_icgraph.png" border="0" usemap="#_utilities_8cuh_a83adf8e26e2c33497523a260bb6e42d8_icgraph" alt=""/></div>
+<map name="_utilities_8cuh_a83adf8e26e2c33497523a260bb6e42d8_icgraph" id="_utilities_8cuh_a83adf8e26e2c33497523a260bb6e42d8_icgraph">
+<area shape="rect" id="node2" href="main_8cu.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="93,5,144,32"/></map>
+</div>
+</p>
+
+</div>
+</div>
+<h2 class="groupheader">Variable Documentation</h2>
+<a class="anchor" id="ac12384e371607d235ed59acbc1b1f54b"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">cudaEvent_t start</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a2988e6268ff1eb45f70f7ae1cd48b2de"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">cudaEvent_t stop</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a868ab0b14575f8597473e2dc00439c7b"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">short tic_called = 0</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a9cc6fa4f577649a54547b6fb8256b6fb"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">short timer_running = 0</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Apr 11 2017 11:58:27 for APG by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu May 4 2017 02:03:32 for RapidNet by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

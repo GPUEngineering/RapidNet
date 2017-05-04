@@ -7,4 +7,5 @@
 <area shape="rect" id="node7" href="$class_scenario_tree.html#add52c9168d0fd4eeefe56780d072bd65" title="ScenarioTree::getNumScenarios" alt="" coords="264,275,475,301"/>
 <area shape="rect" id="node8" href="$class_scenario_tree.html#ad6a9108a9226d28588b99a637251081f" title="ScenarioTree::getNumNodes" alt="" coords="274,325,465,352"/>
 <area shape="rect" id="node9" href="$class_smpc_configuration.html#a0bb59d3c6e075b75ed31b43711c836a7" title="SmpcConfiguration::\lgetStepSize" alt="" coords="299,377,440,418"/>
+<area shape="rect" id="node10" href="$class_smpc_configuration.html#a64420f0c5283378173041ca6158e2003" title="SmpcConfiguration::\lgetMaxIterations" alt="" coords="299,442,440,483"/>
 </map>

@@ -1,4 +1,6 @@
 <map id="SmpcController::proximalFunG" name="SmpcController::proximalFunG">
-<area shape="rect" id="node2" href="$class_smpc_controller.html#a70ecfdd41c38a5c4de76155f30f6b0c1" title="SmpcController::algorithmApg" alt="" coords="257,5,453,32"/>
+<area shape="rect" id="node2" href="$class_smpc_controller.html#a504a73b33ca1704bc0e743006ef71dae" title="SmpcController::algorithmApg" alt="" coords="257,31,453,57"/>
 <area shape="rect" id="node3" href="$class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="502,5,709,32"/>
+<area shape="rect" id="node4" href="$class_smpc_controller.html#a84fa9efe8b15742c929c0d274e479ff8" title="SmpcController::controlAction" alt="" coords="507,56,703,83"/>
+<area shape="rect" id="node5" href="$main_8cu.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="757,56,808,83"/>
 </map>

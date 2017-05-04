@@ -1,10 +1,10 @@
 <map id="main.cu" name="main.cu">
-<area shape="rect" id="node8" href="$_configuration_8h.html" title="Configuration.h" alt="" coords="598,333,708,360"/>
-<area shape="rect" id="node13" href="$_smpc_controller_8cuh.html" title="SmpcController.cuh" alt="" coords="891,95,1028,121"/>
-<area shape="rect" id="node14" href="$_engine_8cuh.html" title="Engine.cuh" alt="" coords="561,184,647,211"/>
-<area shape="rect" id="node15" href="$_dwn_network_8cuh.html" title="DwnNetwork.cuh" alt="" coords="592,259,715,285"/>
-<area shape="rect" id="node16" href="$_scenario_tree_8cuh.html" title="ScenarioTree.cuh" alt="" coords="854,259,977,285"/>
-<area shape="rect" id="node17" href="$_smpc_configuration_8cuh.html" title="SmpcConfiguration.cuh" alt="" coords="225,259,383,285"/>
-<area shape="rect" id="node18" href="$_forecaster_8cuh.html" title="Forecaster.cuh" alt="" coords="408,259,517,285"/>
-<area shape="rect" id="node19" href="$_utilities_8cuh.html" title="Utilities.cuh" alt="" coords="739,259,829,285"/>
+<area shape="rect" id="node7" href="$_configuration_8h.html" title="Configuration.h" alt="" coords="505,341,615,368"/>
+<area shape="rect" id="node13" href="$_smpc_controller_8cuh.html" title="SmpcController.cuh" alt="" coords="491,95,628,121"/>
+<area shape="rect" id="node14" href="$_engine_8cuh.html" title="Engine.cuh" alt="" coords="517,184,603,211"/>
+<area shape="rect" id="node15" href="$_dwn_network_8cuh.html" title="DwnNetwork.cuh" alt="" coords="499,259,621,285"/>
+<area shape="rect" id="node16" href="$_scenario_tree_8cuh.html" title="ScenarioTree.cuh" alt="" coords="646,259,769,285"/>
+<area shape="rect" id="node17" href="$_smpc_configuration_8cuh.html" title="SmpcConfiguration.cuh" alt="" coords="794,259,952,285"/>
+<area shape="rect" id="node18" href="$_forecaster_8cuh.html" title="Forecaster.cuh" alt="" coords="977,259,1087,285"/>
+<area shape="rect" id="node19" href="$_utilities_8cuh.html" title="Utilities.cuh" alt="" coords="115,259,205,285"/>
 </map>

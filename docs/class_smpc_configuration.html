@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.6"/>
-<title>APG: SmpcConfiguration Class Reference</title>
+<title>RapidNet: SmpcConfiguration Class Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -22,8 +22,9 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">APG
+   <div id="projectname">RapidNet
    </div>
+   <div id="projectbrief">Fast Stochastic MPC for Drinking Water Networks</div>
   </td>
  </tr>
  </tbody>
@@ -83,7 +84,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="#pri-attribs">Private Attributes</a> &#124;
 <a href="class_smpc_configuration-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">SmpcConfiguration Class Reference</div>  </div>
@@ -114,10 +114,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a96f1d20f109c0d8c165e447e368a657c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9b6dadf8c3d99cbd7326c60939d99d17"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_smpc_configuration.html#a9b6dadf8c3d99cbd7326c60939d99d17">getPrevU</a> ()</td></tr>
 <tr class="separator:a9b6dadf8c3d99cbd7326c60939d99d17"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7ad72bc8f8642f7dff806feceb32cf80"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_smpc_configuration.html#a7ad72bc8f8642f7dff806feceb32cf80">getPrevUhat</a> ()</td></tr>
-<tr class="separator:a7ad72bc8f8642f7dff806feceb32cf80"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a26f74f74f0915b1966ee9a5c9d459540"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_smpc_configuration.html#a26f74f74f0915b1966ee9a5c9d459540">getPrevV</a> ()</td></tr>
-<tr class="separator:a26f74f74f0915b1966ee9a5c9d459540"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a828c65ae23c33e3e9162a5d7cb5db1e8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_smpc_configuration.html#a828c65ae23c33e3e9162a5d7cb5db1e8">getPrevDemand</a> ()</td></tr>
+<tr class="separator:a828c65ae23c33e3e9162a5d7cb5db1e8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7dc9f1021869ff57ba65e7c38a4ca717"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_smpc_configuration.html#a7dc9f1021869ff57ba65e7c38a4ca717">getPenaltyState</a> ()</td></tr>
 <tr class="separator:a7dc9f1021869ff57ba65e7c38a4ca717"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae3486c795186d96806c8ad7aac57b67a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_smpc_configuration.html#ae3486c795186d96806c8ad7aac57b67a">getPenaltySafety</a> ()</td></tr>
@@ -126,43 +124,28 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a64420f0c5283378173041ca6158e2003"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0bb59d3c6e075b75ed31b43711c836a7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_smpc_configuration.html#a0bb59d3c6e075b75ed31b43711c836a7">getStepSize</a> ()</td></tr>
 <tr class="separator:a0bb59d3c6e075b75ed31b43711c836a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab65a1c02c305d0615245f09c1ca57d28"><td class="memItemLeft" align="right" valign="top">string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_smpc_configuration.html#ab65a1c02c305d0615245f09c1ca57d28">getPathToControllerConfig</a> ()</td></tr>
+<tr class="separator:ab65a1c02c305d0615245f09c1ca57d28"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac22bba2c9ede8f0193e53da0ddb11b42"><td class="memItemLeft" align="right" valign="top">string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_smpc_configuration.html#ac22bba2c9ede8f0193e53da0ddb11b42">getPathToNetwork</a> ()</td></tr>
+<tr class="separator:ac22bba2c9ede8f0193e53da0ddb11b42"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7e060035a125f3471054ec7efbf60067"><td class="memItemLeft" align="right" valign="top">string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_smpc_configuration.html#a7e060035a125f3471054ec7efbf60067">getPathToScenarioTree</a> ()</td></tr>
+<tr class="separator:a7e060035a125f3471054ec7efbf60067"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1b4bb429ba5f703fa717b1bbaab424f5"><td class="memItemLeft" align="right" valign="top">string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_smpc_configuration.html#a1b4bb429ba5f703fa717b1bbaab424f5">getPathToForecaster</a> ()</td></tr>
+<tr class="separator:a1b4bb429ba5f703fa717b1bbaab424f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4e9fd6f8806d89f9df825001e028eccd"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_smpc_configuration.html#a4e9fd6f8806d89f9df825001e028eccd">setCurrentState</a> ()</td></tr>
+<tr class="separator:a4e9fd6f8806d89f9df825001e028eccd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2195a3b0ebab95e357eef18e19b1cecc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_smpc_configuration.html#a2195a3b0ebab95e357eef18e19b1cecc">setPreviousControl</a> ()</td></tr>
+<tr class="separator:a2195a3b0ebab95e357eef18e19b1cecc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad52533957da300587a86c9170d5c528b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_smpc_configuration.html#ad52533957da300587a86c9170d5c528b">setPreviousDemand</a> ()</td></tr>
+<tr class="separator:ad52533957da300587a86c9170d5c528b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a60b293185dfc095544156e0f2f4d3f0c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_smpc_configuration.html#a60b293185dfc095544156e0f2f4d3f0c">setCurrentState</a> (<a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> *state)</td></tr>
+<tr class="separator:a60b293185dfc095544156e0f2f4d3f0c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae8adfb9676f042813162dae68d141e49"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_smpc_configuration.html#ae8adfb9676f042813162dae68d141e49">setPreviousControl</a> (<a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> *control)</td></tr>
+<tr class="separator:ae8adfb9676f042813162dae68d141e49"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeabcb9fb328380a69240f69df14638ca"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_smpc_configuration.html#aeabcb9fb328380a69240f69df14638ca">setpreviousdemand</a> (<a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> *demand)</td></tr>
+<tr class="separator:aeabcb9fb328380a69240f69df14638ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7a9e420bb857a1876a1cfa9926a9e993"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_smpc_configuration.html#a7a9e420bb857a1876a1cfa9926a9e993">~SmpcConfiguration</a> ()</td></tr>
 <tr class="separator:a7a9e420bb857a1876a1cfa9926a9e993"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-attribs"></a>
-Private Attributes</h2></td></tr>
-<tr class="memitem:abd7bedfecf3130ec3b9d0c089fef1819"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a6c06fdeafc128178f45859699c0fc09b">uint_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_smpc_configuration.html#abd7bedfecf3130ec3b9d0c089fef1819">NX</a></td></tr>
-<tr class="separator:abd7bedfecf3130ec3b9d0c089fef1819"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7a027f03786558f497ebec90367eba76"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a6c06fdeafc128178f45859699c0fc09b">uint_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_smpc_configuration.html#a7a027f03786558f497ebec90367eba76">NU</a></td></tr>
-<tr class="separator:a7a027f03786558f497ebec90367eba76"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3bb6c6f7c2af11b316211ba0c3ca983f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a6c06fdeafc128178f45859699c0fc09b">uint_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_smpc_configuration.html#a3bb6c6f7c2af11b316211ba0c3ca983f">ND</a></td></tr>
-<tr class="separator:a3bb6c6f7c2af11b316211ba0c3ca983f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a57d94c1f39c37c375c4803f9c1abc9ba"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a6c06fdeafc128178f45859699c0fc09b">uint_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_smpc_configuration.html#a57d94c1f39c37c375c4803f9c1abc9ba">NV</a></td></tr>
-<tr class="separator:a57d94c1f39c37c375c4803f9c1abc9ba"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4ebb2294f1a6cc71d95b931924b4c57d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_smpc_configuration.html#a4ebb2294f1a6cc71d95b931924b4c57d">matL</a></td></tr>
-<tr class="separator:a4ebb2294f1a6cc71d95b931924b4c57d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a546f3a89dc1f325b7709ff1b0868f086"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_smpc_configuration.html#a546f3a89dc1f325b7709ff1b0868f086">matLhat</a></td></tr>
-<tr class="separator:a546f3a89dc1f325b7709ff1b0868f086"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a95d85e5077e2a48c203855a7a1e56d1a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_smpc_configuration.html#a95d85e5077e2a48c203855a7a1e56d1a">matCostW</a></td></tr>
-<tr class="separator:a95d85e5077e2a48c203855a7a1e56d1a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a96ca2c8d99bc28f06b51a328bcd439db"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_smpc_configuration.html#a96ca2c8d99bc28f06b51a328bcd439db">penaltyStateX</a></td></tr>
-<tr class="separator:a96ca2c8d99bc28f06b51a328bcd439db"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a46ba06845526609c6d0235bc23e13409"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_smpc_configuration.html#a46ba06845526609c6d0235bc23e13409">penaltySafetyX</a></td></tr>
-<tr class="separator:a46ba06845526609c6d0235bc23e13409"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acaf200d7d1998afeb9c4dd3ddf235678"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_smpc_configuration.html#acaf200d7d1998afeb9c4dd3ddf235678">matDiagPrecnd</a></td></tr>
-<tr class="separator:acaf200d7d1998afeb9c4dd3ddf235678"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac3af5d23beec985191a37ce05984c598"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_smpc_configuration.html#ac3af5d23beec985191a37ce05984c598">currentX</a></td></tr>
-<tr class="separator:ac3af5d23beec985191a37ce05984c598"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2de7ad6cd6e8bbf867b2bb9fda4446a8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_smpc_configuration.html#a2de7ad6cd6e8bbf867b2bb9fda4446a8">prevUhat</a></td></tr>
-<tr class="separator:a2de7ad6cd6e8bbf867b2bb9fda4446a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3cb3633357a3dd6a14b9cdbfc7307abf"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_smpc_configuration.html#a3cb3633357a3dd6a14b9cdbfc7307abf">prevV</a></td></tr>
-<tr class="separator:a3cb3633357a3dd6a14b9cdbfc7307abf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a899e6f6410a1f08e3598f0608b15aa74"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_smpc_configuration.html#a899e6f6410a1f08e3598f0608b15aa74">prevU</a></td></tr>
-<tr class="separator:a899e6f6410a1f08e3598f0608b15aa74"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abd7ed86cabb8a427e0abd628d88e485d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_smpc_configuration.html#abd7ed86cabb8a427e0abd628d88e485d">stepSize</a></td></tr>
-<tr class="separator:abd7ed86cabb8a427e0abd628d88e485d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0e832dceeac6d461d4e48e3f2d78b20c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a6c06fdeafc128178f45859699c0fc09b">uint_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_smpc_configuration.html#a0e832dceeac6d461d4e48e3f2d78b20c">maxIteration</a></td></tr>
-<tr class="separator:a0e832dceeac6d461d4e48e3f2d78b20c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="ad71684af7ce94a0f9e3e1863eb203f64"></a>
@@ -219,15 +202,6 @@ Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Smooth operation cost matrix </p>
 
-<p><div class="dynheader">
-Here is the caller graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="class_smpc_configuration_aae941e0602a6eaef8e4b738b9c50bc77_icgraph.png" border="0" usemap="#class_smpc_configuration_aae941e0602a6eaef8e4b738b9c50bc77_icgraph" alt=""/></div>
-<map name="class_smpc_configuration_aae941e0602a6eaef8e4b738b9c50bc77_icgraph" id="class_smpc_configuration_aae941e0602a6eaef8e4b738b9c50bc77_icgraph">
-<area shape="rect" id="node2" href="class_engine.html#ac9d6cb7d673e625256bead5e786e65a5" title="Engine::initialiseSystem\lDevice" alt="" coords="195,5,357,46"/><area shape="rect" id="node3" href="class_engine.html#ad5b7316584c79e2db5dc5f785b0a652f" title="Engine::factorStep" alt="" coords="405,12,536,39"/></map>
-</div>
-</p>
-
 </div>
 </div>
 <a class="anchor" id="a96f1d20f109c0d8c165e447e368a657c"></a>
@@ -249,7 +223,7 @@ Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="class_smpc_configuration_a96f1d20f109c0d8c165e447e368a657c_icgraph.png" border="0" usemap="#class_smpc_configuration_a96f1d20f109c0d8c165e447e368a657c_icgraph" alt=""/></div>
 <map name="class_smpc_configuration_a96f1d20f109c0d8c165e447e368a657c_icgraph" id="class_smpc_configuration_a96f1d20f109c0d8c165e447e368a657c_icgraph">
-<area shape="rect" id="node2" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="195,12,402,39"/></map>
+<area shape="rect" id="node2" href="class_smpc_controller.html#ac11e4145e513a95a5114c7296a0416e1" title="SmpcController::initialise\lSmpcController" alt="" coords="195,54,362,96"/><area shape="rect" id="node6" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="883,138,1090,164"/><area shape="rect" id="node7" href="class_smpc_controller.html#a84fa9efe8b15742c929c0d274e479ff8" title="SmpcController::controlAction" alt="" coords="889,36,1085,63"/><area shape="rect" id="node3" href="main_8cu.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="1139,62,1189,88"/><area shape="rect" id="node4" href="class_smpc_controller.html#a232316a3ba52a6d397e8337c130c81c2" title="SmpcController::solveStep" alt="" coords="411,36,589,63"/><area shape="rect" id="node5" href="class_smpc_controller.html#a504a73b33ca1704bc0e743006ef71dae" title="SmpcController::algorithmApg" alt="" coords="638,36,834,63"/></map>
 </div>
 </p>
 
@@ -269,15 +243,6 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 <p>Affine space representation for the control-disturbance equality </p>
 
-<p><div class="dynheader">
-Here is the caller graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="class_smpc_configuration_a8c33dc3a1fc9889c4ff43cbc74f72983_icgraph.png" border="0" usemap="#class_smpc_configuration_a8c33dc3a1fc9889c4ff43cbc74f72983_icgraph" alt=""/></div>
-<map name="class_smpc_configuration_a8c33dc3a1fc9889c4ff43cbc74f72983_icgraph" id="class_smpc_configuration_a8c33dc3a1fc9889c4ff43cbc74f72983_icgraph">
-<area shape="rect" id="node2" href="class_engine.html#ac9d6cb7d673e625256bead5e786e65a5" title="Engine::initialiseSystem\lDevice" alt="" coords="195,5,357,46"/><area shape="rect" id="node3" href="class_engine.html#ad5b7316584c79e2db5dc5f785b0a652f" title="Engine::factorStep" alt="" coords="405,12,536,39"/></map>
-</div>
-</p>
-
 </div>
 </div>
 <a class="anchor" id="a051e98c0598e2b6d1da92322faf223d0"></a>
@@ -294,15 +259,6 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 <p>matrix to calculate the particular solution </p>
 
-<p><div class="dynheader">
-Here is the caller graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="class_smpc_configuration_a051e98c0598e2b6d1da92322faf223d0_icgraph.png" border="0" usemap="#class_smpc_configuration_a051e98c0598e2b6d1da92322faf223d0_icgraph" alt=""/></div>
-<map name="class_smpc_configuration_a051e98c0598e2b6d1da92322faf223d0_icgraph" id="class_smpc_configuration_a051e98c0598e2b6d1da92322faf223d0_icgraph">
-<area shape="rect" id="node2" href="class_engine.html#ac9d6cb7d673e625256bead5e786e65a5" title="Engine::initialiseSystem\lDevice" alt="" coords="195,5,357,46"/><area shape="rect" id="node3" href="class_engine.html#ad5b7316584c79e2db5dc5f785b0a652f" title="Engine::factorStep" alt="" coords="405,12,536,39"/></map>
-</div>
-</p>
-
 </div>
 </div>
 <a class="anchor" id="acca2836baa19e65573dec836ff69a3d2"></a>
@@ -318,15 +274,6 @@ Here is the caller graph for this function:</div>
       </table>
 </div><div class="memdoc">
 <p>Diagonal preconditioner used </p>
-
-<p><div class="dynheader">
-Here is the caller graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="class_smpc_configuration_acca2836baa19e65573dec836ff69a3d2_icgraph.png" border="0" usemap="#class_smpc_configuration_acca2836baa19e65573dec836ff69a3d2_icgraph" alt=""/></div>
-<map name="class_smpc_configuration_acca2836baa19e65573dec836ff69a3d2_icgraph" id="class_smpc_configuration_acca2836baa19e65573dec836ff69a3d2_icgraph">
-<area shape="rect" id="node2" href="class_engine.html#ac9d6cb7d673e625256bead5e786e65a5" title="Engine::initialiseSystem\lDevice" alt="" coords="195,5,357,46"/><area shape="rect" id="node3" href="class_engine.html#ad5b7316584c79e2db5dc5f785b0a652f" title="Engine::factorStep" alt="" coords="405,12,536,39"/></map>
-</div>
-</p>
 
 </div>
 </div>
@@ -349,7 +296,7 @@ Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="class_smpc_configuration_a64420f0c5283378173041ca6158e2003_icgraph.png" border="0" usemap="#class_smpc_configuration_a64420f0c5283378173041ca6158e2003_icgraph" alt=""/></div>
 <map name="class_smpc_configuration_a64420f0c5283378173041ca6158e2003_icgraph" id="class_smpc_configuration_a64420f0c5283378173041ca6158e2003_icgraph">
-<area shape="rect" id="node2" href="class_smpc_controller.html#a70ecfdd41c38a5c4de76155f30f6b0c1" title="SmpcController::algorithmApg" alt="" coords="195,12,391,39"/><area shape="rect" id="node3" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="441,12,647,39"/></map>
+<area shape="rect" id="node2" href="class_smpc_controller.html#a42d20e6dd18dfcaf63ddf484fc8c7813" title="SmpcController::SmpcController" alt="" coords="195,5,405,32"/><area shape="rect" id="node3" href="class_smpc_controller.html#a504a73b33ca1704bc0e743006ef71dae" title="SmpcController::algorithmApg" alt="" coords="202,56,398,83"/><area shape="rect" id="node4" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="454,31,661,57"/><area shape="rect" id="node5" href="class_smpc_controller.html#a84fa9efe8b15742c929c0d274e479ff8" title="SmpcController::controlAction" alt="" coords="459,81,655,108"/><area shape="rect" id="node6" href="main_8cu.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="709,81,760,108"/></map>
 </div>
 </p>
 
@@ -369,6 +316,15 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 <p>Dimension of the demand </p>
 
+<p><div class="dynheader">
+Here is the caller graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="class_smpc_configuration_a74bd0375cbd932c2fe432532b2a6ec7d_icgraph.png" border="0" usemap="#class_smpc_configuration_a74bd0375cbd932c2fe432532b2a6ec7d_icgraph" alt=""/></div>
+<map name="class_smpc_configuration_a74bd0375cbd932c2fe432532b2a6ec7d_icgraph" id="class_smpc_configuration_a74bd0375cbd932c2fe432532b2a6ec7d_icgraph">
+<area shape="rect" id="node2" href="class_smpc_controller.html#a229632c8f9ae24dc8955688d677a6e13" title="SmpcController::updateSmpc\lConfiguration" alt="" coords="195,5,389,46"/></map>
+</div>
+</p>
+
 </div>
 </div>
 <a class="anchor" id="a003a0f69c7ecc13f1b0fcf76f419305d"></a>
@@ -384,6 +340,15 @@ Here is the caller graph for this function:</div>
       </table>
 </div><div class="memdoc">
 <p>Dimension of the control </p>
+
+<p><div class="dynheader">
+Here is the caller graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="class_smpc_configuration_a003a0f69c7ecc13f1b0fcf76f419305d_icgraph.png" border="0" usemap="#class_smpc_configuration_a003a0f69c7ecc13f1b0fcf76f419305d_icgraph" alt=""/></div>
+<map name="class_smpc_configuration_a003a0f69c7ecc13f1b0fcf76f419305d_icgraph" id="class_smpc_configuration_a003a0f69c7ecc13f1b0fcf76f419305d_icgraph">
+<area shape="rect" id="node2" href="class_smpc_controller.html#a84fa9efe8b15742c929c0d274e479ff8" title="SmpcController::controlAction" alt="" coords="443,5,639,32"/><area shape="rect" id="node4" href="class_smpc_controller.html#a229632c8f9ae24dc8955688d677a6e13" title="SmpcController::updateSmpc\lConfiguration" alt="" coords="195,42,389,83"/><area shape="rect" id="node5" href="class_smpc_controller.html#a69a259598ed5f16388221f8bb0ef438f" title="SmpcController::updateKpi" alt="" coords="203,108,381,135"/><area shape="rect" id="node3" href="main_8cu.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="693,43,744,69"/><area shape="rect" id="node6" href="class_smpc_controller.html#a3d02dd634603e096fc5f8e8940ace333" title="SmpcController::moveForeward\lInTime" alt="" coords="438,71,645,113"/></map>
+</div>
+</p>
 
 </div>
 </div>
@@ -406,7 +371,7 @@ Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="class_smpc_configuration_a31dc27fe4c16453cea0f451e58c33879_icgraph.png" border="0" usemap="#class_smpc_configuration_a31dc27fe4c16453cea0f451e58c33879_icgraph" alt=""/></div>
 <map name="class_smpc_configuration_a31dc27fe4c16453cea0f451e58c33879_icgraph" id="class_smpc_configuration_a31dc27fe4c16453cea0f451e58c33879_icgraph">
-<area shape="rect" id="node2" href="class_engine.html#a2b0c9788f08eb0d6e5cd5d144f5581a3" title="Engine::Engine" alt="" coords="507,26,618,52"/><area shape="rect" id="node3" href="class_engine.html#a1f5af029bce4d3dadc6944fdd3391040" title="Engine::allocateSystemDevice" alt="" coords="199,51,401,78"/><area shape="rect" id="node4" href="class_engine.html#ac9d6cb7d673e625256bead5e786e65a5" title="Engine::initialiseSystem\lDevice" alt="" coords="219,102,381,144"/><area shape="rect" id="node5" href="class_engine.html#ad5b7316584c79e2db5dc5f785b0a652f" title="Engine::factorStep" alt="" coords="497,135,628,162"/><area shape="rect" id="node6" href="class_engine.html#a95cf720a3b184710ed0e3b3808634c68" title="Engine::eliminateInputDistubance\lCoupling" alt="" coords="454,212,671,253"/><area shape="rect" id="node8" href="class_engine.html#a65ca7aceb59bd64433a12694334d14ab" title="Engine::updateStateControl" alt="" coords="471,278,654,304"/><area shape="rect" id="node9" href="class_smpc_controller.html#a42d20e6dd18dfcaf63ddf484fc8c7813" title="SmpcController::SmpcController" alt="" coords="195,320,405,347"/><area shape="rect" id="node10" href="class_smpc_controller.html#a232316a3ba52a6d397e8337c130c81c2" title="SmpcController::solveStep" alt="" coords="211,371,389,398"/><area shape="rect" id="node7" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="721,278,927,304"/><area shape="rect" id="node11" href="class_smpc_controller.html#a70ecfdd41c38a5c4de76155f30f6b0c1" title="SmpcController::algorithmApg" alt="" coords="465,350,661,376"/></map>
+<area shape="rect" id="node2" href="class_engine.html#a2b0c9788f08eb0d6e5cd5d144f5581a3" title="Engine::Engine" alt="" coords="249,5,359,32"/><area shape="rect" id="node3" href="class_engine.html#ad5b7316584c79e2db5dc5f785b0a652f" title="Engine::factorStep" alt="" coords="239,123,369,149"/><area shape="rect" id="node6" href="class_smpc_controller.html#a232316a3ba52a6d397e8337c130c81c2" title="SmpcController::solveStep" alt="" coords="677,157,856,184"/><area shape="rect" id="node10" href="class_engine.html#a95cf720a3b184710ed0e3b3808634c68" title="Engine::eliminateInputDistubance\lCoupling" alt="" coords="195,57,413,98"/><area shape="rect" id="node11" href="class_engine.html#a3fbf653bed9c13fc441fb19cc464405c" title="Engine::updateStateControl" alt="" coords="213,173,395,200"/><area shape="rect" id="node12" href="class_smpc_controller.html#a42d20e6dd18dfcaf63ddf484fc8c7813" title="SmpcController::SmpcController" alt="" coords="199,325,409,352"/><area shape="rect" id="node4" href="class_smpc_controller.html#ac11e4145e513a95a5114c7296a0416e1" title="SmpcController::initialise\lSmpcController" alt="" coords="462,107,629,149"/><area shape="rect" id="node5" href="main_8cu.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="1405,35,1456,61"/><area shape="rect" id="node7" href="class_smpc_controller.html#a504a73b33ca1704bc0e743006ef71dae" title="SmpcController::algorithmApg" alt="" coords="905,115,1101,141"/><area shape="rect" id="node8" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="1150,64,1357,91"/><area shape="rect" id="node9" href="class_smpc_controller.html#a84fa9efe8b15742c929c0d274e479ff8" title="SmpcController::controlAction" alt="" coords="1155,140,1351,167"/></map>
 </div>
 </p>
 
@@ -425,6 +390,102 @@ Here is the caller graph for this function:</div>
       </table>
 </div><div class="memdoc">
 <p>&mdash;GETTER'S FOR CONTROLLER CONFIGURATION&mdash; Dimension of the state </p>
+
+<p><div class="dynheader">
+Here is the caller graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="class_smpc_configuration_aaf5023ccaed6be1b5f738fe62216cdee_icgraph.png" border="0" usemap="#class_smpc_configuration_aaf5023ccaed6be1b5f738fe62216cdee_icgraph" alt=""/></div>
+<map name="class_smpc_configuration_aaf5023ccaed6be1b5f738fe62216cdee_icgraph" id="class_smpc_configuration_aaf5023ccaed6be1b5f738fe62216cdee_icgraph">
+<area shape="rect" id="node2" href="class_smpc_controller.html#a229632c8f9ae24dc8955688d677a6e13" title="SmpcController::updateSmpc\lConfiguration" alt="" coords="195,5,389,46"/><area shape="rect" id="node3" href="class_smpc_controller.html#a69a259598ed5f16388221f8bb0ef438f" title="SmpcController::updateKpi" alt="" coords="203,71,381,97"/><area shape="rect" id="node6" href="class_smpc_controller.html#ac9f531f272e075ee7b5ad7e97df5e7bd" title="SmpcController::getNetworkKpi" alt="" coords="438,127,645,153"/><area shape="rect" id="node4" href="class_smpc_controller.html#a3d02dd634603e096fc5f8e8940ace333" title="SmpcController::moveForeward\lInTime" alt="" coords="438,61,645,102"/><area shape="rect" id="node5" href="main_8cu.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="693,97,744,124"/></map>
+</div>
+</p>
+
+</div>
+</div>
+<a class="anchor" id="ab65a1c02c305d0615245f09c1ca57d28"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">string SmpcConfiguration::getPathToControllerConfig </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a1b4bb429ba5f703fa717b1bbaab424f5"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">string SmpcConfiguration::getPathToForecaster </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p><div class="dynheader">
+Here is the caller graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="class_smpc_configuration_a1b4bb429ba5f703fa717b1bbaab424f5_icgraph.png" border="0" usemap="#class_smpc_configuration_a1b4bb429ba5f703fa717b1bbaab424f5_icgraph" alt=""/></div>
+<map name="class_smpc_configuration_a1b4bb429ba5f703fa717b1bbaab424f5_icgraph" id="class_smpc_configuration_a1b4bb429ba5f703fa717b1bbaab424f5_icgraph">
+<area shape="rect" id="node2" href="class_smpc_controller.html#a9972a4e2f7f4a90c190cded75af1ae00" title="SmpcController::SmpcController" alt="" coords="197,12,408,39"/></map>
+</div>
+</p>
+
+</div>
+</div>
+<a class="anchor" id="ac22bba2c9ede8f0193e53da0ddb11b42"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">string SmpcConfiguration::getPathToNetwork </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p><div class="dynheader">
+Here is the caller graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="class_smpc_configuration_ac22bba2c9ede8f0193e53da0ddb11b42_icgraph.png" border="0" usemap="#class_smpc_configuration_ac22bba2c9ede8f0193e53da0ddb11b42_icgraph" alt=""/></div>
+<map name="class_smpc_configuration_ac22bba2c9ede8f0193e53da0ddb11b42_icgraph" id="class_smpc_configuration_ac22bba2c9ede8f0193e53da0ddb11b42_icgraph">
+<area shape="rect" id="node2" href="class_engine.html#a11fe987ffffd721d8cefeec7f762881e" title="Engine::Engine" alt="" coords="195,12,306,39"/></map>
+</div>
+</p>
+
+</div>
+</div>
+<a class="anchor" id="a7e060035a125f3471054ec7efbf60067"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">string SmpcConfiguration::getPathToScenarioTree </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p><div class="dynheader">
+Here is the caller graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="class_smpc_configuration_a7e060035a125f3471054ec7efbf60067_icgraph.png" border="0" usemap="#class_smpc_configuration_a7e060035a125f3471054ec7efbf60067_icgraph" alt=""/></div>
+<map name="class_smpc_configuration_a7e060035a125f3471054ec7efbf60067_icgraph" id="class_smpc_configuration_a7e060035a125f3471054ec7efbf60067_icgraph">
+<area shape="rect" id="node2" href="class_engine.html#a11fe987ffffd721d8cefeec7f762881e" title="Engine::Engine" alt="" coords="214,12,325,39"/></map>
+</div>
+</p>
 
 </div>
 </div>
@@ -447,7 +508,7 @@ Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="class_smpc_configuration_ae3486c795186d96806c8ad7aac57b67a_icgraph.png" border="0" usemap="#class_smpc_configuration_ae3486c795186d96806c8ad7aac57b67a_icgraph" alt=""/></div>
 <map name="class_smpc_configuration_ae3486c795186d96806c8ad7aac57b67a_icgraph" id="class_smpc_configuration_ae3486c795186d96806c8ad7aac57b67a_icgraph">
-<area shape="rect" id="node2" href="class_smpc_controller.html#ad477241e6c34e5db46e6ec00c16ddeab" title="SmpcController::proximalFunG" alt="" coords="195,12,397,39"/><area shape="rect" id="node3" href="class_smpc_controller.html#a70ecfdd41c38a5c4de76155f30f6b0c1" title="SmpcController::algorithmApg" alt="" coords="446,12,642,39"/><area shape="rect" id="node4" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="691,12,898,39"/></map>
+<area shape="rect" id="node2" href="class_smpc_controller.html#ad477241e6c34e5db46e6ec00c16ddeab" title="SmpcController::proximalFunG" alt="" coords="195,31,397,57"/><area shape="rect" id="node3" href="class_smpc_controller.html#a504a73b33ca1704bc0e743006ef71dae" title="SmpcController::algorithmApg" alt="" coords="446,31,642,57"/><area shape="rect" id="node4" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="691,5,898,32"/><area shape="rect" id="node5" href="class_smpc_controller.html#a84fa9efe8b15742c929c0d274e479ff8" title="SmpcController::controlAction" alt="" coords="697,56,893,83"/><area shape="rect" id="node6" href="main_8cu.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="947,56,997,83"/></map>
 </div>
 </p>
 
@@ -472,7 +533,32 @@ Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="class_smpc_configuration_a7dc9f1021869ff57ba65e7c38a4ca717_icgraph.png" border="0" usemap="#class_smpc_configuration_a7dc9f1021869ff57ba65e7c38a4ca717_icgraph" alt=""/></div>
 <map name="class_smpc_configuration_a7dc9f1021869ff57ba65e7c38a4ca717_icgraph" id="class_smpc_configuration_a7dc9f1021869ff57ba65e7c38a4ca717_icgraph">
-<area shape="rect" id="node2" href="class_smpc_controller.html#ad477241e6c34e5db46e6ec00c16ddeab" title="SmpcController::proximalFunG" alt="" coords="195,12,397,39"/><area shape="rect" id="node3" href="class_smpc_controller.html#a70ecfdd41c38a5c4de76155f30f6b0c1" title="SmpcController::algorithmApg" alt="" coords="446,12,642,39"/><area shape="rect" id="node4" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="691,12,898,39"/></map>
+<area shape="rect" id="node2" href="class_smpc_controller.html#ad477241e6c34e5db46e6ec00c16ddeab" title="SmpcController::proximalFunG" alt="" coords="195,31,397,57"/><area shape="rect" id="node3" href="class_smpc_controller.html#a504a73b33ca1704bc0e743006ef71dae" title="SmpcController::algorithmApg" alt="" coords="446,31,642,57"/><area shape="rect" id="node4" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="691,5,898,32"/><area shape="rect" id="node5" href="class_smpc_controller.html#a84fa9efe8b15742c929c0d274e479ff8" title="SmpcController::controlAction" alt="" coords="697,56,893,83"/><area shape="rect" id="node6" href="main_8cu.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="947,56,997,83"/></map>
+</div>
+</p>
+
+</div>
+</div>
+<a class="anchor" id="a828c65ae23c33e3e9162a5d7cb5db1e8"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> * SmpcConfiguration::getPrevDemand </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Previous demand </p>
+
+<p><div class="dynheader">
+Here is the caller graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="class_smpc_configuration_a828c65ae23c33e3e9162a5d7cb5db1e8_icgraph.png" border="0" usemap="#class_smpc_configuration_a828c65ae23c33e3e9162a5d7cb5db1e8_icgraph" alt=""/></div>
+<map name="class_smpc_configuration_a828c65ae23c33e3e9162a5d7cb5db1e8_icgraph" id="class_smpc_configuration_a828c65ae23c33e3e9162a5d7cb5db1e8_icgraph">
+<area shape="rect" id="node2" href="class_smpc_controller.html#ac11e4145e513a95a5114c7296a0416e1" title="SmpcController::initialise\lSmpcController" alt="" coords="195,54,362,96"/><area shape="rect" id="node6" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="883,138,1090,164"/><area shape="rect" id="node7" href="class_smpc_controller.html#a84fa9efe8b15742c929c0d274e479ff8" title="SmpcController::controlAction" alt="" coords="889,36,1085,63"/><area shape="rect" id="node3" href="main_8cu.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="1139,62,1189,88"/><area shape="rect" id="node4" href="class_smpc_controller.html#a232316a3ba52a6d397e8337c130c81c2" title="SmpcController::solveStep" alt="" coords="411,36,589,63"/><area shape="rect" id="node5" href="class_smpc_controller.html#a504a73b33ca1704bc0e743006ef71dae" title="SmpcController::algorithmApg" alt="" coords="638,36,834,63"/></map>
 </div>
 </p>
 
@@ -497,57 +583,7 @@ Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="class_smpc_configuration_a9b6dadf8c3d99cbd7326c60939d99d17_icgraph.png" border="0" usemap="#class_smpc_configuration_a9b6dadf8c3d99cbd7326c60939d99d17_icgraph" alt=""/></div>
 <map name="class_smpc_configuration_a9b6dadf8c3d99cbd7326c60939d99d17_icgraph" id="class_smpc_configuration_a9b6dadf8c3d99cbd7326c60939d99d17_icgraph">
-<area shape="rect" id="node2" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="195,12,402,39"/></map>
-</div>
-</p>
-
-</div>
-</div>
-<a class="anchor" id="a7ad72bc8f8642f7dff806feceb32cf80"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> * SmpcConfiguration::getPrevUhat </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Previous particular solution based on the previous control </p>
-
-<p><div class="dynheader">
-Here is the caller graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="class_smpc_configuration_a7ad72bc8f8642f7dff806feceb32cf80_icgraph.png" border="0" usemap="#class_smpc_configuration_a7ad72bc8f8642f7dff806feceb32cf80_icgraph" alt=""/></div>
-<map name="class_smpc_configuration_a7ad72bc8f8642f7dff806feceb32cf80_icgraph" id="class_smpc_configuration_a7ad72bc8f8642f7dff806feceb32cf80_icgraph">
-<area shape="rect" id="node2" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="195,12,402,39"/></map>
-</div>
-</p>
-
-</div>
-</div>
-<a class="anchor" id="a26f74f74f0915b1966ee9a5c9d459540"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> * SmpcConfiguration::getPrevV </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Previous reduced control in the reduced spaces </p>
-
-<p><div class="dynheader">
-Here is the caller graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="class_smpc_configuration_a26f74f74f0915b1966ee9a5c9d459540_icgraph.png" border="0" usemap="#class_smpc_configuration_a26f74f74f0915b1966ee9a5c9d459540_icgraph" alt=""/></div>
-<map name="class_smpc_configuration_a26f74f74f0915b1966ee9a5c9d459540_icgraph" id="class_smpc_configuration_a26f74f74f0915b1966ee9a5c9d459540_icgraph">
-<area shape="rect" id="node2" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="195,12,402,39"/></map>
+<area shape="rect" id="node2" href="class_smpc_controller.html#ac11e4145e513a95a5114c7296a0416e1" title="SmpcController::initialise\lSmpcController" alt="" coords="195,123,362,165"/><area shape="rect" id="node6" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="894,199,1101,225"/><area shape="rect" id="node7" href="class_smpc_controller.html#a84fa9efe8b15742c929c0d274e479ff8" title="SmpcController::controlAction" alt="" coords="899,72,1095,99"/><area shape="rect" id="node8" href="class_smpc_controller.html#a69a259598ed5f16388221f8bb0ef438f" title="SmpcController::updateKpi" alt="" coords="411,17,589,44"/><area shape="rect" id="node3" href="main_8cu.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="1149,72,1200,99"/><area shape="rect" id="node4" href="class_smpc_controller.html#a232316a3ba52a6d397e8337c130c81c2" title="SmpcController::solveStep" alt="" coords="411,173,589,200"/><area shape="rect" id="node5" href="class_smpc_controller.html#a504a73b33ca1704bc0e743006ef71dae" title="SmpcController::algorithmApg" alt="" coords="643,173,839,200"/><area shape="rect" id="node9" href="class_smpc_controller.html#a3d02dd634603e096fc5f8e8940ace333" title="SmpcController::moveForeward\lInTime" alt="" coords="638,6,845,47"/></map>
 </div>
 </p>
 
@@ -578,340 +614,154 @@ Here is the caller graph for this function:</div>
 
 </div>
 </div>
-<h2 class="groupheader">Member Data Documentation</h2>
-<a class="anchor" id="ac3af5d23beec985191a37ce05984c598"></a>
+<a class="anchor" id="a4e9fd6f8806d89f9df825001e028eccd"></a>
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a>* SmpcConfiguration::currentX</td>
+          <td class="memname">void SmpcConfiguration::setCurrentState </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
-<p>Current water level of the tanks </p>
+<p>SETTER'S FOR THE CONTROLLER CONFIGURATION OBJECT </p>
+
+<p><div class="dynheader">
+Here is the caller graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="class_smpc_configuration_a4e9fd6f8806d89f9df825001e028eccd_icgraph.png" border="0" usemap="#class_smpc_configuration_a4e9fd6f8806d89f9df825001e028eccd_icgraph" alt=""/></div>
+<map name="class_smpc_configuration_a4e9fd6f8806d89f9df825001e028eccd_icgraph" id="class_smpc_configuration_a4e9fd6f8806d89f9df825001e028eccd_icgraph">
+<area shape="rect" id="node2" href="class_smpc_controller.html#a3d02dd634603e096fc5f8e8940ace333" title="SmpcController::moveForeward\lInTime" alt="" coords="195,5,402,46"/><area shape="rect" id="node3" href="main_8cu.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="451,12,501,39"/></map>
+</div>
+</p>
 
 </div>
 </div>
-<a class="anchor" id="a95d85e5077e2a48c203855a7a1e56d1a"></a>
+<a class="anchor" id="a60b293185dfc095544156e0f2f4d3f0c"></a>
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a>* SmpcConfiguration::matCostW</td>
+          <td class="memname">void SmpcConfiguration::setCurrentState </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> *&#160;</td>
+          <td class="paramname"><em>state</em></td><td>)</td>
+          <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
-<p>Smooth operation, penalise the change of control </p>
+<p>update the level in the tanks </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">state</td><td>updated state </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
-<a class="anchor" id="acaf200d7d1998afeb9c4dd3ddf235678"></a>
+<a class="anchor" id="a2195a3b0ebab95e357eef18e19b1cecc"></a>
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a>* SmpcConfiguration::matDiagPrecnd</td>
+          <td class="memname">void SmpcConfiguration::setPreviousControl </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
-<p>TODO should be calculated by the controller diagonal precondition matrix. Just have the diagonal elements of the precondition matrix of the single scenario </p>
+
+<p><div class="dynheader">
+Here is the caller graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="class_smpc_configuration_a2195a3b0ebab95e357eef18e19b1cecc_icgraph.png" border="0" usemap="#class_smpc_configuration_a2195a3b0ebab95e357eef18e19b1cecc_icgraph" alt=""/></div>
+<map name="class_smpc_configuration_a2195a3b0ebab95e357eef18e19b1cecc_icgraph" id="class_smpc_configuration_a2195a3b0ebab95e357eef18e19b1cecc_icgraph">
+<area shape="rect" id="node2" href="class_smpc_controller.html#a3d02dd634603e096fc5f8e8940ace333" title="SmpcController::moveForeward\lInTime" alt="" coords="195,5,402,46"/><area shape="rect" id="node3" href="main_8cu.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="451,12,501,39"/></map>
+</div>
+</p>
 
 </div>
 </div>
-<a class="anchor" id="a4ebb2294f1a6cc71d95b931924b4c57d"></a>
+<a class="anchor" id="ae8adfb9676f042813162dae68d141e49"></a>
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a>* SmpcConfiguration::matL</td>
+          <td class="memname">void SmpcConfiguration::setPreviousControl </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> *&#160;</td>
+          <td class="paramname"><em>control</em></td><td>)</td>
+          <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
-<p>TODO should be calculated by the controller Affine subspace for the control-disturbance coupling </p>
+<p>update the previous control actions </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">control</td><td>previous control action </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
-<a class="anchor" id="a546f3a89dc1f325b7709ff1b0868f086"></a>
+<a class="anchor" id="ad52533957da300587a86c9170d5c528b"></a>
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a>* SmpcConfiguration::matLhat</td>
+          <td class="memname">void SmpcConfiguration::setPreviousDemand </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
-<p>TODO should be calculated by the controller Matrix to calculate the particular solution </p>
+
+<p><div class="dynheader">
+Here is the caller graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="class_smpc_configuration_ad52533957da300587a86c9170d5c528b_icgraph.png" border="0" usemap="#class_smpc_configuration_ad52533957da300587a86c9170d5c528b_icgraph" alt=""/></div>
+<map name="class_smpc_configuration_ad52533957da300587a86c9170d5c528b_icgraph" id="class_smpc_configuration_ad52533957da300587a86c9170d5c528b_icgraph">
+<area shape="rect" id="node2" href="class_smpc_controller.html#a3d02dd634603e096fc5f8e8940ace333" title="SmpcController::moveForeward\lInTime" alt="" coords="195,5,402,46"/><area shape="rect" id="node3" href="main_8cu.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="451,12,501,39"/></map>
+</div>
+</p>
 
 </div>
 </div>
-<a class="anchor" id="a0e832dceeac6d461d4e48e3f2d78b20c"></a>
+<a class="anchor" id="aeabcb9fb328380a69240f69df14638ca"></a>
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="_configuration_8h.html#a6c06fdeafc128178f45859699c0fc09b">uint_t</a> SmpcConfiguration::maxIteration</td>
+          <td class="memname">void SmpcConfiguration::setpreviousdemand </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> *&#160;</td>
+          <td class="paramname"><em>demand</em></td><td>)</td>
+          <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
-<p>maximum number of iterations of the APG algorithm </p>
+<p>update the previous demand </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">demand</td><td>previous demand </td></tr>
+  </table>
+  </dd>
+</dl>
 
+<p><div class="dynheader">
+Here is the caller graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="class_smpc_configuration_aeabcb9fb328380a69240f69df14638ca_icgraph.png" border="0" usemap="#class_smpc_configuration_aeabcb9fb328380a69240f69df14638ca_icgraph" alt=""/></div>
+<map name="class_smpc_configuration_aeabcb9fb328380a69240f69df14638ca_icgraph" id="class_smpc_configuration_aeabcb9fb328380a69240f69df14638ca_icgraph">
+<area shape="rect" id="node2" href="class_smpc_controller.html#a3d02dd634603e096fc5f8e8940ace333" title="SmpcController::moveForeward\lInTime" alt="" coords="195,5,402,46"/><area shape="rect" id="node3" href="main_8cu.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="451,12,501,39"/></map>
 </div>
-</div>
-<a class="anchor" id="a3bb6c6f7c2af11b316211ba0c3ca983f"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_configuration_8h.html#a6c06fdeafc128178f45859699c0fc09b">uint_t</a> SmpcConfiguration::ND</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Number of demand nodes </p>
-
-</div>
-</div>
-<a class="anchor" id="a7a027f03786558f497ebec90367eba76"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_configuration_8h.html#a6c06fdeafc128178f45859699c0fc09b">uint_t</a> SmpcConfiguration::NU</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Number of actuators </p>
-
-</div>
-</div>
-<a class="anchor" id="a57d94c1f39c37c375c4803f9c1abc9ba"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_configuration_8h.html#a6c06fdeafc128178f45859699c0fc09b">uint_t</a> SmpcConfiguration::NV</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Dimension of the control after eliminating the equality constraints </p>
-
-</div>
-</div>
-<a class="anchor" id="abd7bedfecf3130ec3b9d0c089fef1819"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_configuration_8h.html#a6c06fdeafc128178f45859699c0fc09b">uint_t</a> SmpcConfiguration::NX</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Number of tanks </p>
-
-</div>
-</div>
-<a class="anchor" id="a46ba06845526609c6d0235bc23e13409"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> SmpcConfiguration::penaltySafetyX</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Weight that penalise the safety volume of the tank </p>
-
-</div>
-</div>
-<a class="anchor" id="a96ca2c8d99bc28f06b51a328bcd439db"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> SmpcConfiguration::penaltyStateX</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Weight that penalise the constraints on the tank level </p>
-
-</div>
-</div>
-<a class="anchor" id="a899e6f6410a1f08e3598f0608b15aa74"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a>* SmpcConfiguration::prevU</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Previous control </p>
-
-</div>
-</div>
-<a class="anchor" id="a2de7ad6cd6e8bbf867b2bb9fda4446a8"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a>* SmpcConfiguration::prevUhat</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>TODO should be replaced and calculated directly in <a class="el" href="class_engine.html">Engine</a> previous control particular solution </p>
-
-</div>
-</div>
-<a class="anchor" id="a3cb3633357a3dd6a14b9cdbfc7307abf"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a>* SmpcConfiguration::prevV</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>TODO should be replaced and calculated directly in the <a class="el" href="class_engine.html">Engine</a> previous reduced control decision variable </p>
-
-</div>
-</div>
-<a class="anchor" id="abd7ed86cabb8a427e0abd628d88e485d"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> SmpcConfiguration::stepSize</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>stepsize for the APG </p>
+</p>
 
 </div>
 </div>
@@ -922,7 +772,7 @@ Here is the caller graph for this function:</div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Apr 11 2017 11:58:27 for APG by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu May 4 2017 02:03:32 for RapidNet by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

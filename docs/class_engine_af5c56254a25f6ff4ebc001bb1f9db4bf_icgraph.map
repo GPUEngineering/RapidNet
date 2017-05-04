@@ -1,9 +1,15 @@
 <map id="Engine::getDwnNetwork" name="Engine::getDwnNetwork">
 <area shape="rect" id="node2" href="$class_smpc_controller.html#a42d20e6dd18dfcaf63ddf484fc8c7813" title="SmpcController::SmpcController" alt="" coords="237,5,448,32"/>
 <area shape="rect" id="node3" href="$class_smpc_controller.html#a76c6c0b1d3307a9de26fa17ad2f37d72" title="SmpcController::dualExtrapolationStep" alt="" coords="219,56,466,83"/>
-<area shape="rect" id="node4" href="$class_smpc_controller.html#a70ecfdd41c38a5c4de76155f30f6b0c1" title="SmpcController::algorithmApg" alt="" coords="515,157,711,184"/>
-<area shape="rect" id="node6" href="$class_smpc_controller.html#a232316a3ba52a6d397e8337c130c81c2" title="SmpcController::solveStep" alt="" coords="253,157,432,184"/>
-<area shape="rect" id="node7" href="$class_smpc_controller.html#ad477241e6c34e5db46e6ec00c16ddeab" title="SmpcController::proximalFunG" alt="" coords="242,208,443,235"/>
-<area shape="rect" id="node8" href="$class_smpc_controller.html#a7248245a2c2893be2032c7b29b65cb2d" title="SmpcController::dualUpdate" alt="" coords="249,259,436,285"/>
-<area shape="rect" id="node5" href="$class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="761,157,967,184"/>
+<area shape="rect" id="node4" href="$class_smpc_controller.html#a504a73b33ca1704bc0e743006ef71dae" title="SmpcController::algorithmApg" alt="" coords="525,183,721,209"/>
+<area shape="rect" id="node8" href="$class_smpc_controller.html#a232316a3ba52a6d397e8337c130c81c2" title="SmpcController::solveStep" alt="" coords="253,157,432,184"/>
+<area shape="rect" id="node9" href="$class_smpc_controller.html#ad477241e6c34e5db46e6ec00c16ddeab" title="SmpcController::proximalFunG" alt="" coords="242,208,443,235"/>
+<area shape="rect" id="node10" href="$class_smpc_controller.html#a7248245a2c2893be2032c7b29b65cb2d" title="SmpcController::dualUpdate" alt="" coords="249,259,436,285"/>
+<area shape="rect" id="node11" href="$class_smpc_controller.html#a3d02dd634603e096fc5f8e8940ace333" title="SmpcController::moveForeward\lInTime" alt="" coords="519,302,726,343"/>
+<area shape="rect" id="node12" href="$class_smpc_controller.html#a69a259598ed5f16388221f8bb0ef438f" title="SmpcController::updateKpi" alt="" coords="253,360,432,387"/>
+<area shape="rect" id="node13" href="$class_smpc_controller.html#ad25d2fc65344d661fa775203ca978040" title="SmpcController::getDwnNetwork" alt="" coords="515,411,730,437"/>
+<area shape="rect" id="node5" href="$class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="779,183,986,209"/>
+<area shape="rect" id="node6" href="$class_smpc_controller.html#a84fa9efe8b15742c929c0d274e479ff8" title="SmpcController::controlAction" alt="" coords="785,233,981,260"/>
+<area shape="rect" id="node7" href="$main_8cu.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="1035,335,1085,361"/>
+<area shape="rect" id="node14" href="$class_smpc_controller.html#ac9f531f272e075ee7b5ad7e97df5e7bd" title="SmpcController::getNetworkKpi" alt="" coords="779,411,986,437"/>
 </map>

@@ -1,15 +1,17 @@
 var searchData=
 [
-  ['main',['main',['../main_8cu.html#a840291bc02cba5474a4cb46a9b9566fe',1,'main.cu']]],
-  ['main_2ecu',['main.cu',['../main_8cu.html',1,'']]],
-  ['mata',['matA',['../class_dwn_network.html#aa458cffbddcb1513571ef477a2f1fbef',1,'DwnNetwork']]],
-  ['matb',['matB',['../class_dwn_network.html#a5d8047c91fdaab86843a83844ff81a5a',1,'DwnNetwork']]],
-  ['matcostw',['matCostW',['../class_smpc_configuration.html#a95d85e5077e2a48c203855a7a1e56d1a',1,'SmpcConfiguration']]],
-  ['matdiagprecnd',['matDiagPrecnd',['../class_smpc_configuration.html#acaf200d7d1998afeb9c4dd3ddf235678',1,'SmpcConfiguration']]],
-  ['mate',['matE',['../class_dwn_network.html#a62022291aed43b189ab617b2e27ebba7',1,'DwnNetwork']]],
-  ['mated',['matEd',['../class_dwn_network.html#a6b0832b81e4cec6edd678ef4f9092385',1,'DwnNetwork']]],
-  ['matgd',['matGd',['../class_dwn_network.html#ab373afa62d5dc426f67f9fb58f72497e',1,'DwnNetwork']]],
-  ['matl',['matL',['../class_smpc_configuration.html#a4ebb2294f1a6cc71d95b931924b4c57d',1,'SmpcConfiguration']]],
-  ['matlhat',['matLhat',['../class_smpc_configuration.html#a546f3a89dc1f325b7709ff1b0868f086',1,'SmpcConfiguration']]],
-  ['maxiteration',['maxIteration',['../class_smpc_configuration.html#a0e832dceeac6d461d4e48e3f2d78b20c',1,'SmpcConfiguration']]]
+  ['path_5fforecaster_5ffile',['PATH_FORECASTER_FILE',['../_smpc_configuration_8cuh.html#addd97f394dd1cd6dd2893f2e7624e642',1,'SmpcConfiguration.cuh']]],
+  ['path_5fnetwork_5ffile',['PATH_NETWORK_FILE',['../_smpc_configuration_8cuh.html#a3138e78d7bafb573080e03039190ef7f',1,'SmpcConfiguration.cuh']]],
+  ['path_5fscenario_5ftree_5ffile',['PATH_SCENARIO_TREE_FILE',['../_smpc_configuration_8cuh.html#adc81ceded6096e7ad371945a5403968b',1,'SmpcConfiguration.cuh']]],
+  ['preconditionconstraintu',['preconditionConstraintU',['../_utilities_8cu.html#ab1870140bc1a0a908e13c93abc923326',1,'preconditionConstraintU(real_t *devUmax, real_t *devUmin, real_t *matPrcndDiag, real_t *probNode, uint_t dim, uint_t numBlock):&#160;Utilities.cu'],['../_utilities_8cuh.html#ab1870140bc1a0a908e13c93abc923326',1,'preconditionConstraintU(real_t *devUmax, real_t *devUmin, real_t *matPrcndDiag, real_t *probNode, uint_t dim, uint_t numBlock):&#160;Utilities.cu']]],
+  ['preconditionconstraintx',['preconditionConstraintX',['../_utilities_8cu.html#acee2686288bcc77910d88a2851d21450',1,'preconditionConstraintX(real_t *devXmax, real_t *devXmin, real_t *devXsafe, real_t *matPrcndDiag, real_t *probNode, uint_t dim, uint_t numBlock):&#160;Utilities.cu'],['../_utilities_8cuh.html#acee2686288bcc77910d88a2851d21450',1,'preconditionConstraintX(real_t *devXmax, real_t *devXmin, real_t *devXsafe, real_t *matPrcndDiag, real_t *probNode, uint_t dim, uint_t numBlock):&#160;Utilities.cu']]],
+  ['preconditionsystem',['preconditionSystem',['../_utilities_8cu.html#a79b3910ee82bf4447b91b89fa4bbba64',1,'preconditionSystem(real_t *matF, real_t *matG, real_t *dualDiagPrcnd, real_t *scaleVec, uint_t nx, uint_t nu):&#160;Utilities.cu'],['../_utilities_8cuh.html#a79b3910ee82bf4447b91b89fa4bbba64',1,'preconditionSystem(real_t *matF, real_t *matG, real_t *dualDiagPrcnd, real_t *scaleVec, uint_t nx, uint_t nu):&#160;Utilities.cu']]],
+  ['predictdemand',['predictDemand',['../class_forecaster.html#ad90811d3715a532a0e97bba1b7f2456d',1,'Forecaster']]],
+  ['predictprices',['predictPrices',['../class_forecaster.html#ace5814b4ef635716f70f0a3f6a058142',1,'Forecaster']]],
+  ['projectionbox',['projectionBox',['../_utilities_8cu.html#a085cf375ead72e0b59db657db42bb865',1,'projectionBox(real_t *vecX, real_t *lowerbound, real_t *upperbound, uint_t dim, uint_t offset, uint_t size):&#160;Utilities.cu'],['../_utilities_8cuh.html#a085cf375ead72e0b59db657db42bb865',1,'projectionBox(real_t *vecX, real_t *lowerbound, real_t *upperbound, uint_t dim, uint_t offset, uint_t size):&#160;Utilities.cu']]],
+  ['projectioncontrol',['projectionControl',['../_utilities_8cu.html#a4c867c719910b9dbd996d555ee7aa7ea',1,'projectionControl(real_t *vecU, real_t *lowerbound, real_t *upperbound, uint_t size):&#160;Utilities.cu'],['../_utilities_8cuh.html#a4c867c719910b9dbd996d555ee7aa7ea',1,'projectionControl(real_t *vecU, real_t *lowerbound, real_t *upperbound, uint_t size):&#160;Utilities.cu']]],
+  ['proximalfung',['proximalFunG',['../class_smpc_controller.html#ad477241e6c34e5db46e6ec00c16ddeab',1,'SmpcController']]],
+  ['ptrmyengine',['ptrMyEngine',['../class_smpc_controller.html#a77209b397839c54c89bd57a624683fa4',1,'SmpcController']]],
+  ['ptrmyforecaster',['ptrMyForecaster',['../class_smpc_controller.html#a86b9ab65cb239cd8f5fb0e043f573ee4',1,'SmpcController']]],
+  ['ptrmysmpcconfig',['ptrMySmpcConfig',['../class_smpc_controller.html#a5702c3c794f7ad810bac90df2f6e9a5c',1,'SmpcController']]]
 ];

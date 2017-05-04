@@ -1,6 +1,9 @@
 <map id="ScenarioTree::getStageNodes" name="ScenarioTree::getStageNodes">
-<area shape="rect" id="node2" href="$class_engine.html#a4e664235e0d3dc748d3f0cb88e0aaa19" title="Engine::initialiseScenario\lTreeDevice" alt="" coords="276,5,444,46"/>
-<area shape="rect" id="node4" href="$class_engine.html#a95cf720a3b184710ed0e3b3808634c68" title="Engine::eliminateInputDistubance\lCoupling" alt="" coords="251,70,469,111"/>
-<area shape="rect" id="node3" href="$class_engine.html#ad5b7316584c79e2db5dc5f785b0a652f" title="Engine::factorStep" alt="" coords="556,12,687,39"/>
-<area shape="rect" id="node5" href="$class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="518,77,725,104"/>
+<area shape="rect" id="node2" href="$class_engine.html#a95cf720a3b184710ed0e3b3808634c68" title="Engine::eliminateInputDistubance\lCoupling" alt="" coords="251,51,469,93"/>
+<area shape="rect" id="node3" href="$class_smpc_controller.html#ac11e4145e513a95a5114c7296a0416e1" title="SmpcController::initialise\lSmpcController" alt="" coords="518,51,685,93"/>
+<area shape="rect" id="node7" href="$class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="1206,135,1413,161"/>
+<area shape="rect" id="node8" href="$class_smpc_controller.html#a84fa9efe8b15742c929c0d274e479ff8" title="SmpcController::controlAction" alt="" coords="1211,33,1407,60"/>
+<area shape="rect" id="node4" href="$main_8cu.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="1461,59,1512,85"/>
+<area shape="rect" id="node5" href="$class_smpc_controller.html#a232316a3ba52a6d397e8337c130c81c2" title="SmpcController::solveStep" alt="" coords="733,33,912,60"/>
+<area shape="rect" id="node6" href="$class_smpc_controller.html#a504a73b33ca1704bc0e743006ef71dae" title="SmpcController::algorithmApg" alt="" coords="961,33,1157,60"/>
 </map>

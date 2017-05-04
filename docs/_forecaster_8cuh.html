@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.6"/>
-<title>APG: Forecaster.cuh File Reference</title>
+<title>RapidNet: Forecaster.cuh File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -22,8 +22,9 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">APG
+   <div id="projectname">RapidNet
    </div>
+   <div id="projectbrief">Fast Stochastic MPC for Drinking Water Networks</div>
   </td>
  </tr>
  </tbody>
@@ -88,12 +89,15 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><code>#include &quot;<a class="el" href="_configuration_8h_source.html">Configuration.h</a>&quot;</code><br/>
+<code>#include &quot;rapidjson/document.h&quot;</code><br/>
+<code>#include &quot;rapidjson/rapidjson.h&quot;</code><br/>
+<code>#include &quot;rapidjson/filereadstream.h&quot;</code><br/>
 </div><div class="textblock"><div class="dynheader">
 Include dependency graph for Forecaster.cuh:</div>
 <div class="dyncontent">
 <div class="center"><img src="_forecaster_8cuh__incl.png" border="0" usemap="#_forecaster_8cuh" alt=""/></div>
 <map name="_forecaster_8cuh" id="_forecaster_8cuh">
-<area shape="rect" id="node2" href="_configuration_8h.html" title="Configuration.h" alt="" coords="115,80,225,107"/></map>
+<area shape="rect" id="node2" href="_configuration_8h.html" title="Configuration.h" alt="" coords="166,80,276,107"/></map>
 </div>
 </div><div class="textblock"><div class="dynheader">
 This graph shows which files directly or indirectly include this file:</div>
@@ -114,6 +118,8 @@ Macros</h2></td></tr>
 <tr class="separator:a86b078574fd1a897d4901b6ca28acb4c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a16e1dd08639081e5aeaa2f209a62e73a"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_forecaster_8cuh.html#a16e1dd08639081e5aeaa2f209a62e73a">VARNAME_N</a>&#160;&#160;&#160;&quot;N&quot;</td></tr>
 <tr class="separator:a16e1dd08639081e5aeaa2f209a62e73a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a99ac5e3cfd48b54ef3589db118705588"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_forecaster_8cuh.html#a99ac5e3cfd48b54ef3589db118705588">VARNAME_SIM_HORIZON</a>&#160;&#160;&#160;&quot;simHorizon&quot;</td></tr>
+<tr class="separator:a99ac5e3cfd48b54ef3589db118705588"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a01639e10970f9bf667236fe6eac62278"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_forecaster_8cuh.html#a01639e10970f9bf667236fe6eac62278">VARNAME_DIM_DEMAND</a>&#160;&#160;&#160;&quot;dimDemand&quot;</td></tr>
 <tr class="separator:a01639e10970f9bf667236fe6eac62278"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8fb2b7e736bea70b42d1606591d5b33d"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_forecaster_8cuh.html#a8fb2b7e736bea70b42d1606591d5b33d">VARNAME_DIM_PRICES</a>&#160;&#160;&#160;&quot;dimPrices&quot;</td></tr>
@@ -122,6 +128,10 @@ Macros</h2></td></tr>
 <tr class="separator:a3d8fb1080249fb857cef7f11212ae45b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a27a3f2f1fef39e85a4046c2a3dd8fbc7"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_forecaster_8cuh.html#a27a3f2f1fef39e85a4046c2a3dd8fbc7">VARNAME_ALPHAHAT</a>&#160;&#160;&#160;&quot;alphaHat&quot;</td></tr>
 <tr class="separator:a27a3f2f1fef39e85a4046c2a3dd8fbc7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6c1c4a5cd6e1424afe8b21d2d64a1ffa"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_forecaster_8cuh.html#a6c1c4a5cd6e1424afe8b21d2d64a1ffa">VARNAME_DEMAND_SIM</a>&#160;&#160;&#160;&quot;timeIdDemand4876&quot;</td></tr>
+<tr class="separator:a6c1c4a5cd6e1424afe8b21d2d64a1ffa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aefd7a5f727032c21187a08139978f44b"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_forecaster_8cuh.html#aefd7a5f727032c21187a08139978f44b">VARNAME_PRICE_SIM</a>&#160;&#160;&#160;&quot;timeIdPrice4876&quot;</td></tr>
+<tr class="separator:aefd7a5f727032c21187a08139978f44b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
 <a class="anchor" id="a86b078574fd1a897d4901b6ca28acb4c"></a>
@@ -142,6 +152,18 @@ Macros</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname">#define VARNAME_ALPHAHAT&#160;&#160;&#160;&quot;alphaHat&quot;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a6c1c4a5cd6e1424afe8b21d2d64a1ffa"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define VARNAME_DEMAND_SIM&#160;&#160;&#160;&quot;timeIdDemand4876&quot;</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -196,10 +218,34 @@ Macros</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="aefd7a5f727032c21187a08139978f44b"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define VARNAME_PRICE_SIM&#160;&#160;&#160;&quot;timeIdPrice4876&quot;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a99ac5e3cfd48b54ef3589db118705588"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define VARNAME_SIM_HORIZON&#160;&#160;&#160;&quot;simHorizon&quot;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Apr 11 2017 11:58:27 for APG by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu May 4 2017 02:03:32 for RapidNet by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

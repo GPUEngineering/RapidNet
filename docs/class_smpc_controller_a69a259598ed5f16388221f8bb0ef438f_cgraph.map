@@ -1,0 +1,9 @@
+<map id="SmpcController::updateKpi" name="SmpcController::updateKpi">
+<area shape="rect" id="node2" href="$class_smpc_configuration.html#aaf5023ccaed6be1b5f738fe62216cdee" title="SmpcConfiguration::\lgetNX" alt="" coords="259,5,400,46"/>
+<area shape="rect" id="node3" href="$class_smpc_configuration.html#a003a0f69c7ecc13f1b0fcf76f419305d" title="SmpcConfiguration::\lgetNU" alt="" coords="259,70,400,111"/>
+<area shape="rect" id="node4" href="$class_engine.html#af5c56254a25f6ff4ebc001bb1f9db4bf" title="Engine::getDwnNetwork" alt="" coords="247,136,411,163"/>
+<area shape="rect" id="node5" href="$class_dwn_network.html#ad0a8c9318eb7b0d3157bafbecbac09a5" title="DwnNetwork::getXsafe" alt="" coords="250,187,409,213"/>
+<area shape="rect" id="node6" href="$class_dwn_network.html#a94569edcaae90b827a238f3596740ece" title="DwnNetwork::getAlpha" alt="" coords="251,237,408,264"/>
+<area shape="rect" id="node7" href="$class_forecaster.html#a0dd35eb8ace816f809837307e220fc76" title="Forecaster::getNominalPrices" alt="" coords="232,288,427,315"/>
+<area shape="rect" id="node8" href="$class_smpc_configuration.html#a9b6dadf8c3d99cbd7326c60939d99d17" title="SmpcConfiguration::\lgetPrevU" alt="" coords="259,339,400,381"/>
+</map>

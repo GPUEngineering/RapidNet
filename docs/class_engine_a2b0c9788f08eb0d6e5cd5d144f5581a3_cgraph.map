@@ -1,14 +1,6 @@
 <map id="Engine::Engine" name="Engine::Engine">
-<area shape="rect" id="node2" href="$class_dwn_network.html#a4bd201487c9e524815b5c9112fcd2722" title="DwnNetwork::getNumTanks" alt="" coords="427,5,615,32"/>
-<area shape="rect" id="node3" href="$class_dwn_network.html#a6791b1fd057bac451f84192624411155" title="DwnNetwork::getNumControls" alt="" coords="421,253,622,280"/>
-<area shape="rect" id="node4" href="$class_smpc_configuration.html#a31dc27fe4c16453cea0f451e58c33879" title="SmpcConfiguration::\lgetNV" alt="" coords="451,57,592,98"/>
-<area shape="rect" id="node5" href="$class_scenario_tree.html#ad6a9108a9226d28588b99a637251081f" title="ScenarioTree::getNumNodes" alt="" coords="426,456,617,483"/>
-<area shape="rect" id="node6" href="$class_engine.html#a1f5af029bce4d3dadc6944fdd3391040" title="Engine::allocateSystemDevice" alt="" coords="166,228,367,255"/>
-<area shape="rect" id="node12" href="$class_engine.html#a2f296234d3876ebe94aaccdd52bc59d5" title="Engine::allocateScenario\lTreeDevice" alt="" coords="183,347,350,389"/>
-<area shape="rect" id="node7" href="$class_dwn_network.html#ae938bb831f8d3cecde15bd240c43dc29" title="DwnNetwork::getNumDemands" alt="" coords="417,304,625,331"/>
-<area shape="rect" id="node8" href="$class_scenario_tree.html#add52c9168d0fd4eeefe56780d072bd65" title="ScenarioTree::getNumScenarios" alt="" coords="416,355,627,381"/>
-<area shape="rect" id="node9" href="$class_scenario_tree.html#a66557e4575270f9202301402441d4ca2" title="ScenarioTree::getPredHorizon" alt="" coords="423,405,620,432"/>
-<area shape="rect" id="node10" href="$class_scenario_tree.html#ac4f4d939ce1caf17884a71592fa05770" title="ScenarioTree::getNodesPer\lStage" alt="" coords="430,187,613,229"/>
-<area shape="rect" id="node11" href="$class_scenario_tree.html#af2635a1644dba8d4b58d30c01fa7993b" title="ScenarioTree::getNodesPer\lStageCumul" alt="" coords="430,122,613,163"/>
-<area shape="rect" id="node13" href="$class_scenario_tree.html#a7130b4e92590127c71d9fc66b56cc701" title="ScenarioTree::getNumNonleaf\lNodes" alt="" coords="422,507,621,549"/>
+<area shape="rect" id="node2" href="$class_dwn_network.html#a4bd201487c9e524815b5c9112fcd2722" title="DwnNetwork::getNumTanks" alt="" coords="173,5,361,32"/>
+<area shape="rect" id="node3" href="$class_dwn_network.html#a6791b1fd057bac451f84192624411155" title="DwnNetwork::getNumControls" alt="" coords="166,56,367,83"/>
+<area shape="rect" id="node4" href="$class_smpc_configuration.html#a31dc27fe4c16453cea0f451e58c33879" title="SmpcConfiguration::\lgetNV" alt="" coords="196,107,337,149"/>
+<area shape="rect" id="node5" href="$class_scenario_tree.html#ad6a9108a9226d28588b99a637251081f" title="ScenarioTree::getNumNodes" alt="" coords="171,173,362,200"/>
 </map>

@@ -7,13 +7,13 @@
 
 var indexSectionsWithContent =
 {
-  0: "_acdefghiklmnprstuv~",
+  0: "_acdefgikmnprstuv~",
   1: "defs",
   2: "cdefmsu",
-  3: "acdefgikmpsu~",
-  4: "acdehlmnpsv",
+  3: "acdefgikmpstu~",
+  4: "defnpstv",
   5: "ru",
-  6: "_cefnsv",
+  6: "_cefnpsv",
   7: "t"
 };
 

@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.6"/>
-<title>APG: Class Members - Functions</title>
+<title>RapidNet: Class Members - Functions</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -22,8 +22,9 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">APG
+   <div id="projectname">RapidNet
    </div>
+   <div id="projectbrief">Fast Stochastic MPC for Drinking Water Networks</div>
   </td>
  </tr>
  </tbody>
@@ -81,6 +82,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
       <li><a href="#index_f"><span>f</span></a></li>
       <li><a href="#index_g"><span>g</span></a></li>
       <li><a href="#index_i"><span>i</span></a></li>
+      <li><a href="#index_m"><span>m</span></a></li>
       <li><a href="#index_p"><span>p</span></a></li>
       <li><a href="#index_s"><span>s</span></a></li>
       <li><a href="#index_u"><span>u</span></a></li>
@@ -107,18 +109,15 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <h3><a class="anchor" id="index_a"></a>- a -</h3><ul>
 <li>algorithmApg()
-: <a class="el" href="class_smpc_controller.html#a70ecfdd41c38a5c4de76155f30f6b0c1">SmpcController</a>
-</li>
-<li>allocateScenarioTreeDevice()
-: <a class="el" href="class_engine.html#a2f296234d3876ebe94aaccdd52bc59d5">Engine</a>
-</li>
-<li>allocateSystemDevice()
-: <a class="el" href="class_engine.html#a1f5af029bce4d3dadc6944fdd3391040">Engine</a>
+: <a class="el" href="class_smpc_controller.html#a504a73b33ca1704bc0e743006ef71dae">SmpcController</a>
 </li>
 </ul>
 
 
 <h3><a class="anchor" id="index_c"></a>- c -</h3><ul>
+<li>controlAction()
+: <a class="el" href="class_smpc_controller.html#a84fa9efe8b15742c929c0d274e479ff8">SmpcController</a>
+</li>
 <li>controllerSmpc()
 : <a class="el" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf">SmpcController</a>
 </li>
@@ -126,12 +125,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 
 <h3><a class="anchor" id="index_d"></a>- d -</h3><ul>
-<li>deallocateScenarioTreeDevice()
-: <a class="el" href="class_engine.html#afc5979645dfa20a58d1ce54d9f2b2796">Engine</a>
-</li>
-<li>deallocateSystemDevice()
-: <a class="el" href="class_engine.html#a07c21aa9aae6056bb7b432a18a96e7c6">Engine</a>
-</li>
 <li>dualExtrapolationStep()
 : <a class="el" href="class_smpc_controller.html#a76c6c0b1d3307a9de26fa17ad2f37d72">SmpcController</a>
 </li>
@@ -191,12 +184,22 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </li>
 <li>getDwnNetwork()
 : <a class="el" href="class_engine.html#af5c56254a25f6ff4ebc001bb1f9db4bf">Engine</a>
+, <a class="el" href="class_smpc_controller.html#ad25d2fc65344d661fa775203ca978040">SmpcController</a>
+</li>
+<li>getEconomicKpi()
+: <a class="el" href="class_smpc_controller.html#a04e243bb152de0e52723692ecf2d14a0">SmpcController</a>
+</li>
+<li>getEngine()
+: <a class="el" href="class_smpc_controller.html#a1573bc36a4ffd08836af7de061e4003c">SmpcController</a>
 </li>
 <li>getErrorDemandArray()
 : <a class="el" href="class_scenario_tree.html#ad027558d837a1118c0d7b57e46da2b9f">ScenarioTree</a>
 </li>
 <li>getErrorPriceArray()
 : <a class="el" href="class_scenario_tree.html#a943bf522b5f9ee5cd1087078b518a6fd">ScenarioTree</a>
+</li>
+<li>getForecaster()
+: <a class="el" href="class_smpc_controller.html#a19bc2872087146d496022f35dae22bc5">SmpcController</a>
 </li>
 <li>getLeaveArray()
 : <a class="el" href="class_scenario_tree.html#abb67e8e923e294bdd2d3149a55db1400">ScenarioTree</a>
@@ -255,6 +258,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <li>getND()
 : <a class="el" href="class_smpc_configuration.html#a74bd0375cbd932c2fe432532b2a6ec7d">SmpcConfiguration</a>
 </li>
+<li>getNetworkKpi()
+: <a class="el" href="class_smpc_controller.html#ac9f531f272e075ee7b5ad7e97df5e7bd">SmpcController</a>
+</li>
 <li>getNodesPerStage()
 : <a class="el" href="class_scenario_tree.html#ac4f4d939ce1caf17884a71592fa05770">ScenarioTree</a>
 </li>
@@ -306,6 +312,18 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <li>getNX()
 : <a class="el" href="class_smpc_configuration.html#aaf5023ccaed6be1b5f738fe62216cdee">SmpcConfiguration</a>
 </li>
+<li>getPathToControllerConfig()
+: <a class="el" href="class_smpc_configuration.html#ab65a1c02c305d0615245f09c1ca57d28">SmpcConfiguration</a>
+</li>
+<li>getPathToForecaster()
+: <a class="el" href="class_smpc_configuration.html#a1b4bb429ba5f703fa717b1bbaab424f5">SmpcConfiguration</a>
+</li>
+<li>getPathToNetwork()
+: <a class="el" href="class_smpc_configuration.html#ac22bba2c9ede8f0193e53da0ddb11b42">SmpcConfiguration</a>
+</li>
+<li>getPathToScenarioTree()
+: <a class="el" href="class_smpc_configuration.html#a7e060035a125f3471054ec7efbf60067">SmpcConfiguration</a>
+</li>
 <li>getPenaltySafety()
 : <a class="el" href="class_smpc_configuration.html#ae3486c795186d96806c8ad7aac57b67a">SmpcConfiguration</a>
 </li>
@@ -316,14 +334,11 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 : <a class="el" href="class_forecaster.html#aa13f4764aeae06599d2717b28e7ff529">Forecaster</a>
 , <a class="el" href="class_scenario_tree.html#a66557e4575270f9202301402441d4ca2">ScenarioTree</a>
 </li>
+<li>getPrevDemand()
+: <a class="el" href="class_smpc_configuration.html#a828c65ae23c33e3e9162a5d7cb5db1e8">SmpcConfiguration</a>
+</li>
 <li>getPrevU()
 : <a class="el" href="class_smpc_configuration.html#a9b6dadf8c3d99cbd7326c60939d99d17">SmpcConfiguration</a>
-</li>
-<li>getPrevUhat()
-: <a class="el" href="class_smpc_configuration.html#a7ad72bc8f8642f7dff806feceb32cf80">SmpcConfiguration</a>
-</li>
-<li>getPrevV()
-: <a class="el" href="class_smpc_configuration.html#a26f74f74f0915b1966ee9a5c9d459540">SmpcConfiguration</a>
 </li>
 <li>getProbArray()
 : <a class="el" href="class_scenario_tree.html#ad3ee14f8397e378b5baa616bc0265122">ScenarioTree</a>
@@ -367,8 +382,21 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <li>getPtrSysMatLhat()
 : <a class="el" href="class_engine.html#ae123e02f201b0a621b31c74ece3db809">Engine</a>
 </li>
+<li>getSafetyKpi()
+: <a class="el" href="class_smpc_controller.html#a8553fa47bd780d7e279c1d7c8683332d">SmpcController</a>
+</li>
 <li>getScenarioTree()
 : <a class="el" href="class_engine.html#a40ea7ce2310db1343f45153ef88965d1">Engine</a>
+, <a class="el" href="class_smpc_controller.html#a69324f05ac863933ecdbfff84d058517">SmpcController</a>
+</li>
+<li>getSimHorizon()
+: <a class="el" href="class_forecaster.html#a1d75d97f70391c9c36c1b93695160e8c">Forecaster</a>
+</li>
+<li>getSmoothKpi()
+: <a class="el" href="class_smpc_controller.html#a0b62143cc2f107efbb27d4453ccc7443">SmpcController</a>
+</li>
+<li>getSmpcConfiguration()
+: <a class="el" href="class_smpc_controller.html#a6cc4400abc43e34a00be639945d3b3bc">SmpcController</a>
 </li>
 <li>getStageNodes()
 : <a class="el" href="class_scenario_tree.html#a53a4a56fd39e52037b5d89707d513007">ScenarioTree</a>
@@ -451,6 +479,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <li>getVecCurrentState()
 : <a class="el" href="class_engine.html#aa75a2ef9f3d77486fc9e87f9e0801e2e">Engine</a>
 </li>
+<li>getVecDemand()
+: <a class="el" href="class_engine.html#a008c49123449be6373604c10a2e30e26">Engine</a>
+</li>
 <li>getVecE()
 : <a class="el" href="class_engine.html#aca774b136f1ba7a83bbf55d5205f5206">Engine</a>
 </li>
@@ -459,9 +490,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </li>
 <li>getVecPreviousUhat()
 : <a class="el" href="class_engine.html#a6c59debcb0b279ce05876c47d88486dd">Engine</a>
-</li>
-<li>getVecPreviousV()
-: <a class="el" href="class_engine.html#aeaa15eb21f3333af1a86f3da9b1724d4">Engine</a>
 </li>
 <li>getVecUhat()
 : <a class="el" href="class_engine.html#a5e5c7f9b5fd70d8dd3209859c833d115">Engine</a>
@@ -479,19 +507,26 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 
 <h3><a class="anchor" id="index_i"></a>- i -</h3><ul>
-<li>initialiseScenarioTreeDevice()
-: <a class="el" href="class_engine.html#a4e664235e0d3dc748d3f0cb88e0aaa19">Engine</a>
+<li>initialiseSmpcController()
+: <a class="el" href="class_smpc_controller.html#ac11e4145e513a95a5114c7296a0416e1">SmpcController</a>
 </li>
-<li>initialiseSystemDevice()
-: <a class="el" href="class_engine.html#ac9d6cb7d673e625256bead5e786e65a5">Engine</a>
-</li>
-<li>inverseBatchMat()
-: <a class="el" href="class_engine.html#a933446e347b77e350b3755b324ca099c">Engine</a>
+</ul>
+
+
+<h3><a class="anchor" id="index_m"></a>- m -</h3><ul>
+<li>moveForewardInTime()
+: <a class="el" href="class_smpc_controller.html#a3d02dd634603e096fc5f8e8940ace333">SmpcController</a>
 </li>
 </ul>
 
 
 <h3><a class="anchor" id="index_p"></a>- p -</h3><ul>
+<li>predictDemand()
+: <a class="el" href="class_forecaster.html#ad90811d3715a532a0e97bba1b7f2456d">Forecaster</a>
+</li>
+<li>predictPrices()
+: <a class="el" href="class_forecaster.html#ace5814b4ef635716f70f0a3f6a058142">Forecaster</a>
+</li>
 <li>proximalFunG()
 : <a class="el" href="class_smpc_controller.html#ad477241e6c34e5db46e6ec00c16ddeab">SmpcController</a>
 </li>
@@ -501,6 +536,18 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <h3><a class="anchor" id="index_s"></a>- s -</h3><ul>
 <li>ScenarioTree()
 : <a class="el" href="class_scenario_tree.html#ac17f9737023a02e0c11e1fcdef2fa2a1">ScenarioTree</a>
+</li>
+<li>setCurrentState()
+: <a class="el" href="class_smpc_configuration.html#a4e9fd6f8806d89f9df825001e028eccd">SmpcConfiguration</a>
+</li>
+<li>setPreviousControl()
+: <a class="el" href="class_smpc_configuration.html#a2195a3b0ebab95e357eef18e19b1cecc">SmpcConfiguration</a>
+</li>
+<li>setPreviousDemand()
+: <a class="el" href="class_smpc_configuration.html#ad52533957da300587a86c9170d5c528b">SmpcConfiguration</a>
+</li>
+<li>setpreviousdemand()
+: <a class="el" href="class_smpc_configuration.html#aeabcb9fb328380a69240f69df14638ca">SmpcConfiguration</a>
 </li>
 <li>SmpcConfiguration()
 : <a class="el" href="class_smpc_configuration.html#ad71684af7ce94a0f9e3e1863eb203f64">SmpcConfiguration</a>
@@ -515,8 +562,14 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 
 <h3><a class="anchor" id="index_u"></a>- u -</h3><ul>
+<li>updateKpi()
+: <a class="el" href="class_smpc_controller.html#a69a259598ed5f16388221f8bb0ef438f">SmpcController</a>
+</li>
+<li>updateSmpcConfiguration()
+: <a class="el" href="class_smpc_controller.html#a229632c8f9ae24dc8955688d677a6e13">SmpcController</a>
+</li>
 <li>updateStateControl()
-: <a class="el" href="class_engine.html#a65ca7aceb59bd64433a12694334d14ab">Engine</a>
+: <a class="el" href="class_engine.html#a3fbf653bed9c13fc441fb19cc464405c">Engine</a>
 </li>
 </ul>
 
@@ -544,7 +597,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Apr 11 2017 11:58:27 for APG by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu May 4 2017 02:03:32 for RapidNet by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['initialisescenariotreedevice',['initialiseScenarioTreeDevice',['../class_engine.html#a4e664235e0d3dc748d3f0cb88e0aaa19',1,'Engine']]],
-  ['initialisesystemdevice',['initialiseSystemDevice',['../class_engine.html#ac9d6cb7d673e625256bead5e786e65a5',1,'Engine']]],
-  ['inversebatchmat',['inverseBatchMat',['../class_engine.html#a933446e347b77e350b3755b324ca099c',1,'Engine']]]
+  ['kerneldualextrapolationstep',['kernelDualExtrapolationStep',['../_utilities_8cu.html#a1ab1fafa13a6eb19755a4f9fa5cb45aa',1,'kernelDualExtrapolationStep(real_t *vecDualW, real_t *vecPrevDual, real_t *vecCurrentDual, real_t alpha, uint_t size):&#160;Utilities.cu'],['../_utilities_8cuh.html#a1ab1fafa13a6eb19755a4f9fa5cb45aa',1,'kernelDualExtrapolationStep(real_t *vecDualW, real_t *vecPrevDual, real_t *vecCurrentDual, real_t alpha, uint_t size):&#160;Utilities.cu']]],
+  ['kerneldualupdate',['kernelDualUpdate',['../_utilities_8cu.html#ae492de7ee3b731ae83208fb643d0ac66',1,'kernelDualUpdate(real_t *vecDualY, real_t *vecDualW, real_t *vecHX, real_t *vecZ, real_t stepSize, uint_t size):&#160;Utilities.cu'],['../_utilities_8cuh.html#ae492de7ee3b731ae83208fb643d0ac66',1,'kernelDualUpdate(real_t *vecDualY, real_t *vecDualW, real_t *vecHX, real_t *vecZ, real_t stepSize, uint_t size):&#160;Utilities.cu']]]
 ];

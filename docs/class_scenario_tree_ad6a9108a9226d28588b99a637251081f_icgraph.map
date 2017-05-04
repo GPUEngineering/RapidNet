@@ -1,16 +1,14 @@
 <map id="ScenarioTree::getNumNodes" name="ScenarioTree::getNumNodes">
-<area shape="rect" id="node2" href="$class_engine.html#a2b0c9788f08eb0d6e5cd5d144f5581a3" title="Engine::Engine" alt="" coords="595,60,706,87"/>
-<area shape="rect" id="node3" href="$class_engine.html#a2f296234d3876ebe94aaccdd52bc59d5" title="Engine::allocateScenario\lTreeDevice" alt="" coords="286,53,453,94"/>
-<area shape="rect" id="node4" href="$class_engine.html#a4e664235e0d3dc748d3f0cb88e0aaa19" title="Engine::initialiseScenario\lTreeDevice" alt="" coords="285,170,453,211"/>
-<area shape="rect" id="node6" href="$class_engine.html#a1f5af029bce4d3dadc6944fdd3391040" title="Engine::allocateSystemDevice" alt="" coords="269,119,470,145"/>
-<area shape="rect" id="node7" href="$class_engine.html#ac9d6cb7d673e625256bead5e786e65a5" title="Engine::initialiseSystem\lDevice" alt="" coords="288,235,451,277"/>
-<area shape="rect" id="node8" href="$class_engine.html#a95cf720a3b184710ed0e3b3808634c68" title="Engine::eliminateInputDistubance\lCoupling" alt="" coords="542,334,759,375"/>
-<area shape="rect" id="node10" href="$class_smpc_controller.html#a42d20e6dd18dfcaf63ddf484fc8c7813" title="SmpcController::SmpcController" alt="" coords="264,352,475,379"/>
-<area shape="rect" id="node11" href="$class_smpc_controller.html#a76c6c0b1d3307a9de26fa17ad2f37d72" title="SmpcController::dualExtrapolationStep" alt="" coords="246,403,493,429"/>
-<area shape="rect" id="node12" href="$class_smpc_controller.html#a70ecfdd41c38a5c4de76155f30f6b0c1" title="SmpcController::algorithmApg" alt="" coords="553,479,749,505"/>
-<area shape="rect" id="node13" href="$class_smpc_controller.html#a232316a3ba52a6d397e8337c130c81c2" title="SmpcController::solveStep" alt="" coords="280,504,459,531"/>
-<area shape="rect" id="node14" href="$class_smpc_controller.html#ad477241e6c34e5db46e6ec00c16ddeab" title="SmpcController::proximalFunG" alt="" coords="269,555,470,581"/>
-<area shape="rect" id="node15" href="$class_smpc_controller.html#a7248245a2c2893be2032c7b29b65cb2d" title="SmpcController::dualUpdate" alt="" coords="276,605,463,632"/>
-<area shape="rect" id="node5" href="$class_engine.html#ad5b7316584c79e2db5dc5f785b0a652f" title="Engine::factorStep" alt="" coords="585,211,716,237"/>
-<area shape="rect" id="node9" href="$class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="809,397,1015,424"/>
+<area shape="rect" id="node2" href="$class_engine.html#a2b0c9788f08eb0d6e5cd5d144f5581a3" title="Engine::Engine" alt="" coords="299,69,410,96"/>
+<area shape="rect" id="node3" href="$class_engine.html#a95cf720a3b184710ed0e3b3808634c68" title="Engine::eliminateInputDistubance\lCoupling" alt="" coords="246,120,463,162"/>
+<area shape="rect" id="node6" href="$class_smpc_controller.html#a232316a3ba52a6d397e8337c130c81c2" title="SmpcController::solveStep" alt="" coords="820,186,999,213"/>
+<area shape="rect" id="node7" href="$class_smpc_controller.html#a504a73b33ca1704bc0e743006ef71dae" title="SmpcController::algorithmApg" alt="" coords="1059,237,1255,264"/>
+<area shape="rect" id="node10" href="$class_smpc_controller.html#a42d20e6dd18dfcaf63ddf484fc8c7813" title="SmpcController::SmpcController" alt="" coords="249,288,460,314"/>
+<area shape="rect" id="node11" href="$class_smpc_controller.html#a76c6c0b1d3307a9de26fa17ad2f37d72" title="SmpcController::dualExtrapolationStep" alt="" coords="513,326,759,353"/>
+<area shape="rect" id="node12" href="$class_smpc_controller.html#ad477241e6c34e5db46e6ec00c16ddeab" title="SmpcController::proximalFunG" alt="" coords="809,377,1010,404"/>
+<area shape="rect" id="node13" href="$class_smpc_controller.html#a7248245a2c2893be2032c7b29b65cb2d" title="SmpcController::dualUpdate" alt="" coords="543,440,729,466"/>
+<area shape="rect" id="node4" href="$class_smpc_controller.html#ac11e4145e513a95a5114c7296a0416e1" title="SmpcController::initialise\lSmpcController" alt="" coords="553,70,719,111"/>
+<area shape="rect" id="node8" href="$class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="1305,208,1511,234"/>
+<area shape="rect" id="node9" href="$class_smpc_controller.html#a84fa9efe8b15742c929c0d274e479ff8" title="SmpcController::controlAction" alt="" coords="1310,128,1506,154"/>
+<area shape="rect" id="node5" href="$main_8cu.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="1560,102,1611,129"/>
 </map>

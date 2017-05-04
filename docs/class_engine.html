@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.6"/>
-<title>APG: Engine Class Reference</title>
+<title>RapidNet: Engine Class Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -22,8 +22,9 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">APG
+   <div id="projectname">RapidNet
    </div>
+   <div id="projectbrief">Fast Stochastic MPC for Drinking Water Networks</div>
   </td>
  </tr>
  </tbody>
@@ -83,29 +84,22 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="#pri-methods">Private Member Functions</a> &#124;
-<a href="#pri-attribs">Private Attributes</a> &#124;
 <a href="class_engine-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">Engine Class Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="dynheader">
-Collaboration diagram for Engine:</div>
-<div class="dyncontent">
-<div class="center"><img src="class_engine__coll__graph.png" border="0" usemap="#_engine_coll__map" alt="Collaboration graph"/></div>
-<map name="_engine_coll__map" id="_engine_coll__map">
-<area shape="rect" id="node2" href="class_dwn_network.html" title="DwnNetwork" alt="" coords="5,5,104,32"/><area shape="rect" id="node3" href="class_scenario_tree.html" title="ScenarioTree" alt="" coords="128,5,227,32"/><area shape="rect" id="node4" href="class_smpc_configuration.html" title="SmpcConfiguration" alt="" coords="256,5,389,32"/></map>
-<center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a2b0c9788f08eb0d6e5cd5d144f5581a3"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_engine.html#a2b0c9788f08eb0d6e5cd5d144f5581a3">Engine</a> (<a class="el" href="class_dwn_network.html">DwnNetwork</a> *network, <a class="el" href="class_scenario_tree.html">ScenarioTree</a> *scenarioTree, <a class="el" href="class_smpc_configuration.html">SmpcConfiguration</a> *smpcConfig)</td></tr>
 <tr class="separator:a2b0c9788f08eb0d6e5cd5d144f5581a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a11fe987ffffd721d8cefeec7f762881e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_engine.html#a11fe987ffffd721d8cefeec7f762881e">Engine</a> (<a class="el" href="class_smpc_configuration.html">SmpcConfiguration</a> *smpcConfig)</td></tr>
+<tr class="separator:a11fe987ffffd721d8cefeec7f762881e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a95cf720a3b184710ed0e3b3808634c68"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_engine.html#a95cf720a3b184710ed0e3b3808634c68">eliminateInputDistubanceCoupling</a> (<a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> *nominalDemand, <a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> *nominalPrices)</td></tr>
 <tr class="separator:a95cf720a3b184710ed0e3b3808634c68"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a65ca7aceb59bd64433a12694334d14ab"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_engine.html#a65ca7aceb59bd64433a12694334d14ab">updateStateControl</a> (<a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> *currentX, <a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> *prevU, <a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> *prevUhat, <a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> *PrevV)</td></tr>
-<tr class="separator:a65ca7aceb59bd64433a12694334d14ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3fbf653bed9c13fc441fb19cc464405c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_engine.html#a3fbf653bed9c13fc441fb19cc464405c">updateStateControl</a> (<a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> *currentX, <a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> *prevU, <a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> *prevDemand)</td></tr>
+<tr class="separator:a3fbf653bed9c13fc441fb19cc464405c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad5b7316584c79e2db5dc5f785b0a652f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_engine.html#ad5b7316584c79e2db5dc5f785b0a652f">factorStep</a> ()</td></tr>
 <tr class="separator:ad5b7316584c79e2db5dc5f785b0a652f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a40ea7ce2310db1343f45153ef88965d1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_scenario_tree.html">ScenarioTree</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_engine.html#a40ea7ce2310db1343f45153ef88965d1">getScenarioTree</a> ()</td></tr>
@@ -138,8 +132,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:aa75a2ef9f3d77486fc9e87f9e0801e2e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6c59debcb0b279ce05876c47d88486dd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_engine.html#a6c59debcb0b279ce05876c47d88486dd">getVecPreviousUhat</a> ()</td></tr>
 <tr class="separator:a6c59debcb0b279ce05876c47d88486dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aeaa15eb21f3333af1a86f3da9b1724d4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_engine.html#aeaa15eb21f3333af1a86f3da9b1724d4">getVecPreviousV</a> ()</td></tr>
-<tr class="separator:aeaa15eb21f3333af1a86f3da9b1724d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a008c49123449be6373604c10a2e30e26"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_engine.html#a008c49123449be6373604c10a2e30e26">getVecDemand</a> ()</td></tr>
+<tr class="separator:a008c49123449be6373604c10a2e30e26"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5d6854f5346979035b210c543fd3571e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_engine.html#a5d6854f5346979035b210c543fd3571e">getMatPhi</a> ()</td></tr>
 <tr class="separator:a5d6854f5346979035b210c543fd3571e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9e9d517fab807549814daa8fb030a682"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_engine.html#a9e9d517fab807549814daa8fb030a682">getMatPsi</a> ()</td></tr>
@@ -214,138 +208,6 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:aa6956e2e98b0ef672e14c4e13bb8bd1d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8ef7030a089ecb30bbfcb9e43094717a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_engine.html#a8ef7030a089ecb30bbfcb9e43094717a">~Engine</a> ()</td></tr>
 <tr class="separator:a8ef7030a089ecb30bbfcb9e43094717a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-methods"></a>
-Private Member Functions</h2></td></tr>
-<tr class="memitem:a2f296234d3876ebe94aaccdd52bc59d5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_engine.html#a2f296234d3876ebe94aaccdd52bc59d5">allocateScenarioTreeDevice</a> ()</td></tr>
-<tr class="separator:a2f296234d3876ebe94aaccdd52bc59d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1f5af029bce4d3dadc6944fdd3391040"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_engine.html#a1f5af029bce4d3dadc6944fdd3391040">allocateSystemDevice</a> ()</td></tr>
-<tr class="separator:a1f5af029bce4d3dadc6944fdd3391040"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4e664235e0d3dc748d3f0cb88e0aaa19"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_engine.html#a4e664235e0d3dc748d3f0cb88e0aaa19">initialiseScenarioTreeDevice</a> ()</td></tr>
-<tr class="separator:a4e664235e0d3dc748d3f0cb88e0aaa19"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac9d6cb7d673e625256bead5e786e65a5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_engine.html#ac9d6cb7d673e625256bead5e786e65a5">initialiseSystemDevice</a> ()</td></tr>
-<tr class="separator:ac9d6cb7d673e625256bead5e786e65a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a933446e347b77e350b3755b324ca099c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_engine.html#a933446e347b77e350b3755b324ca099c">inverseBatchMat</a> (<a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> **src, <a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> **dst, <a class="el" href="_configuration_8h.html#a6c06fdeafc128178f45859699c0fc09b">uint_t</a> n, <a class="el" href="_configuration_8h.html#a6c06fdeafc128178f45859699c0fc09b">uint_t</a> batchSize)</td></tr>
-<tr class="separator:a933446e347b77e350b3755b324ca099c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afc5979645dfa20a58d1ce54d9f2b2796"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_engine.html#afc5979645dfa20a58d1ce54d9f2b2796">deallocateScenarioTreeDevice</a> ()</td></tr>
-<tr class="separator:afc5979645dfa20a58d1ce54d9f2b2796"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a07c21aa9aae6056bb7b432a18a96e7c6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_engine.html#a07c21aa9aae6056bb7b432a18a96e7c6">deallocateSystemDevice</a> ()</td></tr>
-<tr class="separator:a07c21aa9aae6056bb7b432a18a96e7c6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-attribs"></a>
-Private Attributes</h2></td></tr>
-<tr class="memitem:a7054b57f717d61d0a7a2ef87fb1964dd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_dwn_network.html">DwnNetwork</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_engine.html#a7054b57f717d61d0a7a2ef87fb1964dd">ptrMyNetwork</a></td></tr>
-<tr class="separator:a7054b57f717d61d0a7a2ef87fb1964dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acadc69523d3d71e3359289fd07b723b9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_scenario_tree.html">ScenarioTree</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_engine.html#acadc69523d3d71e3359289fd07b723b9">ptrMyScenarioTree</a></td></tr>
-<tr class="separator:acadc69523d3d71e3359289fd07b723b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aee20c0e338f0144ceb00a612d1a9c284"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_smpc_configuration.html">SmpcConfiguration</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_engine.html#aee20c0e338f0144ceb00a612d1a9c284">ptrMySmpcConfig</a></td></tr>
-<tr class="separator:aee20c0e338f0144ceb00a612d1a9c284"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2f986f72be07dcb1b75c22dbc22e3562"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_engine.html#a2f986f72be07dcb1b75c22dbc22e3562">devSysMatB</a></td></tr>
-<tr class="separator:a2f986f72be07dcb1b75c22dbc22e3562"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6d702d0a49bb794811b7f0c766412b83"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_engine.html#a6d702d0a49bb794811b7f0c766412b83">devSysMatF</a></td></tr>
-<tr class="separator:a6d702d0a49bb794811b7f0c766412b83"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7a9a38307eb8b61d9269e6a7ccbdfa8e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_engine.html#a7a9a38307eb8b61d9269e6a7ccbdfa8e">devSysMatG</a></td></tr>
-<tr class="separator:a7a9a38307eb8b61d9269e6a7ccbdfa8e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6bc70c0788789e3798e2bdb27bdb318b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_engine.html#a6bc70c0788789e3798e2bdb27bdb318b">devSysMatL</a></td></tr>
-<tr class="separator:a6bc70c0788789e3798e2bdb27bdb318b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad12cd2b57e28f44f66e39569d8df996a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_engine.html#ad12cd2b57e28f44f66e39569d8df996a">devSysMatLhat</a></td></tr>
-<tr class="separator:ad12cd2b57e28f44f66e39569d8df996a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a41a3199b52dbe41312327528f95fc700"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> **&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_engine.html#a41a3199b52dbe41312327528f95fc700">devPtrSysMatB</a></td></tr>
-<tr class="separator:a41a3199b52dbe41312327528f95fc700"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a71a8be05c4d69671503a6d4e79cbe69c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> **&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_engine.html#a71a8be05c4d69671503a6d4e79cbe69c">devPtrSysMatF</a></td></tr>
-<tr class="separator:a71a8be05c4d69671503a6d4e79cbe69c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a898b862fdbfb0355506630b88380a836"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> **&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_engine.html#a898b862fdbfb0355506630b88380a836">devPtrSysMatG</a></td></tr>
-<tr class="separator:a898b862fdbfb0355506630b88380a836"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aea020be22585f178cd437caf6be75730"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> **&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_engine.html#aea020be22585f178cd437caf6be75730">devPtrSysMatL</a></td></tr>
-<tr class="separator:aea020be22585f178cd437caf6be75730"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afbb60473352b1165e2b9d9771ef88587"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> **&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_engine.html#afbb60473352b1165e2b9d9771ef88587">devPtrSysMatLhat</a></td></tr>
-<tr class="separator:afbb60473352b1165e2b9d9771ef88587"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a221433739157782d72abfa1a0b00dbad"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_engine.html#a221433739157782d72abfa1a0b00dbad">devVecPreviousControl</a></td></tr>
-<tr class="separator:a221433739157782d72abfa1a0b00dbad"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acc1072c6a8a7bde3eaf6f53aa4f14360"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_engine.html#acc1072c6a8a7bde3eaf6f53aa4f14360">devVecCurrentState</a></td></tr>
-<tr class="separator:acc1072c6a8a7bde3eaf6f53aa4f14360"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a77be53eaf39a6c6e31f5b8f0e29ded57"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_engine.html#a77be53eaf39a6c6e31f5b8f0e29ded57">devVecPreviousUhat</a></td></tr>
-<tr class="separator:a77be53eaf39a6c6e31f5b8f0e29ded57"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1fd3b6449c5704c83a2cd445948d912f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_engine.html#a1fd3b6449c5704c83a2cd445948d912f">devVecPreviousV</a></td></tr>
-<tr class="separator:a1fd3b6449c5704c83a2cd445948d912f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0b011d79708a5ffafbf9d813895213f2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_engine.html#a0b011d79708a5ffafbf9d813895213f2">devSysXmin</a></td></tr>
-<tr class="separator:a0b011d79708a5ffafbf9d813895213f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae10172f00a568803e274ea1e5cca627a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_engine.html#ae10172f00a568803e274ea1e5cca627a">devSysXmax</a></td></tr>
-<tr class="separator:ae10172f00a568803e274ea1e5cca627a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a817d2769c5327f18c73ccfe52c6209e1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_engine.html#a817d2769c5327f18c73ccfe52c6209e1">devSysXs</a></td></tr>
-<tr class="separator:a817d2769c5327f18c73ccfe52c6209e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aac6af2e9888a953bef880a355a175db8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_engine.html#aac6af2e9888a953bef880a355a175db8">devSysXsUpper</a></td></tr>
-<tr class="separator:aac6af2e9888a953bef880a355a175db8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3ce3ace17e8e1ef66290cc00bc963465"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_engine.html#a3ce3ace17e8e1ef66290cc00bc963465">devSysUmin</a></td></tr>
-<tr class="separator:a3ce3ace17e8e1ef66290cc00bc963465"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a512b46357a591964e10dc352cd4e9bdc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_engine.html#a512b46357a591964e10dc352cd4e9bdc">devSysUmax</a></td></tr>
-<tr class="separator:a512b46357a591964e10dc352cd4e9bdc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af6155aae7cfaf459bd9317098cc91e48"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_engine.html#af6155aae7cfaf459bd9317098cc91e48">devSysCostW</a></td></tr>
-<tr class="separator:af6155aae7cfaf459bd9317098cc91e48"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a62a674c7ce9123ee6d807b113ea4b6ae"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> **&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_engine.html#a62a674c7ce9123ee6d807b113ea4b6ae">devPtrSysCostW</a></td></tr>
-<tr class="separator:a62a674c7ce9123ee6d807b113ea4b6ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a89c5a42adb35d80841acd6dfe74fac88"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a6c06fdeafc128178f45859699c0fc09b">uint_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_engine.html#a89c5a42adb35d80841acd6dfe74fac88">devTreeStages</a></td></tr>
-<tr class="separator:a89c5a42adb35d80841acd6dfe74fac88"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a756db508143ec0780ec07ece8a948f1d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a6c06fdeafc128178f45859699c0fc09b">uint_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_engine.html#a756db508143ec0780ec07ece8a948f1d">devTreeNodesPerStage</a></td></tr>
-<tr class="separator:a756db508143ec0780ec07ece8a948f1d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a98b16be30202402bfd200be200a73ac3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a6c06fdeafc128178f45859699c0fc09b">uint_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_engine.html#a98b16be30202402bfd200be200a73ac3">devTreeNodesPerStageCumul</a></td></tr>
-<tr class="separator:a98b16be30202402bfd200be200a73ac3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a37799c22c38bee7e8bb4affb9349a7df"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a6c06fdeafc128178f45859699c0fc09b">uint_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_engine.html#a37799c22c38bee7e8bb4affb9349a7df">devTreeLeaves</a></td></tr>
-<tr class="separator:a37799c22c38bee7e8bb4affb9349a7df"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6801f1b76173e2f70690d15d03291453"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a6c06fdeafc128178f45859699c0fc09b">uint_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_engine.html#a6801f1b76173e2f70690d15d03291453">devTreeNumChildren</a></td></tr>
-<tr class="separator:a6801f1b76173e2f70690d15d03291453"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5e43dddd5eabfc1fd54494439d2d3398"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a6c06fdeafc128178f45859699c0fc09b">uint_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_engine.html#a5e43dddd5eabfc1fd54494439d2d3398">devTreeAncestor</a></td></tr>
-<tr class="separator:a5e43dddd5eabfc1fd54494439d2d3398"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa9af92b898062b1526b328852ff1b12f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a6c06fdeafc128178f45859699c0fc09b">uint_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_engine.html#aa9af92b898062b1526b328852ff1b12f">devTreeNumChildrenCumul</a></td></tr>
-<tr class="separator:aa9af92b898062b1526b328852ff1b12f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a010ee1e50ba51fa3eb45ff16df553f56"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_engine.html#a010ee1e50ba51fa3eb45ff16df553f56">devTreeProb</a></td></tr>
-<tr class="separator:a010ee1e50ba51fa3eb45ff16df553f56"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a07654356a1332d08cab041f5a15ce5cb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_engine.html#a07654356a1332d08cab041f5a15ce5cb">devTreeErrorDemand</a></td></tr>
-<tr class="separator:a07654356a1332d08cab041f5a15ce5cb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aeab26013caa82b34fefe97f38d14745b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_engine.html#aeab26013caa82b34fefe97f38d14745b">devTreeErrorPrices</a></td></tr>
-<tr class="separator:aeab26013caa82b34fefe97f38d14745b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2d53b37520eaf3d9b4c3cc9c0dd0c94c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_engine.html#a2d53b37520eaf3d9b4c3cc9c0dd0c94c">devMatPhi</a></td></tr>
-<tr class="separator:a2d53b37520eaf3d9b4c3cc9c0dd0c94c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae8fc64a4e4fcc1e942ea68fd33b3fb65"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_engine.html#ae8fc64a4e4fcc1e942ea68fd33b3fb65">devMatPsi</a></td></tr>
-<tr class="separator:ae8fc64a4e4fcc1e942ea68fd33b3fb65"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acddaaba087fb8a3006aea45aa931855c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_engine.html#acddaaba087fb8a3006aea45aa931855c">devMatTheta</a></td></tr>
-<tr class="separator:acddaaba087fb8a3006aea45aa931855c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3e3d74677da6597b4f92ee7e5e09d901"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_engine.html#a3e3d74677da6597b4f92ee7e5e09d901">devMatOmega</a></td></tr>
-<tr class="separator:a3e3d74677da6597b4f92ee7e5e09d901"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0d4004863733dc0780cb6997c33bdf64"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_engine.html#a0d4004863733dc0780cb6997c33bdf64">devMatSigma</a></td></tr>
-<tr class="separator:a0d4004863733dc0780cb6997c33bdf64"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afb9029c50c8f0d7ace94a64241e792b2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_engine.html#afb9029c50c8f0d7ace94a64241e792b2">devMatD</a></td></tr>
-<tr class="separator:afb9029c50c8f0d7ace94a64241e792b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a54fd03355dc6705b61fa9a7639347e17"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_engine.html#a54fd03355dc6705b61fa9a7639347e17">devMatF</a></td></tr>
-<tr class="separator:a54fd03355dc6705b61fa9a7639347e17"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a93375c8fe8ba3481043bc4a88583eaa2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_engine.html#a93375c8fe8ba3481043bc4a88583eaa2">devMatG</a></td></tr>
-<tr class="separator:a93375c8fe8ba3481043bc4a88583eaa2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6fd87148402f49bc90164dc709e6980a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> **&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_engine.html#a6fd87148402f49bc90164dc709e6980a">devPtrMatPhi</a></td></tr>
-<tr class="separator:a6fd87148402f49bc90164dc709e6980a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af19ca61991015f458c9a11e6ee8cba4d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> **&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_engine.html#af19ca61991015f458c9a11e6ee8cba4d">devPtrMatPsi</a></td></tr>
-<tr class="separator:af19ca61991015f458c9a11e6ee8cba4d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a52bff886650854b221ebd4d4f9b2c381"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> **&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_engine.html#a52bff886650854b221ebd4d4f9b2c381">devPtrMatTheta</a></td></tr>
-<tr class="separator:a52bff886650854b221ebd4d4f9b2c381"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af5537e36abaeaf708be13b63bb4b0eb1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> **&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_engine.html#af5537e36abaeaf708be13b63bb4b0eb1">devPtrMatOmega</a></td></tr>
-<tr class="separator:af5537e36abaeaf708be13b63bb4b0eb1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0a412ee7fca11209aaa86454225b2a1d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> **&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_engine.html#a0a412ee7fca11209aaa86454225b2a1d">devPtrMatSigma</a></td></tr>
-<tr class="separator:a0a412ee7fca11209aaa86454225b2a1d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae05202a96b2fb408384ca5ed2defdf00"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> **&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_engine.html#ae05202a96b2fb408384ca5ed2defdf00">devPtrMatD</a></td></tr>
-<tr class="separator:ae05202a96b2fb408384ca5ed2defdf00"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9981486fd93c8af75ce7aa1571f7b121"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> **&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_engine.html#a9981486fd93c8af75ce7aa1571f7b121">devPtrMatF</a></td></tr>
-<tr class="separator:a9981486fd93c8af75ce7aa1571f7b121"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a232e95ccda49dde4cd5af8051f9a47aa"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> **&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_engine.html#a232e95ccda49dde4cd5af8051f9a47aa">devPtrMatG</a></td></tr>
-<tr class="separator:a232e95ccda49dde4cd5af8051f9a47aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac2985630fa5dcee98da6ae8e808b64ac"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_engine.html#ac2985630fa5dcee98da6ae8e808b64ac">devVecUhat</a></td></tr>
-<tr class="separator:ac2985630fa5dcee98da6ae8e808b64ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6dd24e276a5fed6f8768ca1a244eb245"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_engine.html#a6dd24e276a5fed6f8768ca1a244eb245">devVecBeta</a></td></tr>
-<tr class="separator:a6dd24e276a5fed6f8768ca1a244eb245"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a51d5ac111c8bd8cfd800bd70993a27da"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_engine.html#a51d5ac111c8bd8cfd800bd70993a27da">devVecE</a></td></tr>
-<tr class="separator:a51d5ac111c8bd8cfd800bd70993a27da"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0fcca1183fd5fbe1751e46d979a66bec"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_engine.html#a0fcca1183fd5fbe1751e46d979a66bec">devMatWv</a></td></tr>
-<tr class="separator:a0fcca1183fd5fbe1751e46d979a66bec"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac9e074aa92e6676dcaaf90c84bb58a8b"><td class="memItemLeft" align="right" valign="top">cublasHandle_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_engine.html#ac9e074aa92e6676dcaaf90c84bb58a8b">handle</a></td></tr>
-<tr class="separator:ac9e074aa92e6676dcaaf90c84bb58a8b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>TODO Document this class (what is its purpose) </p>
@@ -393,7 +255,40 @@ Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="class_engine_a2b0c9788f08eb0d6e5cd5d144f5581a3_cgraph.png" border="0" usemap="#class_engine_a2b0c9788f08eb0d6e5cd5d144f5581a3_cgraph" alt=""/></div>
 <map name="class_engine_a2b0c9788f08eb0d6e5cd5d144f5581a3_cgraph" id="class_engine_a2b0c9788f08eb0d6e5cd5d144f5581a3_cgraph">
-<area shape="rect" id="node2" href="class_dwn_network.html#a4bd201487c9e524815b5c9112fcd2722" title="DwnNetwork::getNumTanks" alt="" coords="427,5,615,32"/><area shape="rect" id="node3" href="class_dwn_network.html#a6791b1fd057bac451f84192624411155" title="DwnNetwork::getNumControls" alt="" coords="421,253,622,280"/><area shape="rect" id="node4" href="class_smpc_configuration.html#a31dc27fe4c16453cea0f451e58c33879" title="SmpcConfiguration::\lgetNV" alt="" coords="451,57,592,98"/><area shape="rect" id="node5" href="class_scenario_tree.html#ad6a9108a9226d28588b99a637251081f" title="ScenarioTree::getNumNodes" alt="" coords="426,456,617,483"/><area shape="rect" id="node6" href="class_engine.html#a1f5af029bce4d3dadc6944fdd3391040" title="Engine::allocateSystemDevice" alt="" coords="166,228,367,255"/><area shape="rect" id="node12" href="class_engine.html#a2f296234d3876ebe94aaccdd52bc59d5" title="Engine::allocateScenario\lTreeDevice" alt="" coords="183,347,350,389"/><area shape="rect" id="node7" href="class_dwn_network.html#ae938bb831f8d3cecde15bd240c43dc29" title="DwnNetwork::getNumDemands" alt="" coords="417,304,625,331"/><area shape="rect" id="node8" href="class_scenario_tree.html#add52c9168d0fd4eeefe56780d072bd65" title="ScenarioTree::getNumScenarios" alt="" coords="416,355,627,381"/><area shape="rect" id="node9" href="class_scenario_tree.html#a66557e4575270f9202301402441d4ca2" title="ScenarioTree::getPredHorizon" alt="" coords="423,405,620,432"/><area shape="rect" id="node10" href="class_scenario_tree.html#ac4f4d939ce1caf17884a71592fa05770" title="ScenarioTree::getNodesPer\lStage" alt="" coords="430,187,613,229"/><area shape="rect" id="node11" href="class_scenario_tree.html#af2635a1644dba8d4b58d30c01fa7993b" title="ScenarioTree::getNodesPer\lStageCumul" alt="" coords="430,122,613,163"/><area shape="rect" id="node13" href="class_scenario_tree.html#a7130b4e92590127c71d9fc66b56cc701" title="ScenarioTree::getNumNonleaf\lNodes" alt="" coords="422,507,621,549"/></map>
+<area shape="rect" id="node2" href="class_dwn_network.html#a4bd201487c9e524815b5c9112fcd2722" title="DwnNetwork::getNumTanks" alt="" coords="173,5,361,32"/><area shape="rect" id="node3" href="class_dwn_network.html#a6791b1fd057bac451f84192624411155" title="DwnNetwork::getNumControls" alt="" coords="166,56,367,83"/><area shape="rect" id="node4" href="class_smpc_configuration.html#a31dc27fe4c16453cea0f451e58c33879" title="SmpcConfiguration::\lgetNV" alt="" coords="196,107,337,149"/><area shape="rect" id="node5" href="class_scenario_tree.html#ad6a9108a9226d28588b99a637251081f" title="ScenarioTree::getNumNodes" alt="" coords="171,173,362,200"/></map>
+</div>
+</p>
+
+</div>
+</div>
+<a class="anchor" id="a11fe987ffffd721d8cefeec7f762881e"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Engine::Engine </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="class_smpc_configuration.html">SmpcConfiguration</a> *&#160;</td>
+          <td class="paramname"><em>smpcConfig</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">network</td><td></td></tr>
+    <tr><td class="paramname">forecaster</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000002">Todo:</a></b></dt><dd>remove <code>SmpcConfig</code> from here </dd></dl>
+
+<p><div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="class_engine_a11fe987ffffd721d8cefeec7f762881e_cgraph.png" border="0" usemap="#class_engine_a11fe987ffffd721d8cefeec7f762881e_cgraph" alt=""/></div>
+<map name="class_engine_a11fe987ffffd721d8cefeec7f762881e_cgraph" id="class_engine_a11fe987ffffd721d8cefeec7f762881e_cgraph">
+<area shape="rect" id="node2" href="class_smpc_configuration.html#ac22bba2c9ede8f0193e53da0ddb11b42" title="SmpcConfiguration::\lgetPathToNetwork" alt="" coords="196,5,337,46"/><area shape="rect" id="node3" href="class_smpc_configuration.html#a7e060035a125f3471054ec7efbf60067" title="SmpcConfiguration::\lgetPathToScenarioTree" alt="" coords="187,70,346,111"/><area shape="rect" id="node4" href="class_dwn_network.html#a4bd201487c9e524815b5c9112fcd2722" title="DwnNetwork::getNumTanks" alt="" coords="173,136,361,163"/><area shape="rect" id="node5" href="class_dwn_network.html#a6791b1fd057bac451f84192624411155" title="DwnNetwork::getNumControls" alt="" coords="166,187,367,213"/><area shape="rect" id="node6" href="class_smpc_configuration.html#a31dc27fe4c16453cea0f451e58c33879" title="SmpcConfiguration::\lgetNV" alt="" coords="196,238,337,279"/><area shape="rect" id="node7" href="class_scenario_tree.html#ad6a9108a9226d28588b99a637251081f" title="ScenarioTree::getNumNodes" alt="" coords="171,304,362,331"/></map>
 </div>
 </p>
 
@@ -413,168 +308,9 @@ Here is the call graph for this function:</div>
 </div><div class="memdoc">
 <p>Destructor </p>
 
-<p><div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="class_engine_a8ef7030a089ecb30bbfcb9e43094717a_cgraph.png" border="0" usemap="#class_engine_a8ef7030a089ecb30bbfcb9e43094717a_cgraph" alt=""/></div>
-<map name="class_engine_a8ef7030a089ecb30bbfcb9e43094717a_cgraph" id="class_engine_a8ef7030a089ecb30bbfcb9e43094717a_cgraph">
-<area shape="rect" id="node2" href="class_engine.html#a07c21aa9aae6056bb7b432a18a96e7c6" title="Engine::deallocateSystem\lDevice" alt="" coords="177,5,351,46"/><area shape="rect" id="node3" href="class_engine.html#afc5979645dfa20a58d1ce54d9f2b2796" title="Engine::deallocateScenario\lTreeDevice" alt="" coords="174,70,354,111"/></map>
-</div>
-</p>
-
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="a2f296234d3876ebe94aaccdd52bc59d5"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void Engine::allocateScenarioTreeDevice </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Allocate the device memory for the scenario tree </p>
-
-<p><div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="class_engine_a2f296234d3876ebe94aaccdd52bc59d5_cgraph.png" border="0" usemap="#class_engine_a2f296234d3876ebe94aaccdd52bc59d5_cgraph" alt=""/></div>
-<map name="class_engine_a2f296234d3876ebe94aaccdd52bc59d5_cgraph" id="class_engine_a2f296234d3876ebe94aaccdd52bc59d5_cgraph">
-<area shape="rect" id="node2" href="class_scenario_tree.html#ad6a9108a9226d28588b99a637251081f" title="ScenarioTree::getNumNodes" alt="" coords="231,5,422,32"/><area shape="rect" id="node3" href="class_scenario_tree.html#a66557e4575270f9202301402441d4ca2" title="ScenarioTree::getPredHorizon" alt="" coords="228,56,425,83"/><area shape="rect" id="node4" href="class_scenario_tree.html#add52c9168d0fd4eeefe56780d072bd65" title="ScenarioTree::getNumScenarios" alt="" coords="221,107,432,133"/><area shape="rect" id="node5" href="class_dwn_network.html#ae938bb831f8d3cecde15bd240c43dc29" title="DwnNetwork::getNumDemands" alt="" coords="223,157,431,184"/><area shape="rect" id="node6" href="class_dwn_network.html#a6791b1fd057bac451f84192624411155" title="DwnNetwork::getNumControls" alt="" coords="226,208,427,235"/><area shape="rect" id="node7" href="class_scenario_tree.html#a7130b4e92590127c71d9fc66b56cc701" title="ScenarioTree::getNumNonleaf\lNodes" alt="" coords="227,259,426,301"/></map>
-</div>
-</p>
-
-<p><div class="dynheader">
-Here is the caller graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="class_engine_a2f296234d3876ebe94aaccdd52bc59d5_icgraph.png" border="0" usemap="#class_engine_a2f296234d3876ebe94aaccdd52bc59d5_icgraph" alt=""/></div>
-<map name="class_engine_a2f296234d3876ebe94aaccdd52bc59d5_icgraph" id="class_engine_a2f296234d3876ebe94aaccdd52bc59d5_icgraph">
-<area shape="rect" id="node2" href="class_engine.html#a2b0c9788f08eb0d6e5cd5d144f5581a3" title="Engine::Engine" alt="" coords="222,12,333,39"/></map>
-</div>
-</p>
-
-</div>
-</div>
-<a class="anchor" id="a1f5af029bce4d3dadc6944fdd3391040"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void Engine::allocateSystemDevice </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Allocate the device memory for the system </p>
-
-<p><div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="class_engine_a1f5af029bce4d3dadc6944fdd3391040_cgraph.png" border="0" usemap="#class_engine_a1f5af029bce4d3dadc6944fdd3391040_cgraph" alt=""/></div>
-<map name="class_engine_a1f5af029bce4d3dadc6944fdd3391040_cgraph" id="class_engine_a1f5af029bce4d3dadc6944fdd3391040_cgraph">
-<area shape="rect" id="node2" href="class_dwn_network.html#a4bd201487c9e524815b5c9112fcd2722" title="DwnNetwork::getNumTanks" alt="" coords="267,5,455,32"/><area shape="rect" id="node3" href="class_dwn_network.html#a6791b1fd057bac451f84192624411155" title="DwnNetwork::getNumControls" alt="" coords="261,56,462,83"/><area shape="rect" id="node4" href="class_smpc_configuration.html#a31dc27fe4c16453cea0f451e58c33879" title="SmpcConfiguration::\lgetNV" alt="" coords="291,107,432,149"/><area shape="rect" id="node5" href="class_dwn_network.html#ae938bb831f8d3cecde15bd240c43dc29" title="DwnNetwork::getNumDemands" alt="" coords="257,173,465,200"/><area shape="rect" id="node6" href="class_scenario_tree.html#ad6a9108a9226d28588b99a637251081f" title="ScenarioTree::getNumNodes" alt="" coords="266,224,457,251"/><area shape="rect" id="node7" href="class_scenario_tree.html#add52c9168d0fd4eeefe56780d072bd65" title="ScenarioTree::getNumScenarios" alt="" coords="256,275,467,301"/><area shape="rect" id="node8" href="class_scenario_tree.html#a66557e4575270f9202301402441d4ca2" title="ScenarioTree::getPredHorizon" alt="" coords="263,325,460,352"/><area shape="rect" id="node9" href="class_scenario_tree.html#ac4f4d939ce1caf17884a71592fa05770" title="ScenarioTree::getNodesPer\lStage" alt="" coords="270,377,453,418"/><area shape="rect" id="node10" href="class_scenario_tree.html#af2635a1644dba8d4b58d30c01fa7993b" title="ScenarioTree::getNodesPer\lStageCumul" alt="" coords="270,442,453,483"/></map>
-</div>
-</p>
-
-<p><div class="dynheader">
-Here is the caller graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="class_engine_a1f5af029bce4d3dadc6944fdd3391040_icgraph.png" border="0" usemap="#class_engine_a1f5af029bce4d3dadc6944fdd3391040_icgraph" alt=""/></div>
-<map name="class_engine_a1f5af029bce4d3dadc6944fdd3391040_icgraph" id="class_engine_a1f5af029bce4d3dadc6944fdd3391040_icgraph">
-<area shape="rect" id="node2" href="class_engine.html#a2b0c9788f08eb0d6e5cd5d144f5581a3" title="Engine::Engine" alt="" coords="257,5,367,32"/></map>
-</div>
-</p>
-
-</div>
-</div>
-<a class="anchor" id="afc5979645dfa20a58d1ce54d9f2b2796"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void Engine::deallocateScenarioTreeDevice </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Deallocate the device memory of the scenario tree </p>
-
-<p><div class="dynheader">
-Here is the caller graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="class_engine_afc5979645dfa20a58d1ce54d9f2b2796_icgraph.png" border="0" usemap="#class_engine_afc5979645dfa20a58d1ce54d9f2b2796_icgraph" alt=""/></div>
-<map name="class_engine_afc5979645dfa20a58d1ce54d9f2b2796_icgraph" id="class_engine_afc5979645dfa20a58d1ce54d9f2b2796_icgraph">
-<area shape="rect" id="node2" href="class_engine.html#a8ef7030a089ecb30bbfcb9e43094717a" title="Engine::~Engine" alt="" coords="235,12,354,39"/></map>
-</div>
-</p>
-
-</div>
-</div>
-<a class="anchor" id="a07c21aa9aae6056bb7b432a18a96e7c6"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void Engine::deallocateSystemDevice </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Deallocate the device memory of the system matrices </p>
-
-<p><div class="dynheader">
-Here is the caller graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="class_engine_a07c21aa9aae6056bb7b432a18a96e7c6_icgraph.png" border="0" usemap="#class_engine_a07c21aa9aae6056bb7b432a18a96e7c6_icgraph" alt=""/></div>
-<map name="class_engine_a07c21aa9aae6056bb7b432a18a96e7c6_icgraph" id="class_engine_a07c21aa9aae6056bb7b432a18a96e7c6_icgraph">
-<area shape="rect" id="node2" href="class_engine.html#a8ef7030a089ecb30bbfcb9e43094717a" title="Engine::~Engine" alt="" coords="230,12,349,39"/></map>
-</div>
-</p>
-
-</div>
-</div>
 <a class="anchor" id="a95cf720a3b184710ed0e3b3808634c68"></a>
 <div class="memitem">
 <div class="memproto">
@@ -621,7 +357,7 @@ Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="class_engine_a95cf720a3b184710ed0e3b3808634c68_icgraph.png" border="0" usemap="#class_engine_a95cf720a3b184710ed0e3b3808634c68_icgraph" alt=""/></div>
 <map name="class_engine_a95cf720a3b184710ed0e3b3808634c68_icgraph" id="class_engine_a95cf720a3b184710ed0e3b3808634c68_icgraph">
-<area shape="rect" id="node2" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="273,12,479,39"/></map>
+<area shape="rect" id="node2" href="class_smpc_controller.html#ac11e4145e513a95a5114c7296a0416e1" title="SmpcController::initialise\lSmpcController" alt="" coords="273,51,439,93"/><area shape="rect" id="node6" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="961,135,1167,161"/><area shape="rect" id="node7" href="class_smpc_controller.html#a84fa9efe8b15742c929c0d274e479ff8" title="SmpcController::controlAction" alt="" coords="966,33,1162,60"/><area shape="rect" id="node3" href="main_8cu.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="1216,59,1267,85"/><area shape="rect" id="node4" href="class_smpc_controller.html#a232316a3ba52a6d397e8337c130c81c2" title="SmpcController::solveStep" alt="" coords="488,33,667,60"/><area shape="rect" id="node5" href="class_smpc_controller.html#a504a73b33ca1704bc0e743006ef71dae" title="SmpcController::algorithmApg" alt="" coords="715,33,911,60"/></map>
 </div>
 </p>
 
@@ -646,7 +382,16 @@ Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="class_engine_ad5b7316584c79e2db5dc5f785b0a652f_cgraph.png" border="0" usemap="#class_engine_ad5b7316584c79e2db5dc5f785b0a652f_cgraph" alt=""/></div>
 <map name="class_engine_ad5b7316584c79e2db5dc5f785b0a652f_cgraph" id="class_engine_ad5b7316584c79e2db5dc5f785b0a652f_cgraph">
-<area shape="rect" id="node2" href="class_engine.html#a4e664235e0d3dc748d3f0cb88e0aaa19" title="Engine::initialiseScenario\lTreeDevice" alt="" coords="184,471,352,513"/><area shape="rect" id="node4" href="class_scenario_tree.html#a66557e4575270f9202301402441d4ca2" title="ScenarioTree::getPredHorizon" alt="" coords="407,289,604,316"/><area shape="rect" id="node5" href="class_scenario_tree.html#add52c9168d0fd4eeefe56780d072bd65" title="ScenarioTree::getNumScenarios" alt="" coords="400,588,611,615"/><area shape="rect" id="node7" href="class_dwn_network.html#a6791b1fd057bac451f84192624411155" title="DwnNetwork::getNumControls" alt="" coords="405,639,606,665"/><area shape="rect" id="node10" href="class_scenario_tree.html#ac4f4d939ce1caf17884a71592fa05770" title="ScenarioTree::getNodesPer\lStage" alt="" coords="414,690,597,731"/><area shape="rect" id="node11" href="class_scenario_tree.html#af2635a1644dba8d4b58d30c01fa7993b" title="ScenarioTree::getNodesPer\lStageCumul" alt="" coords="414,807,597,849"/><area shape="rect" id="node19" href="class_engine.html#ac9d6cb7d673e625256bead5e786e65a5" title="Engine::initialiseSystem\lDevice" alt="" coords="187,942,349,983"/><area shape="rect" id="node20" href="class_dwn_network.html#a4bd201487c9e524815b5c9112fcd2722" title="DwnNetwork::getNumTanks" alt="" coords="411,924,599,951"/><area shape="rect" id="node21" href="class_smpc_configuration.html#a31dc27fe4c16453cea0f451e58c33879" title="SmpcConfiguration::\lgetNV" alt="" coords="435,1543,576,1585"/><area shape="rect" id="node32" href="class_engine.html#a933446e347b77e350b3755b324ca099c" title="Engine::inverseBatchMat" alt="" coords="184,1059,352,1085"/><area shape="rect" id="node3" href="class_scenario_tree.html#ad6a9108a9226d28588b99a637251081f" title="ScenarioTree::getNumNodes" alt="" coords="410,756,601,783"/><area shape="rect" id="node6" href="class_dwn_network.html#ae938bb831f8d3cecde15bd240c43dc29" title="DwnNetwork::getNumDemands" alt="" coords="401,873,609,900"/><area shape="rect" id="node8" href="class_scenario_tree.html#a7130b4e92590127c71d9fc66b56cc701" title="ScenarioTree::getNumNonleaf\lNodes" alt="" coords="406,471,605,513"/><area shape="rect" id="node9" href="class_scenario_tree.html#a53a4a56fd39e52037b5d89707d513007" title="ScenarioTree::getStageNodes" alt="" coords="407,5,604,32"/><area shape="rect" id="node12" href="class_scenario_tree.html#abb67e8e923e294bdd2d3149a55db1400" title="ScenarioTree::getLeaveArray" alt="" coords="410,56,601,83"/><area shape="rect" id="node13" href="class_scenario_tree.html#aa51be42528397cc9522dd1224064ccd3" title="ScenarioTree::getNumChildren" alt="" coords="405,107,606,133"/><area shape="rect" id="node14" href="class_scenario_tree.html#aa5b578255b7b195f535324d0cf1135d2" title="ScenarioTree::getAncestor\lArray" alt="" coords="417,158,594,199"/><area shape="rect" id="node15" href="class_scenario_tree.html#aae77f877e1bd0585f7add07c5d380801" title="ScenarioTree::getNumChildren\lCumul" alt="" coords="405,223,606,265"/><area shape="rect" id="node16" href="class_scenario_tree.html#ad3ee14f8397e378b5baa616bc0265122" title="ScenarioTree::getProbArray" alt="" coords="414,537,597,564"/><area shape="rect" id="node17" href="class_scenario_tree.html#ad027558d837a1118c0d7b57e46da2b9f" title="ScenarioTree::getErrorDemand\lArray" alt="" coords="404,341,607,382"/><area shape="rect" id="node18" href="class_scenario_tree.html#a943bf522b5f9ee5cd1087078b518a6fd" title="ScenarioTree::getErrorPrice\lArray" alt="" coords="414,406,597,447"/><area shape="rect" id="node22" href="class_smpc_configuration.html#acca2836baa19e65573dec836ff69a3d2" title="SmpcConfiguration::\lgetMatPrcndDiag" alt="" coords="435,1178,576,1219"/><area shape="rect" id="node23" href="class_dwn_network.html#ab5a9a9d2f885de00c0c6f773744d4a7a" title="DwnNetwork::getMatB" alt="" coords="428,1244,583,1271"/><area shape="rect" id="node24" href="class_smpc_configuration.html#a8c33dc3a1fc9889c4ff43cbc74f72983" title="SmpcConfiguration::\lgetMatL" alt="" coords="435,1295,576,1337"/><area shape="rect" id="node25" href="class_smpc_configuration.html#a051e98c0598e2b6d1da92322faf223d0" title="SmpcConfiguration::\lgetMatLhat" alt="" coords="435,1361,576,1402"/><area shape="rect" id="node26" href="class_smpc_configuration.html#aae941e0602a6eaef8e4b738b9c50bc77" title="SmpcConfiguration::\lgetCostW" alt="" coords="435,1426,576,1467"/><area shape="rect" id="node27" href="class_dwn_network.html#a3d3f7c7b0cdbe2d060e47fd680874a62" title="DwnNetwork::getXmin" alt="" coords="428,1492,583,1519"/><area shape="rect" id="node28" href="class_dwn_network.html#aacbb495cd126b17e7a8c31cd60237191" title="DwnNetwork::getXmax" alt="" coords="426,975,585,1001"/><area shape="rect" id="node29" href="class_dwn_network.html#ad0a8c9318eb7b0d3157bafbecbac09a5" title="DwnNetwork::getXsafe" alt="" coords="426,1025,585,1052"/><area shape="rect" id="node30" href="class_dwn_network.html#ac7b16f6d58ff54502f8ba4d5617e3808" title="DwnNetwork::getUmin" alt="" coords="428,1076,583,1103"/><area shape="rect" id="node31" href="class_dwn_network.html#abe737922e107d55f09864fcdc1c4703f" title="DwnNetwork::getUmax" alt="" coords="426,1127,585,1153"/></map>
+<area shape="rect" id="node2" href="class_scenario_tree.html#add52c9168d0fd4eeefe56780d072bd65" title="ScenarioTree::getNumScenarios" alt="" coords="184,5,395,32"/><area shape="rect" id="node3" href="class_dwn_network.html#a4bd201487c9e524815b5c9112fcd2722" title="DwnNetwork::getNumTanks" alt="" coords="195,56,383,83"/><area shape="rect" id="node4" href="class_dwn_network.html#a6791b1fd057bac451f84192624411155" title="DwnNetwork::getNumControls" alt="" coords="189,107,390,133"/><area shape="rect" id="node5" href="class_smpc_configuration.html#a31dc27fe4c16453cea0f451e58c33879" title="SmpcConfiguration::\lgetNV" alt="" coords="219,158,360,199"/><area shape="rect" id="node6" href="class_scenario_tree.html#a66557e4575270f9202301402441d4ca2" title="ScenarioTree::getPredHorizon" alt="" coords="191,224,388,251"/><area shape="rect" id="node7" href="class_scenario_tree.html#ac4f4d939ce1caf17884a71592fa05770" title="ScenarioTree::getNodesPer\lStage" alt="" coords="198,275,381,317"/><area shape="rect" id="node8" href="class_scenario_tree.html#af2635a1644dba8d4b58d30c01fa7993b" title="ScenarioTree::getNodesPer\lStageCumul" alt="" coords="198,341,381,382"/></map>
+</div>
+</p>
+
+<p><div class="dynheader">
+Here is the caller graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="class_engine_ad5b7316584c79e2db5dc5f785b0a652f_icgraph.png" border="0" usemap="#class_engine_ad5b7316584c79e2db5dc5f785b0a652f_icgraph" alt=""/></div>
+<map name="class_engine_ad5b7316584c79e2db5dc5f785b0a652f_icgraph" id="class_engine_ad5b7316584c79e2db5dc5f785b0a652f_icgraph">
+<area shape="rect" id="node2" href="class_smpc_controller.html#ac11e4145e513a95a5114c7296a0416e1" title="SmpcController::initialise\lSmpcController" alt="" coords="185,12,351,53"/><area shape="rect" id="node3" href="main_8cu.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="1128,45,1179,71"/><area shape="rect" id="node4" href="class_smpc_controller.html#a232316a3ba52a6d397e8337c130c81c2" title="SmpcController::solveStep" alt="" coords="400,45,579,71"/><area shape="rect" id="node5" href="class_smpc_controller.html#a504a73b33ca1704bc0e743006ef71dae" title="SmpcController::algorithmApg" alt="" coords="627,45,823,71"/><area shape="rect" id="node6" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="873,45,1079,71"/><area shape="rect" id="node7" href="class_smpc_controller.html#a84fa9efe8b15742c929c0d274e479ff8" title="SmpcController::controlAction" alt="" coords="878,95,1074,122"/></map>
 </div>
 </p>
 
@@ -664,14 +409,15 @@ Here is the call graph for this function:</div>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>handle cublasHandle </p>
+<p>handle cublasHandle</p>
+<p>cublasHandle </p>
 
 <p><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="class_engine_a96b542ee7b14510c442e3bfdd311382c_icgraph.png" border="0" usemap="#class_engine_a96b542ee7b14510c442e3bfdd311382c_icgraph" alt=""/></div>
 <map name="class_engine_a96b542ee7b14510c442e3bfdd311382c_icgraph" id="class_engine_a96b542ee7b14510c442e3bfdd311382c_icgraph">
-<area shape="rect" id="node2" href="class_smpc_controller.html#a76c6c0b1d3307a9de26fa17ad2f37d72" title="SmpcController::dualExtrapolationStep" alt="" coords="225,5,471,32"/><area shape="rect" id="node5" href="class_smpc_controller.html#a232316a3ba52a6d397e8337c130c81c2" title="SmpcController::solveStep" alt="" coords="259,56,437,83"/><area shape="rect" id="node6" href="class_smpc_controller.html#ad477241e6c34e5db46e6ec00c16ddeab" title="SmpcController::proximalFunG" alt="" coords="247,107,449,133"/><area shape="rect" id="node7" href="class_smpc_controller.html#a7248245a2c2893be2032c7b29b65cb2d" title="SmpcController::dualUpdate" alt="" coords="255,157,441,184"/><area shape="rect" id="node3" href="class_smpc_controller.html#a70ecfdd41c38a5c4de76155f30f6b0c1" title="SmpcController::algorithmApg" alt="" coords="521,81,717,108"/><area shape="rect" id="node4" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="766,81,973,108"/></map>
+<area shape="rect" id="node2" href="class_smpc_controller.html#a76c6c0b1d3307a9de26fa17ad2f37d72" title="SmpcController::dualExtrapolationStep" alt="" coords="225,5,471,32"/><area shape="rect" id="node3" href="class_smpc_controller.html#a504a73b33ca1704bc0e743006ef71dae" title="SmpcController::algorithmApg" alt="" coords="526,132,722,159"/><area shape="rect" id="node7" href="class_smpc_controller.html#a232316a3ba52a6d397e8337c130c81c2" title="SmpcController::solveStep" alt="" coords="259,107,437,133"/><area shape="rect" id="node8" href="class_smpc_controller.html#ad477241e6c34e5db46e6ec00c16ddeab" title="SmpcController::proximalFunG" alt="" coords="247,157,449,184"/><area shape="rect" id="node9" href="class_smpc_controller.html#a7248245a2c2893be2032c7b29b65cb2d" title="SmpcController::dualUpdate" alt="" coords="255,208,441,235"/><area shape="rect" id="node10" href="class_smpc_controller.html#a3d02dd634603e096fc5f8e8940ace333" title="SmpcController::moveForeward\lInTime" alt="" coords="521,247,727,289"/><area shape="rect" id="node4" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="777,132,983,159"/><area shape="rect" id="node5" href="class_smpc_controller.html#a84fa9efe8b15742c929c0d274e479ff8" title="SmpcController::controlAction" alt="" coords="782,185,978,212"/><area shape="rect" id="node6" href="main_8cu.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="1032,215,1083,241"/></map>
 </div>
 </p>
 
@@ -696,7 +442,7 @@ Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="class_engine_af5c56254a25f6ff4ebc001bb1f9db4bf_icgraph.png" border="0" usemap="#class_engine_af5c56254a25f6ff4ebc001bb1f9db4bf_icgraph" alt=""/></div>
 <map name="class_engine_af5c56254a25f6ff4ebc001bb1f9db4bf_icgraph" id="class_engine_af5c56254a25f6ff4ebc001bb1f9db4bf_icgraph">
-<area shape="rect" id="node2" href="class_smpc_controller.html#a42d20e6dd18dfcaf63ddf484fc8c7813" title="SmpcController::SmpcController" alt="" coords="237,5,448,32"/><area shape="rect" id="node3" href="class_smpc_controller.html#a76c6c0b1d3307a9de26fa17ad2f37d72" title="SmpcController::dualExtrapolationStep" alt="" coords="219,56,466,83"/><area shape="rect" id="node4" href="class_smpc_controller.html#a70ecfdd41c38a5c4de76155f30f6b0c1" title="SmpcController::algorithmApg" alt="" coords="515,157,711,184"/><area shape="rect" id="node6" href="class_smpc_controller.html#a232316a3ba52a6d397e8337c130c81c2" title="SmpcController::solveStep" alt="" coords="253,157,432,184"/><area shape="rect" id="node7" href="class_smpc_controller.html#ad477241e6c34e5db46e6ec00c16ddeab" title="SmpcController::proximalFunG" alt="" coords="242,208,443,235"/><area shape="rect" id="node8" href="class_smpc_controller.html#a7248245a2c2893be2032c7b29b65cb2d" title="SmpcController::dualUpdate" alt="" coords="249,259,436,285"/><area shape="rect" id="node5" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="761,157,967,184"/></map>
+<area shape="rect" id="node2" href="class_smpc_controller.html#a42d20e6dd18dfcaf63ddf484fc8c7813" title="SmpcController::SmpcController" alt="" coords="237,5,448,32"/><area shape="rect" id="node3" href="class_smpc_controller.html#a76c6c0b1d3307a9de26fa17ad2f37d72" title="SmpcController::dualExtrapolationStep" alt="" coords="219,56,466,83"/><area shape="rect" id="node4" href="class_smpc_controller.html#a504a73b33ca1704bc0e743006ef71dae" title="SmpcController::algorithmApg" alt="" coords="525,183,721,209"/><area shape="rect" id="node8" href="class_smpc_controller.html#a232316a3ba52a6d397e8337c130c81c2" title="SmpcController::solveStep" alt="" coords="253,157,432,184"/><area shape="rect" id="node9" href="class_smpc_controller.html#ad477241e6c34e5db46e6ec00c16ddeab" title="SmpcController::proximalFunG" alt="" coords="242,208,443,235"/><area shape="rect" id="node10" href="class_smpc_controller.html#a7248245a2c2893be2032c7b29b65cb2d" title="SmpcController::dualUpdate" alt="" coords="249,259,436,285"/><area shape="rect" id="node11" href="class_smpc_controller.html#a3d02dd634603e096fc5f8e8940ace333" title="SmpcController::moveForeward\lInTime" alt="" coords="519,302,726,343"/><area shape="rect" id="node12" href="class_smpc_controller.html#a69a259598ed5f16388221f8bb0ef438f" title="SmpcController::updateKpi" alt="" coords="253,360,432,387"/><area shape="rect" id="node13" href="class_smpc_controller.html#ad25d2fc65344d661fa775203ca978040" title="SmpcController::getDwnNetwork" alt="" coords="515,411,730,437"/><area shape="rect" id="node5" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="779,183,986,209"/><area shape="rect" id="node6" href="class_smpc_controller.html#a84fa9efe8b15742c929c0d274e479ff8" title="SmpcController::controlAction" alt="" coords="785,233,981,260"/><area shape="rect" id="node7" href="main_8cu.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="1035,335,1085,361"/><area shape="rect" id="node14" href="class_smpc_controller.html#ac9f531f272e075ee7b5ad7e97df5e7bd" title="SmpcController::getNetworkKpi" alt="" coords="779,411,986,437"/></map>
 </div>
 </p>
 
@@ -779,7 +525,7 @@ Here is the caller graph for this function:</div>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>-&mdash;GETTER'S FOR FACTOR MATRICES-&mdash; matrix Phi</p>
+<p>previous v reduced control dimensions-&mdash;GETTER'S FOR FACTOR MATRICES-&mdash; matrix Phi</p>
 <p>-&mdash;GETTER'S FOR THE FACTOR STEP&mdash; matrix Phi </p>
 
 </div>
@@ -819,7 +565,7 @@ Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="class_engine_a9f98a3758628c9bf163e205122113e82_icgraph.png" border="0" usemap="#class_engine_a9f98a3758628c9bf163e205122113e82_icgraph" alt=""/></div>
 <map name="class_engine_a9f98a3758628c9bf163e205122113e82_icgraph" id="class_engine_a9f98a3758628c9bf163e205122113e82_icgraph">
-<area shape="rect" id="node2" href="class_smpc_controller.html#a232316a3ba52a6d397e8337c130c81c2" title="SmpcController::solveStep" alt="" coords="200,5,379,32"/><area shape="rect" id="node3" href="class_smpc_controller.html#a70ecfdd41c38a5c4de76155f30f6b0c1" title="SmpcController::algorithmApg" alt="" coords="427,5,623,32"/><area shape="rect" id="node4" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="673,5,879,32"/></map>
+<area shape="rect" id="node2" href="class_smpc_controller.html#a232316a3ba52a6d397e8337c130c81c2" title="SmpcController::solveStep" alt="" coords="200,31,379,57"/><area shape="rect" id="node3" href="class_smpc_controller.html#a504a73b33ca1704bc0e743006ef71dae" title="SmpcController::algorithmApg" alt="" coords="427,31,623,57"/><area shape="rect" id="node4" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="673,5,879,32"/><area shape="rect" id="node5" href="class_smpc_controller.html#a84fa9efe8b15742c929c0d274e479ff8" title="SmpcController::controlAction" alt="" coords="678,56,874,83"/><area shape="rect" id="node6" href="main_8cu.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="928,56,979,83"/></map>
 </div>
 </p>
 
@@ -860,7 +606,7 @@ Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="class_engine_af2094746d43f12952de211afd91be314_icgraph.png" border="0" usemap="#class_engine_af2094746d43f12952de211afd91be314_icgraph" alt=""/></div>
 <map name="class_engine_af2094746d43f12952de211afd91be314_icgraph" id="class_engine_af2094746d43f12952de211afd91be314_icgraph">
-<area shape="rect" id="node2" href="class_smpc_controller.html#a232316a3ba52a6d397e8337c130c81c2" title="SmpcController::solveStep" alt="" coords="192,5,371,32"/><area shape="rect" id="node3" href="class_smpc_controller.html#a70ecfdd41c38a5c4de76155f30f6b0c1" title="SmpcController::algorithmApg" alt="" coords="419,5,615,32"/><area shape="rect" id="node4" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="665,5,871,32"/></map>
+<area shape="rect" id="node2" href="class_smpc_controller.html#a232316a3ba52a6d397e8337c130c81c2" title="SmpcController::solveStep" alt="" coords="192,31,371,57"/><area shape="rect" id="node3" href="class_smpc_controller.html#a504a73b33ca1704bc0e743006ef71dae" title="SmpcController::algorithmApg" alt="" coords="419,31,615,57"/><area shape="rect" id="node4" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="665,5,871,32"/><area shape="rect" id="node5" href="class_smpc_controller.html#a84fa9efe8b15742c929c0d274e479ff8" title="SmpcController::controlAction" alt="" coords="670,56,866,83"/><area shape="rect" id="node6" href="main_8cu.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="920,56,971,83"/></map>
 </div>
 </p>
 
@@ -885,7 +631,7 @@ Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="class_engine_a3c493b66e4be71578cb3804620cc58c8_icgraph.png" border="0" usemap="#class_engine_a3c493b66e4be71578cb3804620cc58c8_icgraph" alt=""/></div>
 <map name="class_engine_a3c493b66e4be71578cb3804620cc58c8_icgraph" id="class_engine_a3c493b66e4be71578cb3804620cc58c8_icgraph">
-<area shape="rect" id="node2" href="class_smpc_controller.html#a232316a3ba52a6d397e8337c130c81c2" title="SmpcController::solveStep" alt="" coords="189,5,368,32"/><area shape="rect" id="node3" href="class_smpc_controller.html#a70ecfdd41c38a5c4de76155f30f6b0c1" title="SmpcController::algorithmApg" alt="" coords="417,5,613,32"/><area shape="rect" id="node4" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="662,5,869,32"/></map>
+<area shape="rect" id="node2" href="class_smpc_controller.html#a232316a3ba52a6d397e8337c130c81c2" title="SmpcController::solveStep" alt="" coords="189,31,368,57"/><area shape="rect" id="node3" href="class_smpc_controller.html#a504a73b33ca1704bc0e743006ef71dae" title="SmpcController::algorithmApg" alt="" coords="417,31,613,57"/><area shape="rect" id="node4" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="662,5,869,32"/><area shape="rect" id="node5" href="class_smpc_controller.html#a84fa9efe8b15742c929c0d274e479ff8" title="SmpcController::controlAction" alt="" coords="667,56,863,83"/><area shape="rect" id="node6" href="main_8cu.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="917,56,968,83"/></map>
 </div>
 </p>
 
@@ -910,7 +656,7 @@ Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="class_engine_aa60353ee6f70abf3910862cc57aeb194_icgraph.png" border="0" usemap="#class_engine_aa60353ee6f70abf3910862cc57aeb194_icgraph" alt=""/></div>
 <map name="class_engine_aa60353ee6f70abf3910862cc57aeb194_icgraph" id="class_engine_aa60353ee6f70abf3910862cc57aeb194_icgraph">
-<area shape="rect" id="node2" href="class_smpc_controller.html#a232316a3ba52a6d397e8337c130c81c2" title="SmpcController::solveStep" alt="" coords="192,5,371,32"/><area shape="rect" id="node3" href="class_smpc_controller.html#a70ecfdd41c38a5c4de76155f30f6b0c1" title="SmpcController::algorithmApg" alt="" coords="419,5,615,32"/><area shape="rect" id="node4" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="665,5,871,32"/></map>
+<area shape="rect" id="node2" href="class_smpc_controller.html#a232316a3ba52a6d397e8337c130c81c2" title="SmpcController::solveStep" alt="" coords="192,31,371,57"/><area shape="rect" id="node3" href="class_smpc_controller.html#a504a73b33ca1704bc0e743006ef71dae" title="SmpcController::algorithmApg" alt="" coords="419,31,615,57"/><area shape="rect" id="node4" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="665,5,871,32"/><area shape="rect" id="node5" href="class_smpc_controller.html#a84fa9efe8b15742c929c0d274e479ff8" title="SmpcController::controlAction" alt="" coords="670,56,866,83"/><area shape="rect" id="node6" href="main_8cu.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="920,56,971,83"/></map>
 </div>
 </p>
 
@@ -935,7 +681,7 @@ Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="class_engine_a7d9a092b0f1f9d31771eb64744040dc5_icgraph.png" border="0" usemap="#class_engine_a7d9a092b0f1f9d31771eb64744040dc5_icgraph" alt=""/></div>
 <map name="class_engine_a7d9a092b0f1f9d31771eb64744040dc5_icgraph" id="class_engine_a7d9a092b0f1f9d31771eb64744040dc5_icgraph">
-<area shape="rect" id="node2" href="class_smpc_controller.html#a232316a3ba52a6d397e8337c130c81c2" title="SmpcController::solveStep" alt="" coords="224,5,403,32"/><area shape="rect" id="node3" href="class_smpc_controller.html#a70ecfdd41c38a5c4de76155f30f6b0c1" title="SmpcController::algorithmApg" alt="" coords="451,5,647,32"/><area shape="rect" id="node4" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="697,5,903,32"/></map>
+<area shape="rect" id="node2" href="class_smpc_controller.html#a232316a3ba52a6d397e8337c130c81c2" title="SmpcController::solveStep" alt="" coords="224,31,403,57"/><area shape="rect" id="node3" href="class_smpc_controller.html#a504a73b33ca1704bc0e743006ef71dae" title="SmpcController::algorithmApg" alt="" coords="451,31,647,57"/><area shape="rect" id="node4" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="697,5,903,32"/><area shape="rect" id="node5" href="class_smpc_controller.html#a84fa9efe8b15742c929c0d274e479ff8" title="SmpcController::controlAction" alt="" coords="702,56,898,83"/><area shape="rect" id="node6" href="main_8cu.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="952,56,1003,83"/></map>
 </div>
 </p>
 
@@ -960,7 +706,7 @@ Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="class_engine_a1747aca27eeced5852369aeab6093c1b_icgraph.png" border="0" usemap="#class_engine_a1747aca27eeced5852369aeab6093c1b_icgraph" alt=""/></div>
 <map name="class_engine_a1747aca27eeced5852369aeab6093c1b_icgraph" id="class_engine_a1747aca27eeced5852369aeab6093c1b_icgraph">
-<area shape="rect" id="node2" href="class_smpc_controller.html#a232316a3ba52a6d397e8337c130c81c2" title="SmpcController::solveStep" alt="" coords="200,5,379,32"/><area shape="rect" id="node3" href="class_smpc_controller.html#a70ecfdd41c38a5c4de76155f30f6b0c1" title="SmpcController::algorithmApg" alt="" coords="427,5,623,32"/><area shape="rect" id="node4" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="673,5,879,32"/></map>
+<area shape="rect" id="node2" href="class_smpc_controller.html#a232316a3ba52a6d397e8337c130c81c2" title="SmpcController::solveStep" alt="" coords="200,31,379,57"/><area shape="rect" id="node3" href="class_smpc_controller.html#a504a73b33ca1704bc0e743006ef71dae" title="SmpcController::algorithmApg" alt="" coords="427,31,623,57"/><area shape="rect" id="node4" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="673,5,879,32"/><area shape="rect" id="node5" href="class_smpc_controller.html#a84fa9efe8b15742c929c0d274e479ff8" title="SmpcController::controlAction" alt="" coords="678,56,874,83"/><area shape="rect" id="node6" href="main_8cu.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="928,56,979,83"/></map>
 </div>
 </p>
 
@@ -985,7 +731,7 @@ Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="class_engine_a888b6fe0369f247a1d525d3785176ce5_icgraph.png" border="0" usemap="#class_engine_a888b6fe0369f247a1d525d3785176ce5_icgraph" alt=""/></div>
 <map name="class_engine_a888b6fe0369f247a1d525d3785176ce5_icgraph" id="class_engine_a888b6fe0369f247a1d525d3785176ce5_icgraph">
-<area shape="rect" id="node2" href="class_smpc_controller.html#a232316a3ba52a6d397e8337c130c81c2" title="SmpcController::solveStep" alt="" coords="200,5,379,32"/><area shape="rect" id="node3" href="class_smpc_controller.html#a70ecfdd41c38a5c4de76155f30f6b0c1" title="SmpcController::algorithmApg" alt="" coords="427,5,623,32"/><area shape="rect" id="node4" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="673,5,879,32"/></map>
+<area shape="rect" id="node2" href="class_smpc_controller.html#a232316a3ba52a6d397e8337c130c81c2" title="SmpcController::solveStep" alt="" coords="200,31,379,57"/><area shape="rect" id="node3" href="class_smpc_controller.html#a504a73b33ca1704bc0e743006ef71dae" title="SmpcController::algorithmApg" alt="" coords="427,31,623,57"/><area shape="rect" id="node4" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="673,5,879,32"/><area shape="rect" id="node5" href="class_smpc_controller.html#a84fa9efe8b15742c929c0d274e479ff8" title="SmpcController::controlAction" alt="" coords="678,56,874,83"/><area shape="rect" id="node6" href="main_8cu.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="928,56,979,83"/></map>
 </div>
 </p>
 
@@ -1010,7 +756,7 @@ Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="class_engine_a0bf140de4b9e45154f172fea6a300764_icgraph.png" border="0" usemap="#class_engine_a0bf140de4b9e45154f172fea6a300764_icgraph" alt=""/></div>
 <map name="class_engine_a0bf140de4b9e45154f172fea6a300764_icgraph" id="class_engine_a0bf140de4b9e45154f172fea6a300764_icgraph">
-<area shape="rect" id="node2" href="class_smpc_controller.html#a232316a3ba52a6d397e8337c130c81c2" title="SmpcController::solveStep" alt="" coords="219,5,397,32"/><area shape="rect" id="node3" href="class_smpc_controller.html#a70ecfdd41c38a5c4de76155f30f6b0c1" title="SmpcController::algorithmApg" alt="" coords="446,5,642,32"/><area shape="rect" id="node4" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="691,5,898,32"/></map>
+<area shape="rect" id="node2" href="class_smpc_controller.html#a232316a3ba52a6d397e8337c130c81c2" title="SmpcController::solveStep" alt="" coords="219,31,397,57"/><area shape="rect" id="node3" href="class_smpc_controller.html#a504a73b33ca1704bc0e743006ef71dae" title="SmpcController::algorithmApg" alt="" coords="446,31,642,57"/><area shape="rect" id="node4" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="691,5,898,32"/><area shape="rect" id="node5" href="class_smpc_controller.html#a84fa9efe8b15742c929c0d274e479ff8" title="SmpcController::controlAction" alt="" coords="697,56,893,83"/><area shape="rect" id="node6" href="main_8cu.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="947,56,997,83"/></map>
 </div>
 </p>
 
@@ -1035,7 +781,7 @@ Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="class_engine_a155e3afdc810b09542a2f87d0edb915a_icgraph.png" border="0" usemap="#class_engine_a155e3afdc810b09542a2f87d0edb915a_icgraph" alt=""/></div>
 <map name="class_engine_a155e3afdc810b09542a2f87d0edb915a_icgraph" id="class_engine_a155e3afdc810b09542a2f87d0edb915a_icgraph">
-<area shape="rect" id="node2" href="class_smpc_controller.html#a232316a3ba52a6d397e8337c130c81c2" title="SmpcController::solveStep" alt="" coords="213,5,392,32"/><area shape="rect" id="node3" href="class_smpc_controller.html#a70ecfdd41c38a5c4de76155f30f6b0c1" title="SmpcController::algorithmApg" alt="" coords="441,5,637,32"/><area shape="rect" id="node4" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="686,5,893,32"/></map>
+<area shape="rect" id="node2" href="class_smpc_controller.html#a232316a3ba52a6d397e8337c130c81c2" title="SmpcController::solveStep" alt="" coords="213,31,392,57"/><area shape="rect" id="node3" href="class_smpc_controller.html#a504a73b33ca1704bc0e743006ef71dae" title="SmpcController::algorithmApg" alt="" coords="441,31,637,57"/><area shape="rect" id="node4" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="686,5,893,32"/><area shape="rect" id="node5" href="class_smpc_controller.html#a84fa9efe8b15742c929c0d274e479ff8" title="SmpcController::controlAction" alt="" coords="691,56,887,83"/><area shape="rect" id="node6" href="main_8cu.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="941,56,992,83"/></map>
 </div>
 </p>
 
@@ -1076,7 +822,7 @@ Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="class_engine_aab710a21c96346c8705721ac5f3e0d07_icgraph.png" border="0" usemap="#class_engine_aab710a21c96346c8705721ac5f3e0d07_icgraph" alt=""/></div>
 <map name="class_engine_aab710a21c96346c8705721ac5f3e0d07_icgraph" id="class_engine_aab710a21c96346c8705721ac5f3e0d07_icgraph">
-<area shape="rect" id="node2" href="class_smpc_controller.html#a232316a3ba52a6d397e8337c130c81c2" title="SmpcController::solveStep" alt="" coords="225,5,404,32"/><area shape="rect" id="node5" href="class_smpc_controller.html#ad477241e6c34e5db46e6ec00c16ddeab" title="SmpcController::proximalFunG" alt="" coords="214,56,415,83"/><area shape="rect" id="node3" href="class_smpc_controller.html#a70ecfdd41c38a5c4de76155f30f6b0c1" title="SmpcController::algorithmApg" alt="" coords="465,31,661,57"/><area shape="rect" id="node4" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="710,31,917,57"/></map>
+<area shape="rect" id="node2" href="class_smpc_controller.html#a232316a3ba52a6d397e8337c130c81c2" title="SmpcController::solveStep" alt="" coords="225,5,404,32"/><area shape="rect" id="node7" href="class_smpc_controller.html#ad477241e6c34e5db46e6ec00c16ddeab" title="SmpcController::proximalFunG" alt="" coords="214,56,415,83"/><area shape="rect" id="node3" href="class_smpc_controller.html#a504a73b33ca1704bc0e743006ef71dae" title="SmpcController::algorithmApg" alt="" coords="465,31,661,57"/><area shape="rect" id="node4" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="710,5,917,32"/><area shape="rect" id="node5" href="class_smpc_controller.html#a84fa9efe8b15742c929c0d274e479ff8" title="SmpcController::controlAction" alt="" coords="715,56,911,83"/><area shape="rect" id="node6" href="main_8cu.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="965,56,1016,83"/></map>
 </div>
 </p>
 
@@ -1101,7 +847,7 @@ Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="class_engine_a2e49f5732ea07bd6467204ba1213c7fd_icgraph.png" border="0" usemap="#class_engine_a2e49f5732ea07bd6467204ba1213c7fd_icgraph" alt=""/></div>
 <map name="class_engine_a2e49f5732ea07bd6467204ba1213c7fd_icgraph" id="class_engine_a2e49f5732ea07bd6467204ba1213c7fd_icgraph">
-<area shape="rect" id="node2" href="class_smpc_controller.html#ad477241e6c34e5db46e6ec00c16ddeab" title="SmpcController::proximalFunG" alt="" coords="214,5,415,32"/><area shape="rect" id="node3" href="class_smpc_controller.html#a70ecfdd41c38a5c4de76155f30f6b0c1" title="SmpcController::algorithmApg" alt="" coords="465,5,661,32"/><area shape="rect" id="node4" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="710,5,917,32"/></map>
+<area shape="rect" id="node2" href="class_smpc_controller.html#ad477241e6c34e5db46e6ec00c16ddeab" title="SmpcController::proximalFunG" alt="" coords="214,31,415,57"/><area shape="rect" id="node3" href="class_smpc_controller.html#a504a73b33ca1704bc0e743006ef71dae" title="SmpcController::algorithmApg" alt="" coords="465,31,661,57"/><area shape="rect" id="node4" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="710,5,917,32"/><area shape="rect" id="node5" href="class_smpc_controller.html#a84fa9efe8b15742c929c0d274e479ff8" title="SmpcController::controlAction" alt="" coords="715,56,911,83"/><area shape="rect" id="node6" href="main_8cu.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="965,56,1016,83"/></map>
 </div>
 </p>
 
@@ -1158,7 +904,7 @@ Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="class_engine_a40ea7ce2310db1343f45153ef88965d1_icgraph.png" border="0" usemap="#class_engine_a40ea7ce2310db1343f45153ef88965d1_icgraph" alt=""/></div>
 <map name="class_engine_a40ea7ce2310db1343f45153ef88965d1_icgraph" id="class_engine_a40ea7ce2310db1343f45153ef88965d1_icgraph">
-<area shape="rect" id="node2" href="class_smpc_controller.html#a42d20e6dd18dfcaf63ddf484fc8c7813" title="SmpcController::SmpcController" alt="" coords="237,5,448,32"/><area shape="rect" id="node3" href="class_smpc_controller.html#a76c6c0b1d3307a9de26fa17ad2f37d72" title="SmpcController::dualExtrapolationStep" alt="" coords="219,56,466,83"/><area shape="rect" id="node4" href="class_smpc_controller.html#a70ecfdd41c38a5c4de76155f30f6b0c1" title="SmpcController::algorithmApg" alt="" coords="515,157,711,184"/><area shape="rect" id="node6" href="class_smpc_controller.html#a232316a3ba52a6d397e8337c130c81c2" title="SmpcController::solveStep" alt="" coords="253,157,432,184"/><area shape="rect" id="node7" href="class_smpc_controller.html#ad477241e6c34e5db46e6ec00c16ddeab" title="SmpcController::proximalFunG" alt="" coords="242,208,443,235"/><area shape="rect" id="node8" href="class_smpc_controller.html#a7248245a2c2893be2032c7b29b65cb2d" title="SmpcController::dualUpdate" alt="" coords="249,259,436,285"/><area shape="rect" id="node5" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="761,157,967,184"/></map>
+<area shape="rect" id="node2" href="class_smpc_controller.html#a42d20e6dd18dfcaf63ddf484fc8c7813" title="SmpcController::SmpcController" alt="" coords="237,5,448,32"/><area shape="rect" id="node3" href="class_smpc_controller.html#a76c6c0b1d3307a9de26fa17ad2f37d72" title="SmpcController::dualExtrapolationStep" alt="" coords="219,56,466,83"/><area shape="rect" id="node4" href="class_smpc_controller.html#a504a73b33ca1704bc0e743006ef71dae" title="SmpcController::algorithmApg" alt="" coords="515,157,711,184"/><area shape="rect" id="node8" href="class_smpc_controller.html#a232316a3ba52a6d397e8337c130c81c2" title="SmpcController::solveStep" alt="" coords="253,157,432,184"/><area shape="rect" id="node9" href="class_smpc_controller.html#ad477241e6c34e5db46e6ec00c16ddeab" title="SmpcController::proximalFunG" alt="" coords="242,208,443,235"/><area shape="rect" id="node10" href="class_smpc_controller.html#a7248245a2c2893be2032c7b29b65cb2d" title="SmpcController::dualUpdate" alt="" coords="249,259,436,285"/><area shape="rect" id="node11" href="class_smpc_controller.html#a69324f05ac863933ecdbfff84d058517" title="SmpcController::getScenarioTree" alt="" coords="235,309,450,336"/><area shape="rect" id="node5" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="761,132,967,159"/><area shape="rect" id="node6" href="class_smpc_controller.html#a84fa9efe8b15742c929c0d274e479ff8" title="SmpcController::controlAction" alt="" coords="766,183,962,209"/><area shape="rect" id="node7" href="main_8cu.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="1016,183,1067,209"/></map>
 </div>
 </p>
 
@@ -1184,7 +930,7 @@ Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="class_engine_a3111663e2726aec5914acc87d8e0c7be_icgraph.png" border="0" usemap="#class_engine_a3111663e2726aec5914acc87d8e0c7be_icgraph" alt=""/></div>
 <map name="class_engine_a3111663e2726aec5914acc87d8e0c7be_icgraph" id="class_engine_a3111663e2726aec5914acc87d8e0c7be_icgraph">
-<area shape="rect" id="node2" href="class_smpc_controller.html#a232316a3ba52a6d397e8337c130c81c2" title="SmpcController::solveStep" alt="" coords="197,5,376,32"/><area shape="rect" id="node3" href="class_smpc_controller.html#a70ecfdd41c38a5c4de76155f30f6b0c1" title="SmpcController::algorithmApg" alt="" coords="425,5,621,32"/><area shape="rect" id="node4" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="670,5,877,32"/></map>
+<area shape="rect" id="node2" href="class_smpc_controller.html#a232316a3ba52a6d397e8337c130c81c2" title="SmpcController::solveStep" alt="" coords="197,51,376,77"/><area shape="rect" id="node7" href="class_smpc_controller.html#a3d02dd634603e096fc5f8e8940ace333" title="SmpcController::moveForeward\lInTime" alt="" coords="425,99,631,141"/><area shape="rect" id="node3" href="class_smpc_controller.html#a504a73b33ca1704bc0e743006ef71dae" title="SmpcController::algorithmApg" alt="" coords="430,48,626,75"/><area shape="rect" id="node4" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="681,5,887,32"/><area shape="rect" id="node5" href="class_smpc_controller.html#a84fa9efe8b15742c929c0d274e479ff8" title="SmpcController::controlAction" alt="" coords="686,56,882,83"/><area shape="rect" id="node6" href="main_8cu.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="936,81,987,108"/></map>
 </div>
 </p>
 
@@ -1241,7 +987,7 @@ Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="class_engine_a72f53b91d535350ae87145382cb1efdf_icgraph.png" border="0" usemap="#class_engine_a72f53b91d535350ae87145382cb1efdf_icgraph" alt=""/></div>
 <map name="class_engine_a72f53b91d535350ae87145382cb1efdf_icgraph" id="class_engine_a72f53b91d535350ae87145382cb1efdf_icgraph">
-<area shape="rect" id="node2" href="class_smpc_controller.html#a232316a3ba52a6d397e8337c130c81c2" title="SmpcController::solveStep" alt="" coords="195,5,373,32"/><area shape="rect" id="node3" href="class_smpc_controller.html#a70ecfdd41c38a5c4de76155f30f6b0c1" title="SmpcController::algorithmApg" alt="" coords="422,5,618,32"/><area shape="rect" id="node4" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="667,5,874,32"/></map>
+<area shape="rect" id="node2" href="class_smpc_controller.html#a232316a3ba52a6d397e8337c130c81c2" title="SmpcController::solveStep" alt="" coords="195,31,373,57"/><area shape="rect" id="node3" href="class_smpc_controller.html#a504a73b33ca1704bc0e743006ef71dae" title="SmpcController::algorithmApg" alt="" coords="422,31,618,57"/><area shape="rect" id="node4" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="667,5,874,32"/><area shape="rect" id="node5" href="class_smpc_controller.html#a84fa9efe8b15742c929c0d274e479ff8" title="SmpcController::controlAction" alt="" coords="673,56,869,83"/><area shape="rect" id="node6" href="main_8cu.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="923,56,973,83"/></map>
 </div>
 </p>
 
@@ -1283,7 +1029,7 @@ Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="class_engine_aa6956e2e98b0ef672e14c4e13bb8bd1d_icgraph.png" border="0" usemap="#class_engine_aa6956e2e98b0ef672e14c4e13bb8bd1d_icgraph" alt=""/></div>
 <map name="class_engine_aa6956e2e98b0ef672e14c4e13bb8bd1d_icgraph" id="class_engine_aa6956e2e98b0ef672e14c4e13bb8bd1d_icgraph">
-<area shape="rect" id="node2" href="class_smpc_controller.html#ad477241e6c34e5db46e6ec00c16ddeab" title="SmpcController::proximalFunG" alt="" coords="201,5,402,32"/><area shape="rect" id="node3" href="class_smpc_controller.html#a70ecfdd41c38a5c4de76155f30f6b0c1" title="SmpcController::algorithmApg" alt="" coords="451,5,647,32"/><area shape="rect" id="node4" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="697,5,903,32"/></map>
+<area shape="rect" id="node2" href="class_smpc_controller.html#ad477241e6c34e5db46e6ec00c16ddeab" title="SmpcController::proximalFunG" alt="" coords="201,31,402,57"/><area shape="rect" id="node7" href="class_smpc_controller.html#a8d32b96e3c4ae195616a651459701241" title="SmpcController::controlAction" alt="" coords="203,81,399,108"/><area shape="rect" id="node3" href="class_smpc_controller.html#a504a73b33ca1704bc0e743006ef71dae" title="SmpcController::algorithmApg" alt="" coords="451,31,647,57"/><area shape="rect" id="node4" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="697,5,903,32"/><area shape="rect" id="node5" href="class_smpc_controller.html#a84fa9efe8b15742c929c0d274e479ff8" title="SmpcController::controlAction" alt="" coords="702,56,898,83"/><area shape="rect" id="node6" href="main_8cu.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="952,56,1003,83"/></map>
 </div>
 </p>
 
@@ -1308,7 +1054,7 @@ Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="class_engine_aab13a632a7104dfd8fc8d97d81732ec6_icgraph.png" border="0" usemap="#class_engine_aab13a632a7104dfd8fc8d97d81732ec6_icgraph" alt=""/></div>
 <map name="class_engine_aab13a632a7104dfd8fc8d97d81732ec6_icgraph" id="class_engine_aab13a632a7104dfd8fc8d97d81732ec6_icgraph">
-<area shape="rect" id="node2" href="class_smpc_controller.html#ad477241e6c34e5db46e6ec00c16ddeab" title="SmpcController::proximalFunG" alt="" coords="198,5,399,32"/><area shape="rect" id="node3" href="class_smpc_controller.html#a70ecfdd41c38a5c4de76155f30f6b0c1" title="SmpcController::algorithmApg" alt="" coords="449,5,645,32"/><area shape="rect" id="node4" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="694,5,901,32"/></map>
+<area shape="rect" id="node2" href="class_smpc_controller.html#ad477241e6c34e5db46e6ec00c16ddeab" title="SmpcController::proximalFunG" alt="" coords="198,31,399,57"/><area shape="rect" id="node7" href="class_smpc_controller.html#a8d32b96e3c4ae195616a651459701241" title="SmpcController::controlAction" alt="" coords="201,81,397,108"/><area shape="rect" id="node3" href="class_smpc_controller.html#a504a73b33ca1704bc0e743006ef71dae" title="SmpcController::algorithmApg" alt="" coords="449,31,645,57"/><area shape="rect" id="node4" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="694,5,901,32"/><area shape="rect" id="node5" href="class_smpc_controller.html#a84fa9efe8b15742c929c0d274e479ff8" title="SmpcController::controlAction" alt="" coords="699,56,895,83"/><area shape="rect" id="node6" href="main_8cu.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="949,56,1000,83"/></map>
 </div>
 </p>
 
@@ -1333,7 +1079,7 @@ Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="class_engine_a4e863110b9574e1f157c19d7542fe1cd_icgraph.png" border="0" usemap="#class_engine_a4e863110b9574e1f157c19d7542fe1cd_icgraph" alt=""/></div>
 <map name="class_engine_a4e863110b9574e1f157c19d7542fe1cd_icgraph" id="class_engine_a4e863110b9574e1f157c19d7542fe1cd_icgraph">
-<area shape="rect" id="node2" href="class_smpc_controller.html#ad477241e6c34e5db46e6ec00c16ddeab" title="SmpcController::proximalFunG" alt="" coords="201,5,402,32"/><area shape="rect" id="node3" href="class_smpc_controller.html#a70ecfdd41c38a5c4de76155f30f6b0c1" title="SmpcController::algorithmApg" alt="" coords="451,5,647,32"/><area shape="rect" id="node4" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="697,5,903,32"/></map>
+<area shape="rect" id="node2" href="class_smpc_controller.html#ad477241e6c34e5db46e6ec00c16ddeab" title="SmpcController::proximalFunG" alt="" coords="201,31,402,57"/><area shape="rect" id="node3" href="class_smpc_controller.html#a504a73b33ca1704bc0e743006ef71dae" title="SmpcController::algorithmApg" alt="" coords="451,31,647,57"/><area shape="rect" id="node4" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="697,5,903,32"/><area shape="rect" id="node5" href="class_smpc_controller.html#a84fa9efe8b15742c929c0d274e479ff8" title="SmpcController::controlAction" alt="" coords="702,56,898,83"/><area shape="rect" id="node6" href="main_8cu.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="952,56,1003,83"/></map>
 </div>
 </p>
 
@@ -1359,7 +1105,7 @@ Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="class_engine_aab7402ace4e3bcabda14d481f63233b4_icgraph.png" border="0" usemap="#class_engine_aab7402ace4e3bcabda14d481f63233b4_icgraph" alt=""/></div>
 <map name="class_engine_aab7402ace4e3bcabda14d481f63233b4_icgraph" id="class_engine_aab7402ace4e3bcabda14d481f63233b4_icgraph">
-<area shape="rect" id="node2" href="class_smpc_controller.html#ad477241e6c34e5db46e6ec00c16ddeab" title="SmpcController::proximalFunG" alt="" coords="195,5,397,32"/><area shape="rect" id="node3" href="class_smpc_controller.html#a70ecfdd41c38a5c4de76155f30f6b0c1" title="SmpcController::algorithmApg" alt="" coords="446,5,642,32"/><area shape="rect" id="node4" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="691,5,898,32"/></map>
+<area shape="rect" id="node2" href="class_smpc_controller.html#ad477241e6c34e5db46e6ec00c16ddeab" title="SmpcController::proximalFunG" alt="" coords="195,31,397,57"/><area shape="rect" id="node3" href="class_smpc_controller.html#a504a73b33ca1704bc0e743006ef71dae" title="SmpcController::algorithmApg" alt="" coords="446,31,642,57"/><area shape="rect" id="node4" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="691,5,898,32"/><area shape="rect" id="node5" href="class_smpc_controller.html#a84fa9efe8b15742c929c0d274e479ff8" title="SmpcController::controlAction" alt="" coords="697,56,893,83"/><area shape="rect" id="node6" href="main_8cu.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="947,56,997,83"/></map>
 </div>
 </p>
 
@@ -1384,7 +1130,7 @@ Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="class_engine_abbb576c29276e9943eafc348c1a9a790_icgraph.png" border="0" usemap="#class_engine_abbb576c29276e9943eafc348c1a9a790_icgraph" alt=""/></div>
 <map name="class_engine_abbb576c29276e9943eafc348c1a9a790_icgraph" id="class_engine_abbb576c29276e9943eafc348c1a9a790_icgraph">
-<area shape="rect" id="node2" href="class_smpc_controller.html#ad477241e6c34e5db46e6ec00c16ddeab" title="SmpcController::proximalFunG" alt="" coords="182,5,383,32"/><area shape="rect" id="node3" href="class_smpc_controller.html#a70ecfdd41c38a5c4de76155f30f6b0c1" title="SmpcController::algorithmApg" alt="" coords="433,5,629,32"/><area shape="rect" id="node4" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="678,5,885,32"/></map>
+<area shape="rect" id="node2" href="class_smpc_controller.html#ad477241e6c34e5db46e6ec00c16ddeab" title="SmpcController::proximalFunG" alt="" coords="182,31,383,57"/><area shape="rect" id="node3" href="class_smpc_controller.html#a504a73b33ca1704bc0e743006ef71dae" title="SmpcController::algorithmApg" alt="" coords="433,31,629,57"/><area shape="rect" id="node4" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="678,5,885,32"/><area shape="rect" id="node5" href="class_smpc_controller.html#a84fa9efe8b15742c929c0d274e479ff8" title="SmpcController::controlAction" alt="" coords="683,56,879,83"/><area shape="rect" id="node6" href="main_8cu.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="933,56,984,83"/></map>
 </div>
 </p>
 
@@ -1409,7 +1155,7 @@ Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="class_engine_afc800fda92ad5def0a744c0cab4914df_icgraph.png" border="0" usemap="#class_engine_afc800fda92ad5def0a744c0cab4914df_icgraph" alt=""/></div>
 <map name="class_engine_afc800fda92ad5def0a744c0cab4914df_icgraph" id="class_engine_afc800fda92ad5def0a744c0cab4914df_icgraph">
-<area shape="rect" id="node2" href="class_smpc_controller.html#ad477241e6c34e5db46e6ec00c16ddeab" title="SmpcController::proximalFunG" alt="" coords="217,5,418,32"/><area shape="rect" id="node3" href="class_smpc_controller.html#a70ecfdd41c38a5c4de76155f30f6b0c1" title="SmpcController::algorithmApg" alt="" coords="467,5,663,32"/><area shape="rect" id="node4" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="713,5,919,32"/></map>
+<area shape="rect" id="node2" href="class_smpc_controller.html#ad477241e6c34e5db46e6ec00c16ddeab" title="SmpcController::proximalFunG" alt="" coords="217,31,418,57"/><area shape="rect" id="node3" href="class_smpc_controller.html#a504a73b33ca1704bc0e743006ef71dae" title="SmpcController::algorithmApg" alt="" coords="467,31,663,57"/><area shape="rect" id="node4" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="713,5,919,32"/><area shape="rect" id="node5" href="class_smpc_controller.html#a84fa9efe8b15742c929c0d274e479ff8" title="SmpcController::controlAction" alt="" coords="718,56,914,83"/><area shape="rect" id="node6" href="main_8cu.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="968,56,1019,83"/></map>
 </div>
 </p>
 
@@ -1434,7 +1180,7 @@ Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="class_engine_aee75d114806ff22950ec2ae0b8943513_icgraph.png" border="0" usemap="#class_engine_aee75d114806ff22950ec2ae0b8943513_icgraph" alt=""/></div>
 <map name="class_engine_aee75d114806ff22950ec2ae0b8943513_icgraph" id="class_engine_aee75d114806ff22950ec2ae0b8943513_icgraph">
-<area shape="rect" id="node2" href="class_smpc_controller.html#a232316a3ba52a6d397e8337c130c81c2" title="SmpcController::solveStep" alt="" coords="221,5,400,32"/><area shape="rect" id="node3" href="class_smpc_controller.html#a70ecfdd41c38a5c4de76155f30f6b0c1" title="SmpcController::algorithmApg" alt="" coords="449,5,645,32"/><area shape="rect" id="node4" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="694,5,901,32"/></map>
+<area shape="rect" id="node2" href="class_smpc_controller.html#a232316a3ba52a6d397e8337c130c81c2" title="SmpcController::solveStep" alt="" coords="221,31,400,57"/><area shape="rect" id="node3" href="class_smpc_controller.html#a504a73b33ca1704bc0e743006ef71dae" title="SmpcController::algorithmApg" alt="" coords="449,31,645,57"/><area shape="rect" id="node4" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="694,5,901,32"/><area shape="rect" id="node5" href="class_smpc_controller.html#a84fa9efe8b15742c929c0d274e479ff8" title="SmpcController::controlAction" alt="" coords="699,56,895,83"/><area shape="rect" id="node6" href="main_8cu.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="949,56,1000,83"/></map>
 </div>
 </p>
 
@@ -1539,7 +1285,7 @@ Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="class_engine_a5393a40086129a3d31a2fde00bd749a4_icgraph.png" border="0" usemap="#class_engine_a5393a40086129a3d31a2fde00bd749a4_icgraph" alt=""/></div>
 <map name="class_engine_a5393a40086129a3d31a2fde00bd749a4_icgraph" id="class_engine_a5393a40086129a3d31a2fde00bd749a4_icgraph">
-<area shape="rect" id="node2" href="class_smpc_controller.html#a232316a3ba52a6d397e8337c130c81c2" title="SmpcController::solveStep" alt="" coords="245,5,424,32"/><area shape="rect" id="node3" href="class_smpc_controller.html#a70ecfdd41c38a5c4de76155f30f6b0c1" title="SmpcController::algorithmApg" alt="" coords="473,5,669,32"/><area shape="rect" id="node4" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="718,5,925,32"/></map>
+<area shape="rect" id="node2" href="class_smpc_controller.html#a232316a3ba52a6d397e8337c130c81c2" title="SmpcController::solveStep" alt="" coords="245,31,424,57"/><area shape="rect" id="node3" href="class_smpc_controller.html#a504a73b33ca1704bc0e743006ef71dae" title="SmpcController::algorithmApg" alt="" coords="473,31,669,57"/><area shape="rect" id="node4" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="718,5,925,32"/><area shape="rect" id="node5" href="class_smpc_controller.html#a84fa9efe8b15742c929c0d274e479ff8" title="SmpcController::controlAction" alt="" coords="723,56,919,83"/><area shape="rect" id="node6" href="main_8cu.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="973,56,1024,83"/></map>
 </div>
 </p>
 
@@ -1564,7 +1310,7 @@ Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="class_engine_ad68843349a715ad12a7e1742d53ee44e_icgraph.png" border="0" usemap="#class_engine_ad68843349a715ad12a7e1742d53ee44e_icgraph" alt=""/></div>
 <map name="class_engine_ad68843349a715ad12a7e1742d53ee44e_icgraph" id="class_engine_ad68843349a715ad12a7e1742d53ee44e_icgraph">
-<area shape="rect" id="node2" href="class_smpc_controller.html#a232316a3ba52a6d397e8337c130c81c2" title="SmpcController::solveStep" alt="" coords="245,12,424,39"/><area shape="rect" id="node3" href="class_smpc_controller.html#a70ecfdd41c38a5c4de76155f30f6b0c1" title="SmpcController::algorithmApg" alt="" coords="473,12,669,39"/><area shape="rect" id="node4" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="718,12,925,39"/></map>
+<area shape="rect" id="node2" href="class_smpc_controller.html#a232316a3ba52a6d397e8337c130c81c2" title="SmpcController::solveStep" alt="" coords="245,31,424,57"/><area shape="rect" id="node3" href="class_smpc_controller.html#a504a73b33ca1704bc0e743006ef71dae" title="SmpcController::algorithmApg" alt="" coords="473,31,669,57"/><area shape="rect" id="node4" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="718,5,925,32"/><area shape="rect" id="node5" href="class_smpc_controller.html#a84fa9efe8b15742c929c0d274e479ff8" title="SmpcController::controlAction" alt="" coords="723,56,919,83"/><area shape="rect" id="node6" href="main_8cu.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="973,56,1024,83"/></map>
 </div>
 </p>
 
@@ -1622,7 +1368,7 @@ Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="class_engine_abebd11ec21b124b3a5a82f588fa6875c_icgraph.png" border="0" usemap="#class_engine_abebd11ec21b124b3a5a82f588fa6875c_icgraph" alt=""/></div>
 <map name="class_engine_abebd11ec21b124b3a5a82f588fa6875c_icgraph" id="class_engine_abebd11ec21b124b3a5a82f588fa6875c_icgraph">
-<area shape="rect" id="node2" href="class_smpc_controller.html#a232316a3ba52a6d397e8337c130c81c2" title="SmpcController::solveStep" alt="" coords="192,5,371,32"/><area shape="rect" id="node3" href="class_smpc_controller.html#a70ecfdd41c38a5c4de76155f30f6b0c1" title="SmpcController::algorithmApg" alt="" coords="419,5,615,32"/><area shape="rect" id="node4" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="665,5,871,32"/></map>
+<area shape="rect" id="node2" href="class_smpc_controller.html#a232316a3ba52a6d397e8337c130c81c2" title="SmpcController::solveStep" alt="" coords="192,31,371,57"/><area shape="rect" id="node3" href="class_smpc_controller.html#a504a73b33ca1704bc0e743006ef71dae" title="SmpcController::algorithmApg" alt="" coords="419,31,615,57"/><area shape="rect" id="node4" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="665,5,871,32"/><area shape="rect" id="node5" href="class_smpc_controller.html#a84fa9efe8b15742c929c0d274e479ff8" title="SmpcController::controlAction" alt="" coords="670,56,866,83"/><area shape="rect" id="node6" href="main_8cu.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="920,56,971,83"/></map>
 </div>
 </p>
 
@@ -1647,9 +1393,25 @@ Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="class_engine_aa75a2ef9f3d77486fc9e87f9e0801e2e_icgraph.png" border="0" usemap="#class_engine_aa75a2ef9f3d77486fc9e87f9e0801e2e_icgraph" alt=""/></div>
 <map name="class_engine_aa75a2ef9f3d77486fc9e87f9e0801e2e_icgraph" id="class_engine_aa75a2ef9f3d77486fc9e87f9e0801e2e_icgraph">
-<area shape="rect" id="node2" href="class_smpc_controller.html#a232316a3ba52a6d397e8337c130c81c2" title="SmpcController::solveStep" alt="" coords="240,5,419,32"/><area shape="rect" id="node3" href="class_smpc_controller.html#a70ecfdd41c38a5c4de76155f30f6b0c1" title="SmpcController::algorithmApg" alt="" coords="467,5,663,32"/><area shape="rect" id="node4" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="713,5,919,32"/></map>
+<area shape="rect" id="node2" href="class_smpc_controller.html#a232316a3ba52a6d397e8337c130c81c2" title="SmpcController::solveStep" alt="" coords="240,51,419,77"/><area shape="rect" id="node7" href="class_smpc_controller.html#a3d02dd634603e096fc5f8e8940ace333" title="SmpcController::moveForeward\lInTime" alt="" coords="467,99,674,141"/><area shape="rect" id="node3" href="class_smpc_controller.html#a504a73b33ca1704bc0e743006ef71dae" title="SmpcController::algorithmApg" alt="" coords="473,48,669,75"/><area shape="rect" id="node4" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="723,5,930,32"/><area shape="rect" id="node5" href="class_smpc_controller.html#a84fa9efe8b15742c929c0d274e479ff8" title="SmpcController::controlAction" alt="" coords="729,56,925,83"/><area shape="rect" id="node6" href="main_8cu.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="979,81,1029,108"/></map>
 </div>
 </p>
+
+</div>
+</div>
+<a class="anchor" id="a008c49123449be6373604c10a2e30e26"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> * Engine::getVecDemand </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>previous demand </p>
 
 </div>
 </div>
@@ -1672,7 +1434,7 @@ Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="class_engine_aca774b136f1ba7a83bbf55d5205f5206_icgraph.png" border="0" usemap="#class_engine_aca774b136f1ba7a83bbf55d5205f5206_icgraph" alt=""/></div>
 <map name="class_engine_aca774b136f1ba7a83bbf55d5205f5206_icgraph" id="class_engine_aca774b136f1ba7a83bbf55d5205f5206_icgraph">
-<area shape="rect" id="node2" href="class_smpc_controller.html#a232316a3ba52a6d397e8337c130c81c2" title="SmpcController::solveStep" alt="" coords="173,5,352,32"/><area shape="rect" id="node3" href="class_smpc_controller.html#a70ecfdd41c38a5c4de76155f30f6b0c1" title="SmpcController::algorithmApg" alt="" coords="401,5,597,32"/><area shape="rect" id="node4" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="646,5,853,32"/></map>
+<area shape="rect" id="node2" href="class_smpc_controller.html#a232316a3ba52a6d397e8337c130c81c2" title="SmpcController::solveStep" alt="" coords="173,51,352,77"/><area shape="rect" id="node7" href="class_smpc_controller.html#a3d02dd634603e096fc5f8e8940ace333" title="SmpcController::moveForeward\lInTime" alt="" coords="401,99,607,141"/><area shape="rect" id="node3" href="class_smpc_controller.html#a504a73b33ca1704bc0e743006ef71dae" title="SmpcController::algorithmApg" alt="" coords="406,48,602,75"/><area shape="rect" id="node4" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="657,5,863,32"/><area shape="rect" id="node5" href="class_smpc_controller.html#a84fa9efe8b15742c929c0d274e479ff8" title="SmpcController::controlAction" alt="" coords="662,56,858,83"/><area shape="rect" id="node6" href="main_8cu.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="912,81,963,108"/></map>
 </div>
 </p>
 
@@ -1692,6 +1454,15 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 <p>previous control </p>
 
+<p><div class="dynheader">
+Here is the caller graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="class_engine_a41d10a4edcd600a2c26eace9560bf43c_icgraph.png" border="0" usemap="#class_engine_a41d10a4edcd600a2c26eace9560bf43c_icgraph" alt=""/></div>
+<map name="class_engine_a41d10a4edcd600a2c26eace9560bf43c_icgraph" id="class_engine_a41d10a4edcd600a2c26eace9560bf43c_icgraph">
+<area shape="rect" id="node2" href="class_smpc_controller.html#a232316a3ba52a6d397e8337c130c81c2" title="SmpcController::solveStep" alt="" coords="259,31,437,57"/><area shape="rect" id="node3" href="class_smpc_controller.html#a504a73b33ca1704bc0e743006ef71dae" title="SmpcController::algorithmApg" alt="" coords="486,31,682,57"/><area shape="rect" id="node4" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="731,5,938,32"/><area shape="rect" id="node5" href="class_smpc_controller.html#a84fa9efe8b15742c929c0d274e479ff8" title="SmpcController::controlAction" alt="" coords="737,56,933,83"/><area shape="rect" id="node6" href="main_8cu.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="987,56,1037,83"/></map>
+</div>
+</p>
+
 </div>
 </div>
 <a class="anchor" id="a6c59debcb0b279ce05876c47d88486dd"></a>
@@ -1708,29 +1479,12 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 <p>previous uhat </p>
 
-</div>
-</div>
-<a class="anchor" id="aeaa15eb21f3333af1a86f3da9b1724d4"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> * Engine::getVecPreviousV </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>previous v reduced control dimensions</p>
-<p>previous control in reduced dimensions </p>
-
 <p><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="class_engine_aeaa15eb21f3333af1a86f3da9b1724d4_icgraph.png" border="0" usemap="#class_engine_aeaa15eb21f3333af1a86f3da9b1724d4_icgraph" alt=""/></div>
-<map name="class_engine_aeaa15eb21f3333af1a86f3da9b1724d4_icgraph" id="class_engine_aeaa15eb21f3333af1a86f3da9b1724d4_icgraph">
-<area shape="rect" id="node2" href="class_smpc_controller.html#a232316a3ba52a6d397e8337c130c81c2" title="SmpcController::solveStep" alt="" coords="224,5,403,32"/><area shape="rect" id="node3" href="class_smpc_controller.html#a70ecfdd41c38a5c4de76155f30f6b0c1" title="SmpcController::algorithmApg" alt="" coords="451,5,647,32"/><area shape="rect" id="node4" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="697,5,903,32"/></map>
+<div class="center"><img src="class_engine_a6c59debcb0b279ce05876c47d88486dd_icgraph.png" border="0" usemap="#class_engine_a6c59debcb0b279ce05876c47d88486dd_icgraph" alt=""/></div>
+<map name="class_engine_a6c59debcb0b279ce05876c47d88486dd_icgraph" id="class_engine_a6c59debcb0b279ce05876c47d88486dd_icgraph">
+<area shape="rect" id="node2" href="class_smpc_controller.html#a232316a3ba52a6d397e8337c130c81c2" title="SmpcController::solveStep" alt="" coords="245,31,424,57"/><area shape="rect" id="node3" href="class_smpc_controller.html#a504a73b33ca1704bc0e743006ef71dae" title="SmpcController::algorithmApg" alt="" coords="473,31,669,57"/><area shape="rect" id="node4" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="718,5,925,32"/><area shape="rect" id="node5" href="class_smpc_controller.html#a84fa9efe8b15742c929c0d274e479ff8" title="SmpcController::controlAction" alt="" coords="723,56,919,83"/><area shape="rect" id="node6" href="main_8cu.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="973,56,1024,83"/></map>
 </div>
 </p>
 
@@ -1755,161 +1509,13 @@ Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="class_engine_a5e5c7f9b5fd70d8dd3209859c833d115_icgraph.png" border="0" usemap="#class_engine_a5e5c7f9b5fd70d8dd3209859c833d115_icgraph" alt=""/></div>
 <map name="class_engine_a5e5c7f9b5fd70d8dd3209859c833d115_icgraph" id="class_engine_a5e5c7f9b5fd70d8dd3209859c833d115_icgraph">
-<area shape="rect" id="node2" href="class_smpc_controller.html#a232316a3ba52a6d397e8337c130c81c2" title="SmpcController::solveStep" alt="" coords="192,5,371,32"/><area shape="rect" id="node3" href="class_smpc_controller.html#a70ecfdd41c38a5c4de76155f30f6b0c1" title="SmpcController::algorithmApg" alt="" coords="419,5,615,32"/><area shape="rect" id="node4" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="665,5,871,32"/></map>
+<area shape="rect" id="node2" href="class_smpc_controller.html#a232316a3ba52a6d397e8337c130c81c2" title="SmpcController::solveStep" alt="" coords="192,31,371,57"/><area shape="rect" id="node3" href="class_smpc_controller.html#a504a73b33ca1704bc0e743006ef71dae" title="SmpcController::algorithmApg" alt="" coords="419,31,615,57"/><area shape="rect" id="node4" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="665,5,871,32"/><area shape="rect" id="node5" href="class_smpc_controller.html#a84fa9efe8b15742c929c0d274e479ff8" title="SmpcController::controlAction" alt="" coords="670,56,866,83"/><area shape="rect" id="node6" href="main_8cu.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="920,56,971,83"/></map>
 </div>
 </p>
 
 </div>
 </div>
-<a class="anchor" id="a4e664235e0d3dc748d3f0cb88e0aaa19"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void Engine::initialiseScenarioTreeDevice </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Initialise the scenario tree in the device </p>
-
-<p><div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="class_engine_a4e664235e0d3dc748d3f0cb88e0aaa19_cgraph.png" border="0" usemap="#class_engine_a4e664235e0d3dc748d3f0cb88e0aaa19_cgraph" alt=""/></div>
-<map name="class_engine_a4e664235e0d3dc748d3f0cb88e0aaa19_cgraph" id="class_engine_a4e664235e0d3dc748d3f0cb88e0aaa19_cgraph">
-<area shape="rect" id="node2" href="class_scenario_tree.html#ad6a9108a9226d28588b99a637251081f" title="ScenarioTree::getNumNodes" alt="" coords="231,5,422,32"/><area shape="rect" id="node3" href="class_scenario_tree.html#a66557e4575270f9202301402441d4ca2" title="ScenarioTree::getPredHorizon" alt="" coords="228,56,425,83"/><area shape="rect" id="node4" href="class_scenario_tree.html#add52c9168d0fd4eeefe56780d072bd65" title="ScenarioTree::getNumScenarios" alt="" coords="221,107,432,133"/><area shape="rect" id="node5" href="class_dwn_network.html#ae938bb831f8d3cecde15bd240c43dc29" title="DwnNetwork::getNumDemands" alt="" coords="223,157,431,184"/><area shape="rect" id="node6" href="class_dwn_network.html#a6791b1fd057bac451f84192624411155" title="DwnNetwork::getNumControls" alt="" coords="226,208,427,235"/><area shape="rect" id="node7" href="class_scenario_tree.html#a7130b4e92590127c71d9fc66b56cc701" title="ScenarioTree::getNumNonleaf\lNodes" alt="" coords="227,259,426,301"/><area shape="rect" id="node8" href="class_scenario_tree.html#a53a4a56fd39e52037b5d89707d513007" title="ScenarioTree::getStageNodes" alt="" coords="228,325,425,352"/><area shape="rect" id="node9" href="class_scenario_tree.html#ac4f4d939ce1caf17884a71592fa05770" title="ScenarioTree::getNodesPer\lStage" alt="" coords="235,377,418,418"/><area shape="rect" id="node10" href="class_scenario_tree.html#af2635a1644dba8d4b58d30c01fa7993b" title="ScenarioTree::getNodesPer\lStageCumul" alt="" coords="235,442,418,483"/><area shape="rect" id="node11" href="class_scenario_tree.html#abb67e8e923e294bdd2d3149a55db1400" title="ScenarioTree::getLeaveArray" alt="" coords="231,508,422,535"/><area shape="rect" id="node12" href="class_scenario_tree.html#aa51be42528397cc9522dd1224064ccd3" title="ScenarioTree::getNumChildren" alt="" coords="226,559,427,585"/><area shape="rect" id="node13" href="class_scenario_tree.html#aa5b578255b7b195f535324d0cf1135d2" title="ScenarioTree::getAncestor\lArray" alt="" coords="238,610,415,651"/><area shape="rect" id="node14" href="class_scenario_tree.html#aae77f877e1bd0585f7add07c5d380801" title="ScenarioTree::getNumChildren\lCumul" alt="" coords="226,675,427,717"/><area shape="rect" id="node15" href="class_scenario_tree.html#ad3ee14f8397e378b5baa616bc0265122" title="ScenarioTree::getProbArray" alt="" coords="235,741,418,768"/><area shape="rect" id="node16" href="class_scenario_tree.html#ad027558d837a1118c0d7b57e46da2b9f" title="ScenarioTree::getErrorDemand\lArray" alt="" coords="225,793,428,834"/><area shape="rect" id="node17" href="class_scenario_tree.html#a943bf522b5f9ee5cd1087078b518a6fd" title="ScenarioTree::getErrorPrice\lArray" alt="" coords="235,858,418,899"/></map>
-</div>
-</p>
-
-<p><div class="dynheader">
-Here is the caller graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="class_engine_a4e664235e0d3dc748d3f0cb88e0aaa19_icgraph.png" border="0" usemap="#class_engine_a4e664235e0d3dc748d3f0cb88e0aaa19_icgraph" alt=""/></div>
-<map name="class_engine_a4e664235e0d3dc748d3f0cb88e0aaa19_icgraph" id="class_engine_a4e664235e0d3dc748d3f0cb88e0aaa19_icgraph">
-<area shape="rect" id="node2" href="class_engine.html#ad5b7316584c79e2db5dc5f785b0a652f" title="Engine::factorStep" alt="" coords="221,12,352,39"/></map>
-</div>
-</p>
-
-</div>
-</div>
-<a class="anchor" id="ac9d6cb7d673e625256bead5e786e65a5"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void Engine::initialiseSystemDevice </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Initialise the system model in the device </p>
-
-<p><div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="class_engine_ac9d6cb7d673e625256bead5e786e65a5_cgraph.png" border="0" usemap="#class_engine_ac9d6cb7d673e625256bead5e786e65a5_cgraph" alt=""/></div>
-<map name="class_engine_ac9d6cb7d673e625256bead5e786e65a5_cgraph" id="class_engine_ac9d6cb7d673e625256bead5e786e65a5_cgraph">
-<area shape="rect" id="node2" href="class_scenario_tree.html#ad6a9108a9226d28588b99a637251081f" title="ScenarioTree::getNumNodes" alt="" coords="226,5,417,32"/><area shape="rect" id="node3" href="class_dwn_network.html#a4bd201487c9e524815b5c9112fcd2722" title="DwnNetwork::getNumTanks" alt="" coords="227,56,415,83"/><area shape="rect" id="node4" href="class_dwn_network.html#a6791b1fd057bac451f84192624411155" title="DwnNetwork::getNumControls" alt="" coords="221,107,422,133"/><area shape="rect" id="node5" href="class_dwn_network.html#ae938bb831f8d3cecde15bd240c43dc29" title="DwnNetwork::getNumDemands" alt="" coords="217,157,425,184"/><area shape="rect" id="node6" href="class_scenario_tree.html#add52c9168d0fd4eeefe56780d072bd65" title="ScenarioTree::getNumScenarios" alt="" coords="216,208,427,235"/><area shape="rect" id="node7" href="class_scenario_tree.html#a66557e4575270f9202301402441d4ca2" title="ScenarioTree::getPredHorizon" alt="" coords="223,259,420,285"/><area shape="rect" id="node8" href="class_smpc_configuration.html#a31dc27fe4c16453cea0f451e58c33879" title="SmpcConfiguration::\lgetNV" alt="" coords="251,310,392,351"/><area shape="rect" id="node9" href="class_scenario_tree.html#ac4f4d939ce1caf17884a71592fa05770" title="ScenarioTree::getNodesPer\lStage" alt="" coords="230,375,413,417"/><area shape="rect" id="node10" href="class_scenario_tree.html#af2635a1644dba8d4b58d30c01fa7993b" title="ScenarioTree::getNodesPer\lStageCumul" alt="" coords="230,441,413,482"/><area shape="rect" id="node11" href="class_smpc_configuration.html#acca2836baa19e65573dec836ff69a3d2" title="SmpcConfiguration::\lgetMatPrcndDiag" alt="" coords="251,506,392,547"/><area shape="rect" id="node12" href="class_dwn_network.html#ab5a9a9d2f885de00c0c6f773744d4a7a" title="DwnNetwork::getMatB" alt="" coords="244,572,399,599"/><area shape="rect" id="node13" href="class_smpc_configuration.html#a8c33dc3a1fc9889c4ff43cbc74f72983" title="SmpcConfiguration::\lgetMatL" alt="" coords="251,623,392,665"/><area shape="rect" id="node14" href="class_smpc_configuration.html#a051e98c0598e2b6d1da92322faf223d0" title="SmpcConfiguration::\lgetMatLhat" alt="" coords="251,689,392,730"/><area shape="rect" id="node15" href="class_smpc_configuration.html#aae941e0602a6eaef8e4b738b9c50bc77" title="SmpcConfiguration::\lgetCostW" alt="" coords="251,754,392,795"/><area shape="rect" id="node16" href="class_dwn_network.html#a3d3f7c7b0cdbe2d060e47fd680874a62" title="DwnNetwork::getXmin" alt="" coords="244,820,399,847"/><area shape="rect" id="node17" href="class_dwn_network.html#aacbb495cd126b17e7a8c31cd60237191" title="DwnNetwork::getXmax" alt="" coords="242,871,401,897"/><area shape="rect" id="node18" href="class_dwn_network.html#ad0a8c9318eb7b0d3157bafbecbac09a5" title="DwnNetwork::getXsafe" alt="" coords="242,921,401,948"/><area shape="rect" id="node19" href="class_dwn_network.html#ac7b16f6d58ff54502f8ba4d5617e3808" title="DwnNetwork::getUmin" alt="" coords="244,972,399,999"/><area shape="rect" id="node20" href="class_dwn_network.html#abe737922e107d55f09864fcdc1c4703f" title="DwnNetwork::getUmax" alt="" coords="242,1023,401,1049"/><area shape="rect" id="node21" href="class_scenario_tree.html#ad3ee14f8397e378b5baa616bc0265122" title="ScenarioTree::getProbArray" alt="" coords="230,1073,413,1100"/></map>
-</div>
-</p>
-
-<p><div class="dynheader">
-Here is the caller graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="class_engine_ac9d6cb7d673e625256bead5e786e65a5_icgraph.png" border="0" usemap="#class_engine_ac9d6cb7d673e625256bead5e786e65a5_icgraph" alt=""/></div>
-<map name="class_engine_ac9d6cb7d673e625256bead5e786e65a5_icgraph" id="class_engine_ac9d6cb7d673e625256bead5e786e65a5_icgraph">
-<area shape="rect" id="node2" href="class_engine.html#ad5b7316584c79e2db5dc5f785b0a652f" title="Engine::factorStep" alt="" coords="216,12,347,39"/></map>
-</div>
-</p>
-
-</div>
-</div>
-<a class="anchor" id="a933446e347b77e350b3755b324ca099c"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void Engine::inverseBatchMat </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> **&#160;</td>
-          <td class="paramname"><em>src</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> **&#160;</td>
-          <td class="paramname"><em>dst</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="_configuration_8h.html#a6c06fdeafc128178f45859699c0fc09b">uint_t</a>&#160;</td>
-          <td class="paramname"><em>n</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="_configuration_8h.html#a6c06fdeafc128178f45859699c0fc09b">uint_t</a>&#160;</td>
-          <td class="paramname"><em>batchSize</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">src</td><td></td></tr>
-    <tr><td class="paramname">dst</td><td></td></tr>
-    <tr><td class="paramname">n</td><td></td></tr>
-    <tr><td class="paramname">batchSize</td><td></td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p><div class="dynheader">
-Here is the caller graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="class_engine_a933446e347b77e350b3755b324ca099c_icgraph.png" border="0" usemap="#class_engine_a933446e347b77e350b3755b324ca099c_icgraph" alt=""/></div>
-<map name="class_engine_a933446e347b77e350b3755b324ca099c_icgraph" id="class_engine_a933446e347b77e350b3755b324ca099c_icgraph">
-<area shape="rect" id="node2" href="class_engine.html#ad5b7316584c79e2db5dc5f785b0a652f" title="Engine::factorStep" alt="" coords="221,5,352,32"/></map>
-</div>
-</p>
-
-</div>
-</div>
-<a class="anchor" id="a65ca7aceb59bd64433a12694334d14ab"></a>
+<a class="anchor" id="a3fbf653bed9c13fc441fb19cc464405c"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -1929,13 +1535,7 @@ Here is the caller graph for this function:</div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> *&#160;</td>
-          <td class="paramname"><em>prevUhat</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a> *&#160;</td>
-          <td class="paramname"><em>PrevV</em>&#160;</td>
+          <td class="paramname"><em>prevDemand</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -1949,8 +1549,7 @@ Here is the caller graph for this function:</div>
   <table class="params">
     <tr><td class="paramname">currentX</td><td>current level of tanks in the system </td></tr>
     <tr><td class="paramname">prevU</td><td>previous control action </td></tr>
-    <tr><td class="paramname">prevUhat</td><td>previous control action particular solution </td></tr>
-    <tr><td class="paramname">prevV</td><td>previous control action in reduced dimension TODO replace the prevUhat parameter </td></tr>
+    <tr><td class="paramname">prevDemand</td><td>previous demand </td></tr>
   </table>
   </dd>
 </dl>
@@ -1958,1197 +1557,20 @@ Here is the caller graph for this function:</div>
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="class_engine_a65ca7aceb59bd64433a12694334d14ab_cgraph.png" border="0" usemap="#class_engine_a65ca7aceb59bd64433a12694334d14ab_cgraph" alt=""/></div>
-<map name="class_engine_a65ca7aceb59bd64433a12694334d14ab_cgraph" id="class_engine_a65ca7aceb59bd64433a12694334d14ab_cgraph">
-<area shape="rect" id="node2" href="class_dwn_network.html#a4bd201487c9e524815b5c9112fcd2722" title="DwnNetwork::getNumTanks" alt="" coords="245,5,433,32"/><area shape="rect" id="node3" href="class_dwn_network.html#a6791b1fd057bac451f84192624411155" title="DwnNetwork::getNumControls" alt="" coords="238,56,439,83"/><area shape="rect" id="node4" href="class_smpc_configuration.html#a31dc27fe4c16453cea0f451e58c33879" title="SmpcConfiguration::\lgetNV" alt="" coords="268,107,409,149"/></map>
+<div class="center"><img src="class_engine_a3fbf653bed9c13fc441fb19cc464405c_cgraph.png" border="0" usemap="#class_engine_a3fbf653bed9c13fc441fb19cc464405c_cgraph" alt=""/></div>
+<map name="class_engine_a3fbf653bed9c13fc441fb19cc464405c_cgraph" id="class_engine_a3fbf653bed9c13fc441fb19cc464405c_cgraph">
+<area shape="rect" id="node2" href="class_dwn_network.html#a6791b1fd057bac451f84192624411155" title="DwnNetwork::getNumControls" alt="" coords="241,5,442,32"/><area shape="rect" id="node3" href="class_dwn_network.html#a4bd201487c9e524815b5c9112fcd2722" title="DwnNetwork::getNumTanks" alt="" coords="247,56,435,83"/><area shape="rect" id="node4" href="class_dwn_network.html#ae938bb831f8d3cecde15bd240c43dc29" title="DwnNetwork::getNumDemands" alt="" coords="237,107,445,133"/><area shape="rect" id="node5" href="class_smpc_configuration.html#a31dc27fe4c16453cea0f451e58c33879" title="SmpcConfiguration::\lgetNV" alt="" coords="271,158,412,199"/></map>
 </div>
 </p>
 
 <p><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="class_engine_a65ca7aceb59bd64433a12694334d14ab_icgraph.png" border="0" usemap="#class_engine_a65ca7aceb59bd64433a12694334d14ab_icgraph" alt=""/></div>
-<map name="class_engine_a65ca7aceb59bd64433a12694334d14ab_icgraph" id="class_engine_a65ca7aceb59bd64433a12694334d14ab_icgraph">
-<area shape="rect" id="node2" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="238,5,445,32"/></map>
+<div class="center"><img src="class_engine_a3fbf653bed9c13fc441fb19cc464405c_icgraph.png" border="0" usemap="#class_engine_a3fbf653bed9c13fc441fb19cc464405c_icgraph" alt=""/></div>
+<map name="class_engine_a3fbf653bed9c13fc441fb19cc464405c_icgraph" id="class_engine_a3fbf653bed9c13fc441fb19cc464405c_icgraph">
+<area shape="rect" id="node2" href="class_smpc_controller.html#ac11e4145e513a95a5114c7296a0416e1" title="SmpcController::initialise\lSmpcController" alt="" coords="238,53,405,94"/><area shape="rect" id="node6" href="class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="926,136,1133,163"/><area shape="rect" id="node7" href="class_smpc_controller.html#a84fa9efe8b15742c929c0d274e479ff8" title="SmpcController::controlAction" alt="" coords="931,35,1127,61"/><area shape="rect" id="node3" href="main_8cu.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="1181,60,1232,87"/><area shape="rect" id="node4" href="class_smpc_controller.html#a232316a3ba52a6d397e8337c130c81c2" title="SmpcController::solveStep" alt="" coords="453,35,632,61"/><area shape="rect" id="node5" href="class_smpc_controller.html#a504a73b33ca1704bc0e743006ef71dae" title="SmpcController::algorithmApg" alt="" coords="681,35,877,61"/></map>
 </div>
 </p>
-
-</div>
-</div>
-<h2 class="groupheader">Member Data Documentation</h2>
-<a class="anchor" id="afb9029c50c8f0d7ace94a64241e792b2"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a>* Engine::devMatD</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>matrix D </p>
-
-</div>
-</div>
-<a class="anchor" id="a54fd03355dc6705b61fa9a7639347e17"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a>* Engine::devMatF</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>matrix F (Factor step) </p>
-
-</div>
-</div>
-<a class="anchor" id="a93375c8fe8ba3481043bc4a88583eaa2"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a>* Engine::devMatG</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>matrix G (Facotr step) </p>
-
-</div>
-</div>
-<a class="anchor" id="a3e3d74677da6597b4f92ee7e5e09d901"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a>* Engine::devMatOmega</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>matrix Theta </p>
-
-</div>
-</div>
-<a class="anchor" id="a2d53b37520eaf3d9b4c3cc9c0dd0c94c"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a>* Engine::devMatPhi</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>matrix Phi </p>
-
-</div>
-</div>
-<a class="anchor" id="ae8fc64a4e4fcc1e942ea68fd33b3fb65"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a>* Engine::devMatPsi</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>matrix Psi </p>
-
-</div>
-</div>
-<a class="anchor" id="a0d4004863733dc0780cb6997c33bdf64"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a>* Engine::devMatSigma</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>matrix Sigma </p>
-
-</div>
-</div>
-<a class="anchor" id="acddaaba087fb8a3006aea45aa931855c"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a>* Engine::devMatTheta</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>matrix Theta </p>
-
-</div>
-</div>
-<a class="anchor" id="a0fcca1183fd5fbe1751e46d979a66bec"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a>* Engine::devMatWv</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Wv = W*L </p>
-
-</div>
-</div>
-<a class="anchor" id="ae05202a96b2fb408384ca5ed2defdf00"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a>** Engine::devPtrMatD</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>pointer matrix D </p>
-
-</div>
-</div>
-<a class="anchor" id="a9981486fd93c8af75ce7aa1571f7b121"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a>** Engine::devPtrMatF</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>pointer matrix F (Factor step) </p>
-
-</div>
-</div>
-<a class="anchor" id="a232e95ccda49dde4cd5af8051f9a47aa"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a>** Engine::devPtrMatG</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>pointer matrix G (Factor step) </p>
-
-</div>
-</div>
-<a class="anchor" id="af5537e36abaeaf708be13b63bb4b0eb1"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a>** Engine::devPtrMatOmega</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>pointer matrix Omega </p>
-
-</div>
-</div>
-<a class="anchor" id="a6fd87148402f49bc90164dc709e6980a"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a>** Engine::devPtrMatPhi</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>pointer matrix Phi </p>
-
-</div>
-</div>
-<a class="anchor" id="af19ca61991015f458c9a11e6ee8cba4d"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a>** Engine::devPtrMatPsi</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>pointer matrix Psi </p>
-
-</div>
-</div>
-<a class="anchor" id="a0a412ee7fca11209aaa86454225b2a1d"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a>** Engine::devPtrMatSigma</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>pointer matrix Sigma </p>
-
-</div>
-</div>
-<a class="anchor" id="a52bff886650854b221ebd4d4f9b2c381"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a>** Engine::devPtrMatTheta</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>pointer matrix Theta </p>
-
-</div>
-</div>
-<a class="anchor" id="a62a674c7ce9123ee6d807b113ea4b6ae"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a>** Engine::devPtrSysCostW</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>pointer to smooth operation cost W </p>
-
-</div>
-</div>
-<a class="anchor" id="a41a3199b52dbe41312327528f95fc700"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a>** Engine::devPtrSysMatB</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>pointer to Matrix B </p>
-
-</div>
-</div>
-<a class="anchor" id="a71a8be05c4d69671503a6d4e79cbe69c"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a>** Engine::devPtrSysMatF</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>pointer to matrix F </p>
-
-</div>
-</div>
-<a class="anchor" id="a898b862fdbfb0355506630b88380a836"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a>** Engine::devPtrSysMatG</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>pointer to matrix G </p>
-
-</div>
-</div>
-<a class="anchor" id="aea020be22585f178cd437caf6be75730"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a>** Engine::devPtrSysMatL</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>pointer to matrix L </p>
-
-</div>
-</div>
-<a class="anchor" id="afbb60473352b1165e2b9d9771ef88587"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a>** Engine::devPtrSysMatLhat</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>pointer to matrix Lhat </p>
-
-</div>
-</div>
-<a class="anchor" id="af6155aae7cfaf459bd9317098cc91e48"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a>* Engine::devSysCostW</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>smooth operation cost W </p>
-
-</div>
-</div>
-<a class="anchor" id="a2f986f72be07dcb1b75c22dbc22e3562"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a>* Engine::devSysMatB</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>matrix B </p>
-
-</div>
-</div>
-<a class="anchor" id="a6d702d0a49bb794811b7f0c766412b83"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a>* Engine::devSysMatF</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>constraints matrix F </p>
-
-</div>
-</div>
-<a class="anchor" id="a7a9a38307eb8b61d9269e6a7ccbdfa8e"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a>* Engine::devSysMatG</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>constraints matrix G </p>
-
-</div>
-</div>
-<a class="anchor" id="a6bc70c0788789e3798e2bdb27bdb318b"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a>* Engine::devSysMatL</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>matrix L </p>
-
-</div>
-</div>
-<a class="anchor" id="ad12cd2b57e28f44f66e39569d8df996a"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a>* Engine::devSysMatLhat</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>matrix Lhat </p>
-
-</div>
-</div>
-<a class="anchor" id="a512b46357a591964e10dc352cd4e9bdc"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a>* Engine::devSysUmax</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>actuator/cotrol maximum </p>
-
-</div>
-</div>
-<a class="anchor" id="a3ce3ace17e8e1ef66290cc00bc963465"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a>* Engine::devSysUmin</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>actuator/control minimum </p>
-
-</div>
-</div>
-<a class="anchor" id="ae10172f00a568803e274ea1e5cca627a"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a>* Engine::devSysXmax</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>state/volume maximum </p>
-
-</div>
-</div>
-<a class="anchor" id="a0b011d79708a5ffafbf9d813895213f2"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a>* Engine::devSysXmin</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>state/volume minimum </p>
-
-</div>
-</div>
-<a class="anchor" id="a817d2769c5327f18c73ccfe52c6209e1"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a>* Engine::devSysXs</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>state/volume safe level </p>
-
-</div>
-</div>
-<a class="anchor" id="aac6af2e9888a953bef880a355a175db8"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a>* Engine::devSysXsUpper</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>dummy state/volume safe level </p>
-
-</div>
-</div>
-<a class="anchor" id="a5e43dddd5eabfc1fd54494439d2d3398"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_configuration_8h.html#a6c06fdeafc128178f45859699c0fc09b">uint_t</a>* Engine::devTreeAncestor</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Array of ancestor </p>
-
-</div>
-</div>
-<a class="anchor" id="a07654356a1332d08cab041f5a15ce5cb"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a>* Engine::devTreeErrorDemand</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Array of the error in the demand </p>
-
-</div>
-</div>
-<a class="anchor" id="aeab26013caa82b34fefe97f38d14745b"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a>* Engine::devTreeErrorPrices</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Array of the error in the prices </p>
-
-</div>
-</div>
-<a class="anchor" id="a37799c22c38bee7e8bb4affb9349a7df"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_configuration_8h.html#a6c06fdeafc128178f45859699c0fc09b">uint_t</a>* Engine::devTreeLeaves</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Array of the leaves </p>
-
-</div>
-</div>
-<a class="anchor" id="a756db508143ec0780ec07ece8a948f1d"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_configuration_8h.html#a6c06fdeafc128178f45859699c0fc09b">uint_t</a>* Engine::devTreeNodesPerStage</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Array of nodes per stage </p>
-
-</div>
-</div>
-<a class="anchor" id="a98b16be30202402bfd200be200a73ac3"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_configuration_8h.html#a6c06fdeafc128178f45859699c0fc09b">uint_t</a>* Engine::devTreeNodesPerStageCumul</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Array of past nodes </p>
-
-</div>
-</div>
-<a class="anchor" id="a6801f1b76173e2f70690d15d03291453"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_configuration_8h.html#a6c06fdeafc128178f45859699c0fc09b">uint_t</a>* Engine::devTreeNumChildren</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Array number of children </p>
-
-</div>
-</div>
-<a class="anchor" id="aa9af92b898062b1526b328852ff1b12f"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_configuration_8h.html#a6c06fdeafc128178f45859699c0fc09b">uint_t</a>* Engine::devTreeNumChildrenCumul</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Array of past cumulative children </p>
-
-</div>
-</div>
-<a class="anchor" id="a010ee1e50ba51fa3eb45ff16df553f56"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a>* Engine::devTreeProb</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Array of the probability </p>
-
-</div>
-</div>
-<a class="anchor" id="a89c5a42adb35d80841acd6dfe74fac88"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_configuration_8h.html#a6c06fdeafc128178f45859699c0fc09b">uint_t</a>* Engine::devTreeStages</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Array of stages </p>
-
-</div>
-</div>
-<a class="anchor" id="a6dd24e276a5fed6f8768ca1a244eb245"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a>* Engine::devVecBeta</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>beta control-distribution elimination </p>
-
-</div>
-</div>
-<a class="anchor" id="acc1072c6a8a7bde3eaf6f53aa4f14360"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a>* Engine::devVecCurrentState</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>current state </p>
-
-</div>
-</div>
-<a class="anchor" id="a51d5ac111c8bd8cfd800bd70993a27da"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a>* Engine::devVecE</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>e control-disturbance elimination </p>
-
-</div>
-</div>
-<a class="anchor" id="a221433739157782d72abfa1a0b00dbad"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a>* Engine::devVecPreviousControl</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>previous control </p>
-
-</div>
-</div>
-<a class="anchor" id="a77be53eaf39a6c6e31f5b8f0e29ded57"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a>* Engine::devVecPreviousUhat</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>previous uhat </p>
-
-</div>
-</div>
-<a class="anchor" id="a1fd3b6449c5704c83a2cd445948d912f"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a>* Engine::devVecPreviousV</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>previous v (reduced dimension control) </p>
-
-</div>
-</div>
-<a class="anchor" id="ac2985630fa5dcee98da6ae8e808b64ac"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_configuration_8h.html#a1924a4f6907cc3833213aba1f07fcbe9">real_t</a>* Engine::devVecUhat</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>uhat </p>
-
-</div>
-</div>
-<a class="anchor" id="ac9e074aa92e6676dcaaf90c84bb58a8b"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">cublasHandle_t Engine::handle</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>cublas handler </p>
-
-</div>
-</div>
-<a class="anchor" id="a7054b57f717d61d0a7a2ef87fb1964dd"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="class_dwn_network.html">DwnNetwork</a>* Engine::ptrMyNetwork</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Pointer to the network </p>
-
-</div>
-</div>
-<a class="anchor" id="acadc69523d3d71e3359289fd07b723b9"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="class_scenario_tree.html">ScenarioTree</a>* Engine::ptrMyScenarioTree</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Pointer to the scenario tree </p>
-
-</div>
-</div>
-<a class="anchor" id="aee20c0e338f0144ceb00a612d1a9c284"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="class_smpc_configuration.html">SmpcConfiguration</a>* Engine::ptrMySmpcConfig</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Pointer to the Smpc configuration </p>
 
 </div>
 </div>
@@ -3159,7 +1581,7 @@ Here is the caller graph for this function:</div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Apr 11 2017 11:58:27 for APG by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu May 4 2017 02:03:32 for RapidNet by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>
