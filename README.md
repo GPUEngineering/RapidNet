@@ -20,5 +20,5 @@ Highlights:
 Getting started  
 -------------
 
-Check out our [wiki](https://github.com/GPUEngineering/DwnController/wiki) and the [detailed online documentation](https://gpuengineering.github.io/DwnController/annotated.html).
+Check out our [wiki](https://github.com/GPUEngineering/RapidNet/wiki) and the [detailed online documentation](https://gpuengineering.github.io/RapidNet/annotated.html).
 
