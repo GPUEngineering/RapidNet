@@ -21,8 +21,8 @@ int main(void){
 		_ASSERT( myTesting->testSmpcController());
 	}
 	real_t time;
-	string pathToControlOutput = "../systemData/controlOutput653.json";
-	string pathToControllerConfig = "../systemData/controllerConfig653.json";
+	string pathToControlOutput = "../systemData/controlOutput10844.json";
+	string pathToControllerConfig = "../systemData/controllerConfig10844.json";
 	//fstream controlOutputJson( pathToControlOutput.c_str(), ios::out);
 	fstream controlOutputJson;
 	controlOutputJson.open( pathToControlOutput.c_str(), fstream::out);
@@ -37,12 +37,19 @@ int main(void){
 	size_t totalByte;
 	_CUDA( cudaMemGetInfo(&freeByte, &totalByte) );
 	cout<< "free bytes in MB "<< freeByte/1024/1024 << "total bytes in MB "<< totalByte/1024/1024 <<endl;
-
-	while (timeInstance < 20){
+	cout << "scenario tree nodes " << dwnController->getScenarioTree()->getNumNodes() << " "
+			<< dwnController->getScenarioTree()->getNumScenarios() << endl;
+	dwnController->getEngine()->setPriceUncertaintyFlag( false );
+	//dwnController->getEngine()->setDemandUncertaintyFlag( false );
+	while (timeInstance < 48){
 		dwnController->getForecaster()->predictDemand( timeInstance );
 		dwnController->getForecaster()->predictPrices( timeInstance );
 		if( timeInstance == 0){
 			dwnController->initialiseSmpcController();
+			if(dwnController->getEngine()->getPriceUncertainty())
+				cout << "WITH PRICE UNCERTANITY" << endl;
+			else
+				cout << "WITHOUT PRICE UNCERTANITY" << endl;
 		}
 		tic();
 		dwnController->controlAction( controlOutputJson );

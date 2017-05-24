@@ -578,14 +578,14 @@ void SmpcController::proximalFunG(){
 	//distance with constraints X
 	_CUBLAS(cublasSnrm2_v2(ptrMyEngine->getCublasHandle(), nx*nodes, devSuffleVecXi, 1, &distanceXcst));
 	if(distanceXcst > invLambda*ptrMySmpcConfig->getPenaltyState()){
-		cout << " prox distance ";
+		//cout << " prox distance ";
 		penaltyScalar = 1 - invLambda*ptrMySmpcConfig->getPenaltyState()/distanceXcst;
 		additionVectorOffset<<<nodes, nx>>>(devVecDualXi, devVecDiffXi, penaltyScalar, 2*nx, 0, nx*nodes);
 	}
 	//distance with Xsafe
 	_CUBLAS(cublasSnrm2_v2(ptrMyEngine->getCublasHandle(), nx*nodes, &devSuffleVecXi[nx*nodes], 1, &distanceXs));
 	if(distanceXs > invLambda*ptrMySmpcConfig->getPenaltySafety()){
-		cout << " prox distance ";
+		//cout << " prox distance ";
 		penaltyScalar = 1-invLambda*ptrMySmpcConfig->getPenaltySafety()/distanceXs;
 		additionVectorOffset<<<nodes, nx>>>(devVecDualXi, devVecDiffXi, penaltyScalar, 2*nx, nx, nx*nodes);
 	}
@@ -651,6 +651,7 @@ uint_t SmpcController::algorithmApg(){
 	real_t lambda;
 	uint_t maxIndex;
 	for (uint_t iter = 0; iter < ptrMySmpcConfig->getMaxIterations(); iter++){
+	//for (uint_t iter = 0; iter < 40; iter++){
 		lambda = theta[1]*(1/theta[0] - 1);
 		dualExtrapolationStep(lambda);
 		solveStep();
@@ -866,6 +867,7 @@ void SmpcController::updateKpi(real_t* state, real_t* control){
 	real_t *constantPrice = this->ptrMyEngine->getDwnNetwork()->getAlpha();
 	real_t *variablePrice = this->ptrMyForecaster->getNominalPrices();
 	real_t *previousControl = this->ptrMySmpcConfig->getPrevU();
+	real_t weightEconomic = ptrMySmpcConfig->getWeightEconomical();
 	real_t *deltaU = new real_t[nu];
 	real_t *waterLevel = new real_t[nx];
 
@@ -876,7 +878,7 @@ void SmpcController::updateKpi(real_t* state, real_t* control){
 	real_t safeValue = 0;
 
 	for(uint_t iSize = 0; iSize < nu; iSize++){
-		ecoKpi = ecoKpi + (constantPrice[iSize] + variablePrice[iSize])*abs(control[iSize]);
+		ecoKpi = ecoKpi + weightEconomic*(constantPrice[iSize] + variablePrice[iSize])*abs(control[iSize]);
 		deltaU[iSize] = previousControl[iSize] - control[iSize];
 		smKpi = smKpi + deltaU[iSize]*deltaU[iSize];
 	}
@@ -913,7 +915,7 @@ real_t SmpcController::getEconomicKpi( uint_t simulationTime){
  * @param    simulationTime   simulation horizon
  */
 real_t SmpcController::getSmoothKpi( uint_t simulationTime){
-	real_t smoothValue = economicKpi/(3600*3600);
+	real_t smoothValue = smoothKpi/(3600);
 	return smoothValue/simulationTime;
 }
 

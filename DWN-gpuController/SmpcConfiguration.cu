@@ -35,6 +35,9 @@ SmpcConfiguration::SmpcConfiguration(string pathToFile){
 		cerr << "Error in opening the file " <<__LINE__ << endl;
 		exit(100);
 	}else{
+		weightPrice = 300;
+		weightSmooth = 1;
+		weightSafety = 0.01;
 		char* readBuffer = new char[65536];
 		rapidjson::FileReadStream configurationJsonStream(infile, readBuffer, sizeof(readBuffer));
 		jsonDocument.ParseStream(configurationJsonStream);
@@ -66,12 +69,13 @@ SmpcConfiguration::SmpcConfiguration(string pathToFile){
 		matCostW = new real_t[NU * NU];
 		a = jsonDocument[VARNAME_COSTW];
 		_ASSERT(a.IsArray());
-		for (rapidjson::SizeType i = 0; i < a.Size(); i++)
-			matCostW[i] = a[i].GetFloat();
+		for (rapidjson::SizeType i = 0; i < a.Size(); i++){
+			matCostW[i] = weightSmooth*a[i].GetFloat();
+		}
 		a = jsonDocument[VARNAME_PENALITY_X];
 		penaltyStateX = a[0].GetFloat();
 		a = jsonDocument[VARNAME_PENALITY_XS];
-		penaltySafetyX = a[0].GetFloat();
+		penaltySafetyX = weightSafety*a[0].GetFloat();
 		matDiagPrecnd = new real_t[(NU + 2*NX) * N];
 		a = jsonDocument[VARNAME_DIAG_PRCND];
 		_ASSERT(a.IsArray());
@@ -182,6 +186,9 @@ string SmpcConfiguration::getPathToForecaster(){
 	return pathToForecaster;
 }
 
+real_t SmpcConfiguration::getWeightEconomical(){
+	return weightPrice;
+}
 /*
  * Get the path to the controller configuration file
  */

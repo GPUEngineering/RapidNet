@@ -135,6 +135,10 @@ public:
 	 * Get the path to forecaster
 	 */
 	string getPathToForecaster();
+	/**
+	 * Get the scalar for the economical operation
+	 */
+	real_t getWeightEconomical();
 	/** SETTER'S FOR THE CONTROLLER CONFIGURATION OBJECT**/
 	/*
 	 * update the current state from the controller
@@ -252,6 +256,18 @@ private:
 	 * path to forecaster json file
 	 */
 	string pathToForecaster;
+	/**
+	 *
+	 */
+	real_t weightPrice;
+	/**
+	 *
+	 */
+	real_t weightSmooth;
+	/**
+	 *
+	 */
+	real_t weightSafety;
 };
 
 
