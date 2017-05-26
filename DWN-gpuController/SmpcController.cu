@@ -281,8 +281,8 @@ SmpcController::SmpcController(string pathToConfigFile){
 	ptrVecPrimalPsi = NULL;
 	ptrVecQ = NULL;
 	ptrVecR = NULL;
-	ptrMyNetwork = NULL;
-	ptrMyScenarioTree = NULL;
+	//ptrMyNetwork = NULL;
+	//ptrMyScenarioTree = NULL;
 }
 
 /**
@@ -300,6 +300,7 @@ void SmpcController::initialiseSmpcController(){
 	ptrMyEngine->updateStateControl(currentX, prevU, prevDemand);
 	ptrMyEngine->eliminateInputDistubanceCoupling( ptrMyForecaster->getNominalDemand(),
 			ptrMyForecaster->getNominalPrices());
+	/*
 	uint_t nx = ptrMySmpcConfig->getNX();
 	uint_t nu = ptrMySmpcConfig->getNU();
 	uint_t nv = ptrMySmpcConfig->getNV();
@@ -309,6 +310,7 @@ void SmpcController::initialiseSmpcController(){
 	currentX = NULL;
 	prevU = NULL;
 	prevDemand = NULL;
+	*/
 }
 
 /**
@@ -334,8 +336,8 @@ void SmpcController::dualExtrapolationStep(real_t lambda){
 	// y_{k} = y_{k-1}
 	_CUDA(cudaMemcpy(devVecXi, devVecUpdateXi, 2*nx*nodes*sizeof(real_t), cudaMemcpyDeviceToDevice));
 	_CUDA(cudaMemcpy(devVecPsi, devVecUpdatePsi, nu*nodes*sizeof(real_t), cudaMemcpyDeviceToDevice));
-	ptrMyNetwork = NULL;
-	ptrMyScenarioTree = NULL;
+	//ptrMyNetwork = NULL;
+	//ptrMyScenarioTree = NULL;
 }
 
 /**
@@ -358,6 +360,7 @@ void SmpcController::solveStep(){
 	real_t scale[3] = {-0.5, 1, -1};
 	real_t alpha = 1;
 	real_t beta = 0;
+	real_t *xHost = new real_t[nu*nodes];
 
 	if(factorStepFlag == false){
 		initialiseSmpcController();
@@ -520,14 +523,15 @@ void SmpcController::solveStep(){
 
 		}
 	}
-	/**/
 
 	_CUDA(cudaFree(devTempVecQ));
 	_CUDA(cudaFree(devTempVecR));
+	_CUDA(cudaFree(devLv) );
 	devTempVecQ = NULL;
 	devTempVecR = NULL;
-	ptrMyNetwork = NULL;
-	ptrMyScenarioTree = NULL;
+	devLv = NULL;
+	//ptrMyNetwork = NULL;
+	//ptrMyScenarioTree = NULL;
 }
 
 /**
@@ -574,14 +578,14 @@ void SmpcController::proximalFunG(){
 	//distance with constraints X
 	_CUBLAS(cublasSnrm2_v2(ptrMyEngine->getCublasHandle(), nx*nodes, devSuffleVecXi, 1, &distanceXcst));
 	if(distanceXcst > invLambda*ptrMySmpcConfig->getPenaltyState()){
-		cout << " prox distance ";
+		//cout << " prox distance ";
 		penaltyScalar = 1 - invLambda*ptrMySmpcConfig->getPenaltyState()/distanceXcst;
 		additionVectorOffset<<<nodes, nx>>>(devVecDualXi, devVecDiffXi, penaltyScalar, 2*nx, 0, nx*nodes);
 	}
 	//distance with Xsafe
 	_CUBLAS(cublasSnrm2_v2(ptrMyEngine->getCublasHandle(), nx*nodes, &devSuffleVecXi[nx*nodes], 1, &distanceXs));
 	if(distanceXs > invLambda*ptrMySmpcConfig->getPenaltySafety()){
-		cout << " prox distance ";
+		//cout << " prox distance ";
 		penaltyScalar = 1-invLambda*ptrMySmpcConfig->getPenaltySafety()/distanceXs;
 		additionVectorOffset<<<nodes, nx>>>(devVecDualXi, devVecDiffXi, penaltyScalar, 2*nx, nx, nx*nodes);
 	}
@@ -592,8 +596,8 @@ void SmpcController::proximalFunG(){
 	_CUDA( cudaFree(devVecDiffXi) );
 	devSuffleVecXi = NULL;
 	devVecDiffXi = NULL;
-	ptrMyNetwork = NULL;
-	ptrMyScenarioTree = NULL;
+	//ptrMyNetwork = NULL;
+	//ptrMyScenarioTree = NULL;
 }
 
 /**
@@ -617,7 +621,8 @@ void SmpcController::dualUpdate(){
 	_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), 2*nx*nodes, &stepSize, devVecPrimalInfeasibilty, 1, devVecUpdateXi, 1) );
 	_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), nu*nodes, &stepSize, &devVecPrimalInfeasibilty[2*nx*nodes], 1,
 			devVecUpdatePsi, 1) );
-
+	ptrMyNetwork = NULL;
+	ptrMyScenarioTree = NULL;
 }
 
 /**
@@ -646,24 +651,21 @@ uint_t SmpcController::algorithmApg(){
 	real_t lambda;
 	uint_t maxIndex;
 	for (uint_t iter = 0; iter < ptrMySmpcConfig->getMaxIterations(); iter++){
-	//for (uint_t iter = 0; iter < 2; iter++){
+	//for (uint_t iter = 0; iter < 40; iter++){
 		lambda = theta[1]*(1/theta[0] - 1);
-		//cout << theta[0] << " " << theta[1] << " " << lambda << " ";
 		dualExtrapolationStep(lambda);
 		solveStep();
 		proximalFunG();
 		dualUpdate();
-
 		theta[0] = theta[1];
 		theta[1] = 0.5*(sqrt(pow(theta[1], 4) + 4*pow(theta[1], 2)) - pow(theta[1], 2));
 		_CUBLAS( cublasIsamax_v2(ptrMyEngine->getCublasHandle(), (2*nx + nu)*nodes, devVecPrimalInfeasibilty,
 				1, &maxIndex));
 		_CUDA( cudaMemcpy(&vecPrimalInfs[iter], &devVecPrimalInfeasibilty[maxIndex - 1], sizeof(real_t),
 				cudaMemcpyDeviceToHost));
-		/*cout<< vecPrimalInfs[iter] << " " << endl;
-				*/
 	}
 	//cout << endl;
+
 	return 1;
 }
 
@@ -688,14 +690,22 @@ void SmpcController::controllerSmpc(){
  */
 uint_t SmpcController::controlAction(real_t* u){
 	uint_t status;
-	//real_t hostPrimalInfs = new real_t[];
+	size_t initialFreeBytes;
+	size_t totalBytes;
+	size_t finalFreeBytes;
+	_CUDA( cudaMemGetInfo(&initialFreeBytes, &totalBytes) );
 	ptrMyEngine->updateStateControl(ptrMySmpcConfig->getCurrentX(), ptrMySmpcConfig->getPrevU(),
 			ptrMySmpcConfig->getPrevDemand());
 	ptrMyEngine->eliminateInputDistubanceCoupling(ptrMyForecaster->getNominalDemand(),
 			ptrMyForecaster->getNominalPrices());
 	status = algorithmApg();
 	_CUDA( cudaMemcpy(u, devVecU, ptrMySmpcConfig->getNU()*sizeof(real_t), cudaMemcpyDeviceToHost));
-	return status;
+	_CUDA( cudaMemGetInfo(&finalFreeBytes, &totalBytes) );
+	if( abs(finalFreeBytes - initialFreeBytes) > 0 ){
+		cout << "RUNTIME ERROR: MEMORY LEAKS" << endl;
+		return 0;
+	}else
+		return status;
 }
 
 /**
@@ -709,7 +719,10 @@ uint_t SmpcController::controlAction(fstream& controlOutputJson){
 		uint_t status;
 		uint_t nu = ptrMySmpcConfig->getNU();
 		real_t *currentControl = new real_t[nu];
-
+		size_t initialFreeBytes;
+		size_t totalBytes;
+		size_t finalFreeBytes;
+		_CUDA( cudaMemGetInfo(&initialFreeBytes, &totalBytes) );
 		ptrMyEngine->updateStateControl(ptrMySmpcConfig->getCurrentX(), ptrMySmpcConfig->getPrevU(),
 				ptrMySmpcConfig->getPrevDemand());
 		ptrMyEngine->eliminateInputDistubanceCoupling(ptrMyForecaster->getNominalDemand(),
@@ -725,9 +738,14 @@ uint_t SmpcController::controlAction(fstream& controlOutputJson){
 			controlOutputJson << currentControl[iControl] << ", ";
 		}
 		//cout << endl;
+		_CUDA( cudaMemGetInfo(&finalFreeBytes, &totalBytes) );
 		controlOutputJson << "]" << endl;
 		delete [] currentControl;
-		return status;
+		if( abs(finalFreeBytes - initialFreeBytes) > 0 ){
+			cout << "RUNTIME ERROR: MEMORY LEAKS" << endl;
+			return 0;
+		}else
+			return status;
 	}else
 		return 0;
 }
@@ -774,7 +792,7 @@ void SmpcController::moveForewardInTime(){
 		delete [] stateUpdate;
 		previousControl = NULL;
 		stateUpdate = NULL;
-		previousDemand = NULL;
+		//previousDemand = NULL;
 	}else{
 		this->ptrMySmpcConfig->setCurrentState();
 		this->ptrMySmpcConfig->setPreviousControl();
@@ -849,6 +867,7 @@ void SmpcController::updateKpi(real_t* state, real_t* control){
 	real_t *constantPrice = this->ptrMyEngine->getDwnNetwork()->getAlpha();
 	real_t *variablePrice = this->ptrMyForecaster->getNominalPrices();
 	real_t *previousControl = this->ptrMySmpcConfig->getPrevU();
+	real_t weightEconomic = ptrMySmpcConfig->getWeightEconomical();
 	real_t *deltaU = new real_t[nu];
 	real_t *waterLevel = new real_t[nx];
 
@@ -859,7 +878,7 @@ void SmpcController::updateKpi(real_t* state, real_t* control){
 	real_t safeValue = 0;
 
 	for(uint_t iSize = 0; iSize < nu; iSize++){
-		ecoKpi = ecoKpi + (constantPrice[iSize] + variablePrice[iSize])*abs(control[iSize]);
+		ecoKpi = ecoKpi + weightEconomic*(constantPrice[iSize] + variablePrice[iSize])*abs(control[iSize]);
 		deltaU[iSize] = previousControl[iSize] - control[iSize];
 		smKpi = smKpi + deltaU[iSize]*deltaU[iSize];
 	}
@@ -896,7 +915,7 @@ real_t SmpcController::getEconomicKpi( uint_t simulationTime){
  * @param    simulationTime   simulation horizon
  */
 real_t SmpcController::getSmoothKpi( uint_t simulationTime){
-	real_t smoothValue = economicKpi/(3600*3600);
+	real_t smoothValue = smoothKpi/(3600);
 	return smoothValue/simulationTime;
 }
 
@@ -977,6 +996,7 @@ SmpcController::~SmpcController(){
 	_CUDA( cudaFree(devVecQ) );
 	_CUDA( cudaFree(devVecR) );
 	_CUDA( cudaFree(devControlAction) );
+	_CUDA( cudaFree(devStateUpdate) );
 
 	_CUDA( cudaFree(devPtrVecX) );
 	_CUDA( cudaFree(devPtrVecU) );
@@ -1006,6 +1026,7 @@ SmpcController::~SmpcController(){
 	devVecQ = NULL;
 	devVecR = NULL;
 	devControlAction = NULL;
+	devStateUpdate = NULL;
 
 	devPtrVecX = NULL;
 	devPtrVecU = NULL;

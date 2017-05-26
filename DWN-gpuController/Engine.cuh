@@ -304,6 +304,27 @@ public:
 	 */
 	real_t* getSysUmax();
 	/**
+	 * status of price uncertainty
+	 */
+	bool getPriceUncertainty();
+	/**
+	 * status of the demand uncertanity
+	 */
+	bool getDemandUncertantiy();
+	/*  SETTER'S IN THE ENGINE  */
+	/*
+	 * Option for uncertainty in price
+	 * @param    priceUncertaintyFlag    true to include uncertainty (default)
+	 *                                   false to include uncertainty (default)
+	 */
+	void setPriceUncertaintyFlag(bool inputFlag);
+	/*
+	 * Option for uncertainty in demand
+	 * @param    demandUncertaintyFlag    true to include uncertainty (default)
+	 *                                    false to include uncertainty (default)
+	 */
+	void setDemandUncertaintyFlag(bool inputFlag);
+	/**
 	 * Destructor
 	 */
 	~Engine();
@@ -585,6 +606,14 @@ private:
 	 * Wv = W*L
 	 */
 	real_t *devMatWv;
+	/*
+	 * Flag for to use the scenario tree for the price (default is set to 1 or true)
+	 */
+	bool priceUncertaintyFlag;
+	/*
+	 * Flag for to use the scenario tree for the price (default is set to 1 or true)
+	 */
+	bool demandUncertaintyFlag;
 	/**
 	 * cublas handler
 	 */

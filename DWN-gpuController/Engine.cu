@@ -38,6 +38,9 @@ Engine::Engine(DwnNetwork *myNetwork, ScenarioTree *myScenarioTree, SmpcConfigur
 	allocateSystemDevice();
 	allocateScenarioTreeDevice();
 	cublasCreate(&handle);
+	priceUncertaintyFlag = true;
+	demandUncertaintyFlag = true;
+
 	_CUDA( cudaMalloc((void**)&devMatPhi, 2*nodes*nv*nx*sizeof(real_t)) );
 	_CUDA( cudaMalloc((void**)&devMatPsi, nodes*nu*nv*sizeof(real_t)) );
 	_CUDA( cudaMalloc((void**)&devMatTheta, nodes*nx*nv*sizeof(real_t)) );
@@ -119,6 +122,9 @@ Engine::Engine(SmpcConfiguration *smpcConfig){
 	allocateSystemDevice();
 	allocateScenarioTreeDevice();
 	cublasCreate(&handle);
+	priceUncertaintyFlag = true;
+	demandUncertaintyFlag = true;
+
 	_CUDA( cudaMalloc((void**)&devMatPhi, 2*nodes*nv*nx*sizeof(real_t)) );
 	_CUDA( cudaMalloc((void**)&devMatPsi, nodes*nu*nv*sizeof(real_t)) );
 	_CUDA( cudaMalloc((void**)&devMatTheta, nodes*nx*nv*sizeof(real_t)) );
@@ -779,6 +785,37 @@ real_t* Engine::getSysUmax(){
 cublasHandle_t Engine::getCublasHandle(){
 	return handle;
 }
+
+/**
+ * status of price uncertainty
+ */
+bool Engine::getPriceUncertainty(){
+	return priceUncertaintyFlag;
+}
+/**
+ * status of the demand uncertanity
+ */
+bool Engine::getDemandUncertantiy(){
+	return demandUncertaintyFlag;
+}
+/*  SETTER'S IN THE ENGINE  */
+/*
+ * Option for uncertainty in price
+ * @param    priceUncertaintyFlag    true to include uncertainty (default)
+ *                                   false to include uncertainty (default)
+ */
+void Engine::setPriceUncertaintyFlag(bool inputFlag){
+	priceUncertaintyFlag = inputFlag;
+}
+/*
+ * Option for uncertainty in demand
+ * @param    demandUncertaintyFlag    true to include uncertainty (default)
+ *                                    false to include uncertainty (default)
+ */
+void Engine::setDemandUncertaintyFlag(bool inputFlag){
+	demandUncertaintyFlag = inputFlag;
+}
+
 void Engine::eliminateInputDistubanceCoupling(real_t* nominalDemand, real_t *nominalPrices){
 	uint_t ns = ptrMyScenarioTree->getNumScenarios();
 	uint_t nx = ptrMyNetwork->getNumTanks();
@@ -841,6 +878,9 @@ void Engine::eliminateInputDistubanceCoupling(real_t* nominalDemand, real_t *nom
 	// e = Gd*d
 	_CUDA( cudaMemcpy(devVecDemand, ptrMyScenarioTree->getErrorDemandArray(), nodes*nd*sizeof(real_t),
 			cudaMemcpyHostToDevice ));
+	if(!demandUncertaintyFlag){
+		_CUBLAS( cublasSscal_v2(handle, nu*nodes, &beta, devVecDemand, 1) );
+	}
 	_CUDA( cudaMemcpy(devVecDemandHat, nominalDemand, N*nd*sizeof(real_t), cudaMemcpyHostToDevice ));
 	for (iStage = 0 ; iStage < N; iStage++){
 		iStageCumulNodes = nodesPerStageCumul[iStage];
@@ -860,6 +900,11 @@ void Engine::eliminateInputDistubanceCoupling(real_t* nominalDemand, real_t *nom
 	_CUDA( cudaMemcpy(devVecAlphaHat, nominalPrices, N*nu*sizeof(real_t), cudaMemcpyHostToDevice) );
 	_CUDA( cudaMemcpy(devVecAlpha1, ptrMyNetwork->getAlpha(), nu*sizeof(real_t), cudaMemcpyHostToDevice));
 	_CUDA(cudaMemcpy(devVecAlpha, ptrMyScenarioTree->getErrorPriceArray(), nu*nodes*sizeof(real_t), cudaMemcpyHostToDevice));
+	//_CUBLAS(cublasSscal(handle,n,&al,d x,1));
+	if(!priceUncertaintyFlag){
+		_CUBLAS( cublasSscal_v2(handle, nu*nodes, &beta, devVecAlpha, 1) );
+	}
+
 	for(iStage = 0; iStage < N; iStage++){
 		_CUBLAS( cublasSaxpy_v2(handle, nu, &alpha, devVecAlpha1, 1, &devVecAlphaHat[iStage*nu], 1) );
 	}
@@ -867,6 +912,9 @@ void Engine::eliminateInputDistubanceCoupling(real_t* nominalDemand, real_t *nom
 		iStage = nodeStage[iNode];
 		_CUBLAS( cublasSaxpy_v2(handle, nu, &alpha, &devVecAlphaHat[iStage*nu], 1 , &devVecAlpha[iNode*nu], 1));
 	}
+	//scaling with the weight
+	real_t weightEconomical = ptrMySmpcConfig->getWeightEconomical();
+	_CUBLAS( cublasSscal_v2(handle, nu*nodes, &weightEconomical, devVecAlpha, 1) );
 	// alphaBar = L* (alpha)
 	_CUBLAS( cublasSgemm_v2(handle, CUBLAS_OP_T, CUBLAS_OP_N, nv, nodes, nu, &alpha, (const real_t*) devSysMatL, nu,
 			(const real_t*)devVecAlpha, nu, &beta, devVecAlphaBar, nv));
@@ -932,6 +980,7 @@ void Engine::updateStateControl(real_t* currentX, real_t* prevU, real_t* prevDem
 	uint_t nx = ptrMyNetwork->getNumTanks();
 	uint_t nd = ptrMyNetwork->getNumDemands();
 	uint_t nv = ptrMySmpcConfig->getNV();
+
 	_CUDA( cudaMemcpy(devVecCurrentState, currentX, ptrMyNetwork->getNumTanks()*sizeof(real_t),
 			cudaMemcpyHostToDevice) );
 	_CUDA( cudaMemcpy(devVecPreviousControl, prevU, ptrMyNetwork->getNumControls()*sizeof(real_t),
@@ -1025,6 +1074,7 @@ void Engine::deallocateSystemDevice(){
 	devVecPreviousControl = NULL;
 	devVecPreviousUhat = NULL;
 	devVecPreviousDemand = NULL;
+	devMatWv = NULL;
 
 	devPtrSysMatB = NULL;
 	devPtrSysMatL = NULL;
