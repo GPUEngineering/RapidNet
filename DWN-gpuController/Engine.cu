@@ -980,6 +980,7 @@ void Engine::updateStateControl(real_t* currentX, real_t* prevU, real_t* prevDem
 	uint_t nx = ptrMyNetwork->getNumTanks();
 	uint_t nd = ptrMyNetwork->getNumDemands();
 	uint_t nv = ptrMySmpcConfig->getNV();
+
 	_CUDA( cudaMemcpy(devVecCurrentState, currentX, ptrMyNetwork->getNumTanks()*sizeof(real_t),
 			cudaMemcpyHostToDevice) );
 	_CUDA( cudaMemcpy(devVecPreviousControl, prevU, ptrMyNetwork->getNumControls()*sizeof(real_t),

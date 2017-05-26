@@ -360,6 +360,7 @@ void SmpcController::solveStep(){
 	real_t scale[3] = {-0.5, 1, -1};
 	real_t alpha = 1;
 	real_t beta = 0;
+	real_t *xHost = new real_t[nu*nodes];
 
 	if(factorStepFlag == false){
 		initialiseSmpcController();
@@ -522,7 +523,6 @@ void SmpcController::solveStep(){
 
 		}
 	}
-	/**/
 
 	_CUDA(cudaFree(devTempVecQ));
 	_CUDA(cudaFree(devTempVecR));

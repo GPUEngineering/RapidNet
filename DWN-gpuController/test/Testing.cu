@@ -136,14 +136,9 @@ uint_t Testing::testScenarioTree(){
 	rapidjson::Document jsonDocument;
 	FILE* infile = fopen(fileName, "r");
 	if(infile == NULL){
-		try{
-			throw std::logic_error("Error in opening the file ");
-		}
-		catch (exception &e){
-			//cout << e.what() << __LINE__ << endl;
-		}
-		return 0;
-		//exit(100); /*TODO never use `exit`; throw an exception instead */
+		cout << pathToFileScenarioTree << infile << endl;
+		cerr << "Error in opening the file " <<__LINE__ << endl;
+		exit(100);
 	}else{
 		ScenarioTree *ptrMyScenarioTree = new ScenarioTree( pathToFileScenarioTree );
 		char* readBuffer = new char[65536];
@@ -196,7 +191,7 @@ uint_t Testing::testScenarioTree(){
 		_ASSERT( compareArray<real_t>( ptrMyScenarioTree->getErrorDemandArray()) );
 		a = jsonDocument[VARNAME_PRICE_NODE];
 		_ASSERT( a.IsArray() );
-		_ASSERT( compareArray<real_t>( ptrMyScenarioTree->getErrorPriceArray()) );
+		_ASSERT( compareArray<real_t>( ptrMyScenarioTree->getErrorPriceArray()) );/**/
 		delete [] readBuffer;
 		readBuffer = NULL;
 		delete ptrMyScenarioTree;
@@ -498,10 +493,14 @@ uint_t Testing::testSmpcController(){
 	real_t *prevU = ptrMySmpcConfig->getPrevU();
 	real_t *prevDemand = ptrMySmpcConfig->getPrevDemand();
 
-	ptrMyEngine->factorStep();
+	uint_t timeInst = 1;
+	ptrMyForecaster->predictDemand( timeInst );
+	ptrMyForecaster->predictPrices( timeInst );
+	/*ptrMyEngine->factorStep();
 	ptrMyEngine->updateStateControl(currentX, prevU, prevDemand);
 	ptrMyEngine->eliminateInputDistubanceCoupling( ptrMyForecaster->getNominalDemand(),
-			ptrMyForecaster->getNominalPrices());
+			ptrMyForecaster->getNominalPrices());*/
+
 	_ASSERT( ptrMyTestSmpc->testExtrapolation() );
 	_ASSERT( ptrMyTestSmpc->testSoveStep() );
 	_ASSERT( ptrMyTestSmpc->testProximalStep());

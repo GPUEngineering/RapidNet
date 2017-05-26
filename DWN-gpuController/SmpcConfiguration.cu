@@ -35,9 +35,9 @@ SmpcConfiguration::SmpcConfiguration(string pathToFile){
 		cerr << "Error in opening the file " <<__LINE__ << endl;
 		exit(100);
 	}else{
-		weightPrice = 300;
+		weightPrice = 1;
 		weightSmooth = 1;
-		weightSafety = 0.01;
+		weightSafety = 1;
 		char* readBuffer = new char[65536];
 		rapidjson::FileReadStream configurationJsonStream(infile, readBuffer, sizeof(readBuffer));
 		jsonDocument.ParseStream(configurationJsonStream);

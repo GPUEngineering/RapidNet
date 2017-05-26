@@ -46,8 +46,9 @@ uint_t TestSmpcController::compareDeviceArray(T* deviceArrayA){
 template<typename T>
 void TestSmpcController::setDeviceArray(T* deviceArray, uint_t dim){
 	T *hostArray = new T[dim];
-	for (uint_t i = 0; i < dim; i++)
+	for (uint_t i = 0; i < dim; i++){
 		hostArray[i] = (T) a[i].GetFloat();
+	}
 	_CUDA( cudaMemcpy(deviceArray, hostArray, dim*sizeof(T), cudaMemcpyHostToDevice));
 	free(hostArray);
 	//_CUDA( cudaMemcpy(deviceArray, &a[0].GetFloat(), dim*sizeof(T), cudaMemcpyDeviceToHost));
@@ -135,6 +136,7 @@ uint_t TestSmpcController::testSoveStep(){
 	DwnNetwork *ptrDwnNetwork = this->getDwnNetwork();
 	uint_t nx = ptrDwnNetwork->getNumTanks();
 	uint_t nu = ptrDwnNetwork->getNumControls();
+	uint_t nd = ptrDwnNetwork->getNumDemands();
 	uint_t nv = ptrMySmpcConfig->getNV();
 	uint_t nodes = ptrMyScenarioTree->getNumNodes();
 
@@ -143,13 +145,15 @@ uint_t TestSmpcController::testSoveStep(){
 	real_t *currentX = ptrMySmpcConfig->getCurrentX();
 	real_t *prevU = ptrMySmpcConfig->getPrevU();
 	real_t *prevDemand = ptrMySmpcConfig->getPrevDemand();
-	uint_t timeInst = 1;
+
+	/*uint_t timeInst = 1;
 	ptrMyForecaster->predictDemand( timeInst );
 	ptrMyForecaster->predictPrices( timeInst );
+
 	this->ptrMyEngine->factorStep();
 	this->ptrMyEngine->updateStateControl(currentX, prevU, prevDemand);
 	this->ptrMyEngine->eliminateInputDistubanceCoupling( ptrMyForecaster->getNominalDemand(),
-			ptrMyForecaster->getNominalPrices());
+			ptrMyForecaster->getNominalPrices());*/
 
 	rapidjson::Document jsonDocument;
 	FILE* infile = fopen(fileName, "r");
