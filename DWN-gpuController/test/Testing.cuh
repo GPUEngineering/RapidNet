@@ -59,6 +59,7 @@ public:
 	uint_t testControllerConfig();
 	uint_t testEngineTesting();
 	uint_t testSmpcController();
+	uint_t testNewEngineTesting();
 	~Testing();
 private:
 	template<typename T> uint_t compareArray(T* arrayA);
