@@ -18,6 +18,7 @@ int main(void){
 		_ASSERT( myTesting->testControllerConfig() );
 		_ASSERT( myTesting->testEngineTesting() );
 		_ASSERT( myTesting->testSmpcController());
+		//myTesting->testNewEngineTesting();
 	}else{
 		startTicToc();
 		real_t time;

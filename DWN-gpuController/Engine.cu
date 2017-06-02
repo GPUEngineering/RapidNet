@@ -20,7 +20,6 @@
 
 #include <cuda_device_runtime_api.h>
 #include "cuda_runtime.h"
-#include "cublas_v2.h"
 #include "rapidjson/document.h"
 #include "rapidjson/rapidjson.h"
 #include "rapidjson/filereadstream.h"
@@ -317,6 +316,232 @@ void Engine::allocateSystemDevice(){
 	nodesPerStageCumul = NULL;
 }
 
+void Engine::calculateMatLandMatLhat(){
+	uint_t nx = ptrMyNetwork->getNumTanks();
+	uint_t nu = ptrMyNetwork->getNumControls();
+	uint_t nd = ptrMyNetwork->getNumDemands();
+	uint_t ne = ptrMyNetwork->getNumMixNodes();
+	uint_t nullCol = nu - ne;
+
+	double *matE = new double[ne*nu];
+	//double matE[] = { 1.0, 4.0, 2.0, 2.0, 5.0, 1.0};
+	double *matEd = new double[ne*nd];
+	/*null space*/
+	real_t *matL = new real_t[nu*nullCol];
+	real_t *matLhat = new real_t[nu*nd];
+
+	/*matE - find the null space for the transpose of E rather E. So we store the transpose*/
+	for(uint_t iRow = 0; iRow < ne; iRow++)
+		for(uint_t iCol = 0; iCol < nu; iCol++)
+			matE[iRow*nu + iCol] = (double) ptrMyNetwork->getMatE()[iRow + iCol*ne];
+
+	/*matEd*/
+	for(uint_t iSize = 0; iSize < ne*nd; iSize++)
+		matEd[iSize] = (double) ptrMyNetwork->getMatEd()[iSize];
+
+	/*
+	cout<< "matrix E" << endl;
+	for(uint_t iRow = 0; iRow < nu; iRow++){
+		for(uint_t iCol = 0; iCol < ne; iCol++){
+			cout << matE[iRow + iCol*nu] << " ";
+		}
+		cout << endl;
+	}*/
+
+	double *devMatE;
+	double *devMatEd;
+
+	_CUDA( cudaMalloc((void**)&devMatE, ne*nu*sizeof(double)) );
+	_CUDA( cudaMalloc((void**)&devMatEd, ne*nd*sizeof(double)) );
+
+	_CUDA( cudaMemcpy( devMatE, matE, ne*nu*sizeof(double), cudaMemcpyHostToDevice) );
+	_CUDA( cudaMemcpy( devMatEd, matEd, ne*nd*sizeof(double), cudaMemcpyHostToDevice) );
+
+	/*SVD decomposition*/
+	double *devMatS;
+	double *devMatU;
+	double *devMatVT;
+	int *devInfo = NULL;
+	double *devWork =  NULL;
+	double *devNotWork =  NULL;
+	double *devMatInvS;
+	double *devTempMatW;
+	double *devMatPinvE;
+	double *devMatLhat;
+
+	double *matU = new double[nu*nu];
+	double *matVT = new double[ne*ne];
+	double *matS = new double[ne];
+	double *matPinvE = new double[nu*ne];
+	double *matLhatDouble = new double[nu*nd];
+
+    _CUDA( cudaMalloc ((void**)&devMatS  , ne*sizeof(double)) ) ;
+    _CUDA( cudaMalloc ((void**)&devMatU  , nu*nu*sizeof(double)) );
+    _CUDA( cudaMalloc ((void**)&devMatVT , ne*ne*sizeof(double)) );
+    _CUDA( cudaMalloc ((void**)&devInfo, sizeof(int)) );
+    _CUDA( cudaMalloc ((void**)&devMatInvS  , ne*sizeof(double)));
+    _CUDA( cudaMalloc ((void**)&devTempMatW  , ne*ne*sizeof(double)));
+    _CUDA( cudaMalloc ((void**)&devMatPinvE , nu*ne*sizeof(double)));
+    _CUDA( cudaMalloc ((void**)&devMatLhat , nd*nu*sizeof(double)));
+
+    int lwork = 3*(nu < ne ? nu:ne) + (nu > ne ? nu:ne);
+    int wssize = 5*(nu < ne ? nu:ne);
+    lwork = (lwork>wssize?lwork:wssize);
+    int notWork = nu < ne ? nu:ne;
+    int infoGpu = 0;
+    double alpha = 1;
+    double beta = 0;
+    double negAlpha = -1;
+
+    // step 1: create cusolverDn/cublas handle
+	cusolverStatus_t cusolverStatus = CUSOLVER_STATUS_SUCCESS;
+	cusolverDnHandle_t cusolverHandle = NULL;
+
+    cusolverStatus = cusolverDnCreate(&cusolverHandle);
+    assert(CUSOLVER_STATUS_SUCCESS == cusolverStatus);
+
+	// step 2: query working space of SVD
+	cusolverStatus = cusolverDnDgesvd_bufferSize( cusolverHandle, nu, ne, &lwork );
+	assert (cusolverStatus == CUSOLVER_STATUS_SUCCESS);
+
+	_CUDA( cudaMalloc((void**)&devWork , sizeof(double)*lwork) );
+	_CUDA( cudaMalloc((void**)&devNotWork , sizeof(double)*notWork) );
+
+	// step 3: compute SVD
+	signed char jobu = 'A'; // all m columns of U
+	signed char jobvt = 'A'; // all n columns of VT
+	cusolverStatus = cusolverDnDgesvd ( cusolverHandle, jobu, jobvt, nu, ne, devMatE, nu,
+			devMatS, devMatU, nu, devMatVT, ne, devWork, lwork, devNotWork, devInfo);
+
+	_CUDA( cudaMemcpy(&infoGpu, devInfo, sizeof(int), cudaMemcpyDeviceToHost) );
+	assert(CUSOLVER_STATUS_SUCCESS == cusolverStatus);
+
+	// step 4 : psudo inverse of E = U(:, 1:ne)*inv(S)(1:ne, 1:ne)*VT
+	_CUDA( cudaMemcpy(matS, devMatS, ne*sizeof(double), cudaMemcpyDeviceToHost) );
+	for(uint_t iSize = 0; iSize < ne; iSize++)
+		if( abs(matS[iSize]) > 0) matS[iSize] = 1/matS[iSize];
+	_CUDA( cudaMemcpy(devMatInvS, matS, ne*sizeof(double), cudaMemcpyHostToDevice) );
+
+	_CUBLAS( cublasDdgmm(handle, CUBLAS_SIDE_LEFT, ne, ne, devMatVT, ne, devMatInvS, 1, devTempMatW, ne) );
+	_CUBLAS( cublasDgemm_v2(handle, CUBLAS_OP_N, CUBLAS_OP_N, nu, ne, ne, &alpha, devMatU, nu, devTempMatW,
+			ne, &beta, devMatPinvE, nu) );
+
+	// step 5: matLhat = -pinv(E)Ed
+	_CUBLAS( cublasDgemm_v2(handle, CUBLAS_OP_N, CUBLAS_OP_N, nu, nd, ne, &negAlpha, devMatPinvE, nu, devMatEd,
+				ne, &beta, devMatLhat, nu) );
+
+	_CUDA( cudaMemcpy(matS, devMatS, ne*sizeof(double), cudaMemcpyDeviceToHost) );
+	_CUDA( cudaMemcpy(matU, devMatU, nu*nu*sizeof(double), cudaMemcpyDeviceToHost) );
+	_CUDA( cudaMemcpy(matVT, devMatVT, ne*ne*sizeof(double), cudaMemcpyDeviceToHost) );
+	_CUDA( cudaMemcpy(matPinvE, devMatPinvE, nu*ne*sizeof(double), cudaMemcpyDeviceToHost) );
+	_CUDA( cudaMemcpy(matLhatDouble, devMatLhat, nu*nd*sizeof(double), cudaMemcpyDeviceToHost) );
+
+	/*
+	cout << "singular values " << endl;
+	for(uint_t iRow = 0; iRow < ne; iRow++){
+		cout << matS[iRow] << " ";
+	}
+	cout << endl;
+
+	cout<< "matrix U" << endl;
+	for(uint_t iRow = 0; iRow < nu; iRow++){
+		for(uint_t iCol = 0; iCol < nu; iCol++){
+			cout << matU[iRow + iCol*nu] << " ";
+		}
+		cout << endl;
+	}
+
+	cout<< "matrix VT" << endl;
+	for(uint_t iRow = 0; iRow < ne; iRow++){
+		for(uint_t iCol = 0; iCol < ne; iCol++){
+			cout << matVT[iRow + iCol*ne] << " ";
+		}
+		cout << endl;
+	}
+
+	cout << "pseudo inverse " << endl;
+	for(uint_t iRow = 0; iRow < nu; iRow++){
+		for(uint_t iCol = 0; iCol < ne; iCol++){
+			cout << matPinvE[iRow + iCol*nu] << " ";
+		}
+		cout << endl;
+	}
+	*/
+
+	for(uint_t iSize = 0; iSize < nu*nd; iSize++)
+		matLhat[iSize] = (real_t) matLhatDouble[iSize];
+
+	for(uint_t iRow = 0; iRow < nu; iRow++){
+		for(uint_t iCol = ne; iCol < nu; iCol++){
+			matL[iRow + iCol*nu - ne*nu] = (real_t) matU[iRow + iCol*nu];
+		}
+	}
+
+	_CUDA( cudaMemcpy(devSysMatL, matL, nullCol*nu*sizeof(real_t), cudaMemcpyHostToDevice) );
+	_CUDA( cudaMemcpy(devSysMatLhat, matLhat, nd*nu*sizeof(real_t), cudaMemcpyHostToDevice) );
+
+	/*
+	cout << "NULL SPACE" << endl;
+	for(uint_t iSize = 0; iSize < nullCol*nu; iSize++){
+		cout<< matL[iSize] - ptrMySmpcConfig->getMatL()[iSize] << " ";
+	}
+	cout << endl;
+
+	cout << "Lhat" << endl;
+	for(uint_t iSize = 0; iSize < nd*nu; iSize++){
+		cout<< matLhat[iSize] - ptrMySmpcConfig->getMatLhat()[iSize] << " ";
+	}
+	cout << endl;
+	*/
+
+	delete [] matE;
+	delete [] matEd;
+	delete [] matL;
+	delete [] matLhat;
+	delete [] matLhatDouble;
+	delete [] matU;
+	delete [] matVT;
+	delete [] matS;
+	delete [] matPinvE;
+
+	_CUDA( cudaFree(devMatE) );
+	_CUDA( cudaFree(devMatEd) );
+    _CUDA( cudaFree(devMatS) );
+    _CUDA( cudaFree(devMatU) );
+    _CUDA( cudaFree(devMatVT));
+    _CUDA( cudaFree(devInfo) );
+    _CUDA( cudaFree(devWork) );
+    _CUDA( cudaFree(devNotWork) );
+    _CUDA( cudaFree(devMatInvS) );
+    _CUDA( cudaFree(devTempMatW) );
+    _CUDA( cudaFree(devMatPinvE) );
+    _CUDA( cudaFree(devMatLhat) );
+
+	matE = NULL;
+	matEd = NULL;
+	matL = NULL;
+	matLhat = NULL;
+	matLhatDouble = NULL;
+	matU = NULL;
+	matVT = NULL;
+	matS = NULL;
+	matPinvE = NULL;
+
+	devMatE = NULL;
+	devMatEd = NULL;
+    devMatS = NULL;
+    devMatU = NULL;
+    devMatVT = NULL;
+    devInfo = NULL;
+    devWork = NULL;
+    devNotWork = NULL;
+    devMatInvS = NULL;
+    devTempMatW = NULL;
+    devMatPinvE = NULL;
+    devMatLhat = NULL;
+
+}
+
 void Engine::initialiseSystemDevice(){
 	uint_t nodes = ptrMyScenarioTree->getNumNodes();
 	uint_t nx = ptrMyNetwork->getNumTanks();
@@ -337,11 +562,14 @@ void Engine::initialiseSystemDevice(){
 	_CUDA( cudaMalloc((void**)&devMatDiagPrcnd, N*(2*nx + nu)*sizeof(real_t)) );
 	_CUDA( cudaMemcpy(devMatDiagPrcnd, ptrMySmpcConfig->getMatPrcndDiag(), N*(2*nx + nu)*sizeof(real_t),
 			cudaMemcpyHostToDevice) );
+	this->calculateMatLandMatLhat();
 	for (uint_t iScen = 0; iScen < ns; iScen++){
 		_CUDA( cudaMemcpy(&devSysMatB[iScen*nx*nu], ptrMyNetwork->getMatB(), nx*nu*sizeof(real_t), cudaMemcpyHostToDevice) );
-		_CUDA( cudaMemcpy(&devSysMatL[iScen*nu*nv], ptrMySmpcConfig->getMatL(), nu*nv*sizeof(real_t), cudaMemcpyHostToDevice) );
-		_CUDA( cudaMemcpy(&devSysMatLhat[iScen*nu*nd], ptrMySmpcConfig->getMatLhat(), nu*nd*sizeof(real_t),
-				cudaMemcpyHostToDevice) );
+		_CUDA( cudaMemcpy(&devSysMatL[iScen*nu*nv], &devSysMatL[0], nu*nv*sizeof(real_t), cudaMemcpyHostToDevice) );
+		_CUDA( cudaMemcpy(&devSysMatLhat[iScen*nu*nd], &devSysMatLhat[0], nu*nd*sizeof(real_t), cudaMemcpyHostToDevice) );
+		//_CUDA( cudaMemcpy(&devSysMatL[iScen*nu*nv], ptrMySmpcConfig->getMatL(), nu*nv*sizeof(real_t), cudaMemcpyHostToDevice) );
+		//_CUDA( cudaMemcpy(&devSysMatLhat[iScen*nu*nd], ptrMySmpcConfig->getMatLhat(), nu*nd*sizeof(real_t),
+		//		cudaMemcpyHostToDevice) );
 	}
 	_CUDA( cudaMalloc((void**)&devCostMatW, nu*nu*sizeof(real_t)) );
 	_CUDA( cudaMalloc((void**)&devMatvariable, nu*nv*sizeof(real_t)) );

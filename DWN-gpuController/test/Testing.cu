@@ -470,6 +470,140 @@ uint_t Testing::testEngineTesting(){
 	return 1;
 }
 
+
+uint_t Testing::testNewEngineTesting(){
+	SmpcConfiguration *ptrMySmpcConfig = new SmpcConfiguration( pathToFileControllerConfig );
+	Forecaster *ptrMyForecaster = new Forecaster( pathToFileForecaster );
+
+	Engine *ptrMyEngine = new Engine( ptrMySmpcConfig );
+	DwnNetwork *ptrMyDwnNetwork = ptrMyEngine->getDwnNetwork();
+	ScenarioTree *ptrMyScenarioTree = ptrMyEngine->getScenarioTree();
+
+	uint_t *testNodeArray = new uint_t[ptrMyScenarioTree->getPredHorizon()];
+	uint_t dim;
+	uint_t nx  = ptrMyDwnNetwork->getNumTanks();
+	uint_t nu  = ptrMyDwnNetwork->getNumControls();
+	uint_t nd  = ptrMyDwnNetwork->getNumDemands();
+	uint_t ne  = ptrMyDwnNetwork->getNumMixNodes();
+	uint_t nv  = ptrMySmpcConfig->getNV();
+	uint_t nodes = ptrMyScenarioTree->getNumNodes();
+	real_t *y = new real_t[ptrMyScenarioTree->getNumNodes()*nu*nu];
+	real_t *currentX = ptrMySmpcConfig->getCurrentX();
+	real_t *prevU = ptrMySmpcConfig->getPrevU();
+	real_t *prevDemand = ptrMySmpcConfig->getPrevDemand();
+
+	uint_t timeInst = 1;
+	ptrMyForecaster->predictDemand( timeInst );
+	ptrMyForecaster->predictPrices( timeInst );
+	ptrMyEngine->factorStep();
+	ptrMyEngine->updateStateControl(currentX, prevU, prevDemand);
+	ptrMyEngine->eliminateInputDistubanceCoupling( ptrMyForecaster->getNominalDemand(),
+			ptrMyForecaster->getNominalPrices());
+	const char* fileName = pathToFileEnigne.c_str();
+	rapidjson::Document jsonDocument;
+	FILE* infile = fopen(fileName, "r");
+	if(infile == NULL){
+		cout << pathToFileEnigne << infile << endl;
+		cerr << "Error in opening the file " <<__LINE__ << endl;
+		exit(100);
+	}else{
+		ptrMyEngine->calculateMatLandMatLhat();
+		cout << " Doing nothing in the testing engine" << endl;
+		char* readBuffer = new char[65536];
+		rapidjson::FileReadStream networkJsonStream(infile, readBuffer, sizeof(readBuffer));
+		jsonDocument.ParseStream(networkJsonStream);
+		a = jsonDocument[VARNAME_UHAT];
+		_ASSERT(a.IsArray());
+		_ASSERT( compareDeviceArray<real_t>( ptrMyEngine->getVecUhat() ) );
+		a = jsonDocument[VARNAME_VEC_E];
+		_ASSERT(a.IsArray());
+		_ASSERT( compareDeviceArray<real_t>( ptrMyEngine->getVecE() ) );
+		a = jsonDocument[VARNAME_BETA];
+		_ASSERT(a.IsArray());
+		_ASSERT( compareDeviceArray<real_t>( ptrMyEngine->getVecBeta() ) );
+		a = jsonDocument[VARNAME_SCE_NOD];
+		_ASSERT(a.IsArray());
+		for (uint_t i = 0; i < ptrMyScenarioTree->getPredHorizon(); i++){
+			testNodeArray[i] = (uint_t) a[i].GetFloat();
+		}
+		a = jsonDocument[VARNAME_L];
+		_ASSERT(a.IsArray());
+		_ASSERT( compareDeviceArray<real_t>( ptrMyEngine->getSysMatL() ) );
+		a = jsonDocument[VARNAME_SYS_F];
+		_ASSERT(a.IsArray());
+		dim = 2*nx*nx;
+		_ASSERT( compareDeviceScenarioArray<real_t>( ptrMyEngine->getSysMatF(), testNodeArray, dim));
+		a = jsonDocument[VARNAME_SYS_G];
+		_ASSERT(a.IsArray());
+		dim = nu*nu;
+		_ASSERT( compareDeviceScenarioArray<real_t>( ptrMyEngine->getSysMatG(), testNodeArray, dim));
+		a = jsonDocument[VARNAME_TEST_XMIN];
+		_ASSERT(a.IsArray());
+		dim = nx;
+		_ASSERT( compareDeviceScenarioArray<real_t>( ptrMyEngine->getSysXmin(), testNodeArray, dim));
+		a = jsonDocument[VARNAME_TEST_XMAX];
+		_ASSERT(a.IsArray());
+		dim = nx;
+		_ASSERT( compareDeviceScenarioArray<real_t>( ptrMyEngine->getSysXmax(), testNodeArray, dim));
+		a = jsonDocument[VARNAME_TEST_XS];
+		_ASSERT(a.IsArray());
+		dim = nx;
+		_ASSERT( compareDeviceScenarioArray( ptrMyEngine->getSysXs(), testNodeArray, dim));
+		a = jsonDocument[VARNAME_TEST_UMIN];
+		_ASSERT(a.IsArray());
+		dim = nu;
+		_ASSERT( compareDeviceScenarioArray( ptrMyEngine->getSysUmin(), testNodeArray, dim));
+		a = jsonDocument[VARNAME_TEST_UMAX];
+		_ASSERT(a.IsArray());
+		dim = nu;
+		_ASSERT( compareDeviceScenarioArray( ptrMyEngine->getSysUmax(), testNodeArray, dim));
+		a = jsonDocument[VARNAME_OMEGA];
+		_ASSERT(a.IsArray());
+		dim = nv*nv;
+		_ASSERT( compareDeviceScenarioArray( ptrMyEngine->getMatOmega(), testNodeArray, dim));
+		a = jsonDocument[VARNAME_G];
+		_ASSERT(a.IsArray());
+		dim = nx*nv;
+		_ASSERT( compareDeviceScenarioArray( ptrMyEngine->getMatG(), testNodeArray, dim));
+		a = jsonDocument[VARNAME_D];
+		_ASSERT(a.IsArray());
+		dim = 2*nx*nv;
+		_ASSERT( compareDeviceScenarioArray( ptrMyEngine->getMatD(), testNodeArray, dim));
+		a = jsonDocument[VARNAME_THETA];
+		_ASSERT(a.IsArray());
+		dim = nx*nv;
+		_ASSERT( compareDeviceScenarioArray( ptrMyEngine->getMatTheta(), testNodeArray, dim));
+		a = jsonDocument[VARNAME_F];
+		_ASSERT(a.IsArray());
+		dim = nu*nv;
+		_ASSERT( compareDeviceScenarioArray( ptrMyEngine->getMatF(), testNodeArray, dim));
+		a = jsonDocument[VARNAME_PSI];
+		_ASSERT(a.IsArray());
+		dim = nv*nu;
+		_ASSERT( compareDeviceScenarioArray( ptrMyEngine->getMatPsi(), testNodeArray, dim));
+		a = jsonDocument[VARNAME_PHI];
+		_ASSERT(a.IsArray());
+		dim = 2*nv*nx;
+		_ASSERT( compareDeviceScenarioArray( ptrMyEngine->getMatPhi(), testNodeArray, dim));
+		delete [] readBuffer;
+		readBuffer = NULL;
+	}
+	fclose(infile);
+	infile = NULL;
+	delete ptrMyDwnNetwork;
+	delete ptrMyScenarioTree;
+	delete ptrMySmpcConfig;
+	delete ptrMyForecaster;
+	delete ptrMyEngine;
+	ptrMyDwnNetwork = NULL;
+	ptrMyScenarioTree = NULL;
+	ptrMyScenarioTree = NULL;
+	ptrMySmpcConfig = NULL;
+
+	cout << "Completed testing the Engine" << endl;
+	return 1;
+}
+
 uint_t Testing::testSmpcController(){
 	//DwnNetwork *ptrMyDwnNetwork = new DwnNetwork(pathToFileNetwork);
 	//ScenarioTree *ptrMyScenarioTree = new ScenarioTree( pathToFileScenarioTree );

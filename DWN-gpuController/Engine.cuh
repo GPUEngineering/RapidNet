@@ -30,12 +30,17 @@
 #include "Forecaster.cuh"
 #include "Utilities.cuh"
 #include "cublas_v2.h"
+#include "cusolverDn.h"
 
-/*TODO IF A METHOD IS NOT TO BE INVOKED FROM THE OUTSIDE OF THIS CLASS, MAKE IT PRIVATE */
-/*TODO INTRODUCE GETTERS FOR THOSE FIELDS WHICH NEED TO BE ACCESSIBLE FROM THE OUTSIDE */
 
 /**
- *TODO Document this class (what is its purpose)
+ * Class : Engine
+ * Usage : This class contains all the preproccessed information for the
+ *         APG algorithm. This class allocates the memory for the scenario tree
+ *         system and the algorithm matrices in GPU. This class contains the
+ *         method "eliminateControlDisturbance" for factor step. This class
+ *         contains a method "factorStep" that calculates the offline matrices
+ *         for the APG.
  */
 class Engine{
 public:
@@ -328,6 +333,11 @@ public:
 	 * Destructor
 	 */
 	~Engine();
+	/**
+	 * Calculate the matrix L and Lhat
+	 * L = null(E) and Lhat = pinv(E)*Ed
+	 */
+	void calculateMatLandMatLhat();
 
 private:
 	/**
@@ -349,6 +359,7 @@ private:
 	 * Initialise the system model in the device
 	 */
 	void initialiseSystemDevice();
+
 	/**
 	 *
 	 * @param src
