@@ -373,6 +373,8 @@ void SmpcController::solveStep(){
 	_CUDA( cudaMemcpy(ptrMyEngine->getMatSigma(), ptrMyEngine->getVecBeta(), nv*nodes*sizeof(real_t),
 			cudaMemcpyDeviceToDevice) );
 
+	real_t *x = new real_t[ns*nv*nv];
+
 	//Backward substitution
 	for(uint_t iStage = N-1;iStage > -1;iStage--){
 		iStageCumulNodes = nodesPerStageCumul[iStage];
@@ -425,8 +427,11 @@ void SmpcController::solveStep(){
 
 		if(iStage < N-1){
 			// r=g*q+r
+			//_CUBLAS(cublasSgemmBatched(ptrMyEngine->getCublasHandle(), CUBLAS_OP_N, CUBLAS_OP_N, nv, 1, nx, &alpha,
+			//		(const real_t**)&ptrMyEngine->getPtrMatG()[iStageCumulNodes], nv, (const real_t**)devPtrVecQ,
+			//		nx, &alpha, devPtrVecR, nv, iStageNodes));
 			_CUBLAS(cublasSgemmBatched(ptrMyEngine->getCublasHandle(), CUBLAS_OP_N, CUBLAS_OP_N, nv, 1, nx, &alpha,
-					(const real_t**)&ptrMyEngine->getPtrMatG()[iStageCumulNodes], nv, (const real_t**)devPtrVecQ,
+					(const real_t**)&ptrMyEngine->getPtrMatG()[0], nv, (const real_t**)devPtrVecQ,
 					nx, &alpha, devPtrVecR, nv, iStageNodes));
 		}
 
