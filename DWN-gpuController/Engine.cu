@@ -124,6 +124,7 @@ Engine::Engine(SmpcConfiguration *smpcConfig){
 	uint_t *nodesPerStageCumul = ptrMyScenarioTree->getNodesPerStageCumul();
 	uint_t idFinalBranchNode = ptrMyScenarioTree->getFinalBranchNode();
 	uint_t iStageCumulNodes, currentNode;
+	cout << "Number of scenrios " << ns << endl;
 	allocateSystemDevice();
 	allocateScenarioTreeDevice();
 	cublasCreate(&handle);

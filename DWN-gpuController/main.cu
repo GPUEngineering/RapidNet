@@ -9,7 +9,7 @@
 #include "test/Testing.cuh"
 
 int main(void){
-	uint_t TESTING = 1;
+	uint_t TESTING = 0;
 	if (TESTING){
 		Testing *myTesting = new Testing();
 		_ASSERT( myTesting->testNetwork() );
@@ -22,8 +22,8 @@ int main(void){
 	}else{
 		startTicToc();
 		real_t time;
-		string pathToControlOutput = "../systemData/controlOutput32.json";
-		string pathToControllerConfig = "../systemData/controllerConfig32.json";
+		string pathToControlOutput = "../systemData/controlOutput10864.json";
+		string pathToControllerConfig = "../systemData/controllerConfig10864.json";
 		fstream controlOutputJson;
 		controlOutputJson.open( pathToControlOutput.c_str(), fstream::out);
 
@@ -38,7 +38,7 @@ int main(void){
 				<< dwnController->getScenarioTree()->getNumScenarios() << endl;
 		dwnController->getEngine()->setPriceUncertaintyFlag( false );
 
-		while (timeInstance < 48){
+		while (timeInstance < 2){
 			dwnController->getForecaster()->predictDemand( timeInstance );
 			dwnController->getForecaster()->predictPrices( timeInstance );
 			if( timeInstance == 0){
