@@ -155,6 +155,16 @@ wall reactions are included.
   6              	  80.00           	50.00
   7              	  80.00           	30.00
 
+[LABELS]
+;X-Coord           Y-Coord          Label & Anchor Node
+ 22                70               "d1"                 
+ 12                10               "d2"                 
+ 72                40               "d3"        
+ 22                50               "t1"
+ 22                20               "t2"
+ 52                20               "t3"
+ 80                54               "r1"                            
+ 80                34               "r2"
 
 [VERTICES]
 ;Link            	X-Coord         	Y-Coord
