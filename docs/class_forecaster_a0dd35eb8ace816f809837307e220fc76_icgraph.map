@@ -1,0 +1,10 @@
+<map id="Forecaster::getNominalPrices" name="Forecaster::getNominalPrices">
+<area shape="rect" id="node2" href="$class_smpc_controller.html#ac11e4145e513a95a5114c7296a0416e1" title="SmpcController::initialise\lSmpcController" alt="" coords="249,123,415,165"/>
+<area shape="rect" id="node6" href="$class_smpc_controller.html#a4fd04c0118a30182cc5ae19ffc8c35bf" title="SmpcController::controllerSmpc" alt="" coords="947,199,1154,225"/>
+<area shape="rect" id="node7" href="$class_smpc_controller.html#a84fa9efe8b15742c929c0d274e479ff8" title="SmpcController::controlAction" alt="" coords="953,72,1149,99"/>
+<area shape="rect" id="node8" href="$class_smpc_controller.html#a69a259598ed5f16388221f8bb0ef438f" title="SmpcController::updateKpi" alt="" coords="464,17,643,44"/>
+<area shape="rect" id="node3" href="$main_8cu.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="1203,72,1253,99"/>
+<area shape="rect" id="node4" href="$class_smpc_controller.html#a232316a3ba52a6d397e8337c130c81c2" title="SmpcController::solveStep" alt="" coords="464,173,643,200"/>
+<area shape="rect" id="node5" href="$class_smpc_controller.html#a504a73b33ca1704bc0e743006ef71dae" title="SmpcController::algorithmApg" alt="" coords="697,173,893,200"/>
+<area shape="rect" id="node9" href="$class_smpc_controller.html#a3d02dd634603e096fc5f8e8940ace333" title="SmpcController::moveForeward\lInTime" alt="" coords="691,6,898,47"/>
+</map>

@@ -1,0 +1,22 @@
+<map id="SmpcController::moveForewardInTime" name="SmpcController::moveForewardInTime">
+<area shape="rect" id="node2" href="$class_engine.html#af5c56254a25f6ff4ebc001bb1f9db4bf" title="Engine::getDwnNetwork" alt="" coords="533,107,697,134"/>
+<area shape="rect" id="node3" href="$class_dwn_network.html#a4bd201487c9e524815b5c9112fcd2722" title="DwnNetwork::getNumTanks" alt="" coords="271,46,459,72"/>
+<area shape="rect" id="node4" href="$class_dwn_network.html#a6791b1fd057bac451f84192624411155" title="DwnNetwork::getNumControls" alt="" coords="265,96,466,123"/>
+<area shape="rect" id="node5" href="$class_dwn_network.html#ae938bb831f8d3cecde15bd240c43dc29" title="DwnNetwork::getNumDemands" alt="" coords="261,147,469,174"/>
+<area shape="rect" id="node6" href="$class_engine.html#aa75a2ef9f3d77486fc9e87f9e0801e2e" title="Engine::getVecCurrentState" alt="" coords="273,198,458,224"/>
+<area shape="rect" id="node7" href="$class_engine.html#a96b542ee7b14510c442e3bfdd311382c" title="Engine::getCublasHandle" alt="" coords="280,248,451,275"/>
+<area shape="rect" id="node8" href="$class_engine.html#aca774b136f1ba7a83bbf55d5205f5206" title="Engine::getVecE" alt="" coords="305,299,425,326"/>
+<area shape="rect" id="node9" href="$class_engine.html#a3111663e2726aec5914acc87d8e0c7be" title="Engine::getSysMatB" alt="" coords="294,350,437,376"/>
+<area shape="rect" id="node10" href="$class_forecaster.html#a7a08d379a94281fe54c4f196f66f79b2" title="Forecaster::getNominalDemand" alt="" coords="262,400,469,427"/>
+<area shape="rect" id="node11" href="$class_smpc_controller.html#a69a259598ed5f16388221f8bb0ef438f" title="SmpcController::updateKpi" alt="" coords="276,451,455,478"/>
+<area shape="rect" id="node18" href="$class_smpc_configuration.html#a4e9fd6f8806d89f9df825001e028eccd" title="SmpcConfiguration::\lsetCurrentState" alt="" coords="295,502,436,544"/>
+<area shape="rect" id="node19" href="$class_smpc_configuration.html#a2195a3b0ebab95e357eef18e19b1cecc" title="SmpcConfiguration::\lsetPreviousControl" alt="" coords="295,568,436,609"/>
+<area shape="rect" id="node20" href="$class_smpc_configuration.html#aeabcb9fb328380a69240f69df14638ca" title="SmpcConfiguration::\lsetpreviousdemand" alt="" coords="295,633,436,674"/>
+<area shape="rect" id="node21" href="$class_smpc_configuration.html#ad52533957da300587a86c9170d5c528b" title="SmpcConfiguration::\lsetPreviousDemand" alt="" coords="295,698,436,740"/>
+<area shape="rect" id="node12" href="$class_smpc_configuration.html#aaf5023ccaed6be1b5f738fe62216cdee" title="SmpcConfiguration::\lgetNX" alt="" coords="544,294,685,336"/>
+<area shape="rect" id="node13" href="$class_smpc_configuration.html#a003a0f69c7ecc13f1b0fcf76f419305d" title="SmpcConfiguration::\lgetNU" alt="" coords="544,360,685,401"/>
+<area shape="rect" id="node14" href="$class_dwn_network.html#ad0a8c9318eb7b0d3157bafbecbac09a5" title="DwnNetwork::getXsafe" alt="" coords="535,426,694,452"/>
+<area shape="rect" id="node15" href="$class_dwn_network.html#a94569edcaae90b827a238f3596740ece" title="DwnNetwork::getAlpha" alt="" coords="536,476,693,503"/>
+<area shape="rect" id="node16" href="$class_forecaster.html#a0dd35eb8ace816f809837307e220fc76" title="Forecaster::getNominalPrices" alt="" coords="517,527,712,554"/>
+<area shape="rect" id="node17" href="$class_smpc_configuration.html#a9b6dadf8c3d99cbd7326c60939d99d17" title="SmpcConfiguration::\lgetPrevU" alt="" coords="544,578,685,620"/>
+</map>
