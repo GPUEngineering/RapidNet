@@ -11,14 +11,14 @@ wall reactions are included.
 
 [RESERVOIRS]
 ;ID              	Head        	Pattern
-6                800                    ;
-7                850                    ;
+6                200                    ;
+7                250                    ;
 
 [TANKS]
 ;ID              	Elevation   	InitLevel   	MinLevel    	MaxLevel    	Diameter    	MinVol      	VolCurve
- 2               	850         	120         	100         	150         	50.5        	0           	                	;
- 3                830           180           50            300           100.5         0                               ;
- 4                800           140           100           150           20.5          0                               ;
+ 2               	850         	120         	100         	150         	50.5        	0           	                ;
+ 3                  830             180             50              300             100.5           0                               ;
+ 4                  800             140             100             150             20.5            0                               ;
 
 [PIPES]
 ;ID              	Node1           	Node2           Length      	Diameter    	Roughness   	MinorLoss   	Status
@@ -33,8 +33,11 @@ wall reactions are included.
 
 [PUMPS]
 ;ID              Node1           	Node2           Parameters
- 19               3               	2              	  HEAD 1	;
- 20               4                 3                 HEAD 1  ;
+ 19               3               	2              	HEAD 1	;
+ 20               4                 3               HEAD 1  ;
+ 221              6                 12              HEAD 1  ;
+ 222              7                 12              HEAD 1  ;
+ 223              12                4               HEAD 1  ;
 
 [VALVES]
 ;ID              	Node1           	Node2           	Diameter    	Type	Setting     	MinorLoss
@@ -59,7 +62,11 @@ wall reactions are included.
  1               	1500        	250
 ;PUMP: Pump Curve for Pump 20
  2                1500          250
- 
+;PUMP: Pump Curve for Pump 221
+ 3                1500          250
+;PUMP: Pump Curve for Pump 222
+ 4                1500          250 
+
 [CONTROLS]
 
 

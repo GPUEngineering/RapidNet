@@ -1,4 +1,4 @@
-function [ dwnData ] = pharserEpanet( epanetInputFilename )
+function [ dwnData ] = parserEpanet( epanetInputFilename )
 %
 % pharserEpanet pharse the input EPANET file to obtain the topology 
 %  of the network and stores into the dwnData structure. 
@@ -88,7 +88,7 @@ for tankIter = 10:tankDataLength
         minTank = [minTank; str2double(tankData(tankIter))];
         idCount = idCount + 1;
     elseif( idCount == 5)
-        maxTank = [minTank; str2double(tankData(tankIter))];
+        maxTank = [maxTank; str2double(tankData(tankIter))];
         idCount = idCount + 1;
     else
         if( tankStringData(end) == ';')
@@ -234,12 +234,12 @@ for iDemand = 1:nDemand
     rowEd = zeros(1, nDemand);
     rowFlag = 0;
     for iPump = 1:nPump
-        if(strcmp( currentDemandId, pumpNode1))
+        if(strcmp( currentDemandId, pumpNode1(iPump)))
             rowE(1, iPump) = 1;
             rowEd(1, iDemand) = -1;
             rowFlag = 1;
         end
-        if(strcmp( currentDemandId, pumpNode2))
+        if(strcmp( currentDemandId, pumpNode2(iPump)))
             rowE(1, iPump) = -1;
             rowEd(1, iDemand) = -1;
             rowFlag = 1;
@@ -263,13 +263,25 @@ for iDemand = 1:nDemand
     end 
 end 
 
-dwnData.A = A;
-dwnData.B = Bd;
-dwnData.Gd = Gd;
-dwnData.E = E;
-dwnData.Ed = Ed;
-dwnData.xmin = minTank;
-dwnData.xmax = maxTank;
+if isempty(E)
+    E = zeros(1, nInput);
+    Ed = zeros(1, nDemand);
+end 
+
+dwnData.nx = length(A);
+dwnData.nu = size(Bd, 2);
+dwnData.ne = size(E) * [1;0];
+dwnData.nd = size(Gd, 2);
+dwnData.matA = A;
+dwnData.matB = Bd;
+dwnData.matGd = Gd;
+dwnData.matE = E;
+dwnData.matEd = Ed;
+dwnData.vecXmin = minTank;
+dwnData.vecXmax = maxTank;
+dwnData.vecUmin = zeros(dwnData.nu, 1);
+dwnData.vecUmax = ones(dwnData.nu, 1) * 100;
+dwnData.costAlpha1 = 10*ones(dwnData.nu, 1);
 
 end
 

@@ -3,8 +3,13 @@ clc
 clear
 % Path to the json files
 pathToNetwork = 'network.json';
+pathToNetworkWithSaveJson = 'networkJson.json';
 epanetInputFile = 'testEpanet.inp';
-dwnData = pharserEpanet( epanetInputFile );
+dwnData = parserEpanet( epanetInputFile );
+dwnData.N = 24;
+dwnData.vecXsafe = 0.35 * dwnData.vecXmax;
+
+%{
 %load('dwn');
 P.Hp = 24;
 P.Hu = 23;
@@ -26,5 +31,7 @@ DWNnetwork.vecXsafe = P.xs;
 DWNnetwork.vecUmin = zeros(DWNnetwork.nu, 1);
 DWNnetwork.vecUmax = ones(DWNnetwork.nu, 1) * 100;
 DWNnetwork.costAlpha1 = 10*ones(DWNnetwork.nu, 1);
+%}
 
-generateJsonFile( DWNnetwork, pathToNetwork);
+generateJsonFile( dwnData, pathToNetwork);
+%jsonFile = savejson( '', dwnData, pathToNetworkWithSaveJson);
