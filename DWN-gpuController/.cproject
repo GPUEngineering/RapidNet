@@ -37,6 +37,8 @@
 							<tool id="nvcc.linker.base.837138577" name="NVCC Linker" superClass="nvcc.linker.base">
 								<option id="nvcc.linker.option.libs.1357982897" name="Libraries (-l)" superClass="nvcc.linker.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" value="cublas"/>
+									<listOptionValue builtIn="false" value="cusolver"/>
+									<listOptionValue builtIn="false" value="cudart"/>
 								</option>
 								<inputType id="nvcc.linker.input.850850183" superClass="nvcc.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
