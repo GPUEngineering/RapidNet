@@ -64,7 +64,7 @@ public:
 private:
 	template<typename T> uint_t compareArray(T* arrayA);
 	template<typename T> uint_t compareDeviceArray(T* arrayA);
-	template<typename T> uint_t compareDeviceScenarioArray(T* arrayA, uint_t *nodes, uint_t dim);
+	template<typename T> uint_t compareDeviceScenarioArray(T* arrayA, uint_t *nodes, uint_t dim, uint_t arraySize);
 	//int compareArray(real_t* arrayA);
 	string pathToFileNetwork;
 	string pathToFileForecaster;

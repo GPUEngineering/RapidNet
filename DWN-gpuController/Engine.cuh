@@ -37,10 +37,14 @@
  * Class : Engine
  * Usage : This class contains all the preproccessed information for the
  *         APG algorithm. This class allocates the memory for the scenario tree
- *         system and the algorithm matrices in GPU. This class contains the
- *         method "eliminateControlDisturbance" for factor step. This class
- *         contains a method "factorStep" that calculates the offline matrices
- *         for the APG.
+ *         system and the algorithm matrices in GPU.
+ *         methods :
+ *          - allocateScenarioTreeDevice
+ *          - initialiseScenarioTreeDevice
+ *          - allocateSystemDevice
+ *          - initialiseScenarioTreeDevice
+ *          - eliminateInputDistubanceCoupling
+ *          - factorStep
  */
 class Engine{
 public:

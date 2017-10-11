@@ -89,6 +89,15 @@ public:
 	uint_t getNumNonleafNodes();
 
 	/*
+	 * Return the final node before there is no branching
+	 */
+	uint_t getFinalBranchNode();
+
+	/*
+	 * Return the final stage before there is no branching
+	 */
+	uint_t getFinalBranchStage();
+	/*
 	 * Return the pointer to the array representing the stages of the
 	 * node
 	 */

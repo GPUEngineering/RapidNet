@@ -146,6 +146,28 @@ uint_t ScenarioTree::getNumNonleafNodes(){
 	return nNonleafNodes;
 }
 
+uint_t ScenarioTree::getFinalBranchNode(){
+	uint_t finalBranchNode = 0;
+	for( uint_t iNode = 0; iNode < nPredHorizon - 1; iNode++){
+		if ( nodesPerStage[iNode] == nodesPerStage[iNode + 1]){
+			finalBranchNode = nodesPerStageCumul[iNode + 1];
+			return finalBranchNode;
+		}
+	}
+	return 0;
+}
+
+uint_t ScenarioTree::getFinalBranchStage(){
+	uint_t finalBranchStage = 0;
+	for( uint_t iNode = 0; iNode < nPredHorizon - 1; iNode++){
+		if ( nodesPerStage[iNode] == nodesPerStage[iNode + 1]){
+			finalBranchStage = iNode;
+			return finalBranchStage;
+		}
+	}
+	return 0;
+}
+
 uint_t* ScenarioTree::getStageNodes(){
 	return stageArray;
 }

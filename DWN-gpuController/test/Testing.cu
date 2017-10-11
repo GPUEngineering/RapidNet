@@ -56,14 +56,14 @@ uint_t Testing::compareDeviceArray(T* deviceArrayA){
 }
 
 template<typename T>
-uint_t Testing::compareDeviceScenarioArray(T* arrayA, uint_t *nodes, uint_t dim){
+uint_t Testing::compareDeviceScenarioArray(T* arrayA, uint_t *nodeArray, uint_t dim, uint_t arraySize){
 	T variable;
 	real_t TOLERANCE = 1e-2;
 	T* hostArrayA = new T[dim];
-	uint_t numNodes = a.Size()/dim;
-	for (uint_t i = 0; i < numNodes; i++){
+	//uint_t jsonFileNodes = a.Size()/dim;
+	for (uint_t i = 0; i < arraySize; i++){
 		//cout << (nodes[i]-1)*dim << " " << numNodes << " " << dim << endl;
-		_CUDA( cudaMemcpy(hostArrayA, &arrayA[(nodes[i]-1)*dim], dim*sizeof(T), cudaMemcpyDeviceToHost));
+		_CUDA( cudaMemcpy(hostArrayA, &arrayA[(nodeArray[i]-1)*dim], dim*sizeof(T), cudaMemcpyDeviceToHost));
 		for (uint_t j = 0; j < dim; j++ ){
 			variable = hostArrayA[j] - a[i*dim + j].GetFloat();
 			if (abs(variable) > TOLERANCE)
@@ -355,6 +355,8 @@ uint_t Testing::testEngineTesting(){
 	uint_t nd  = ptrMyDwnNetwork->getNumDemands();
 	uint_t nv  = ptrMySmpcConfig->getNV();
 	uint_t nodes = ptrMyScenarioTree->getNumNodes();
+	uint_t numPredHorizon = ptrMyScenarioTree->getPredHorizon();
+	uint_t idFinalBranchStage = ptrMyScenarioTree->getFinalBranchStage();
 	real_t *y = new real_t[ptrMyScenarioTree->getNumNodes()*nu*nu];
 	real_t *currentX = ptrMySmpcConfig->getCurrentX();
 	real_t *prevU = ptrMySmpcConfig->getPrevU();
@@ -398,59 +400,59 @@ uint_t Testing::testEngineTesting(){
 		a = jsonDocument[VARNAME_SYS_F];
 		_ASSERT(a.IsArray());
 		dim = 2*nx*nx;
-		_ASSERT( compareDeviceScenarioArray<real_t>( ptrMyEngine->getSysMatF(), testNodeArray, dim));
+		_ASSERT( compareDeviceScenarioArray<real_t>( ptrMyEngine->getSysMatF(), testNodeArray, dim, numPredHorizon));
 		a = jsonDocument[VARNAME_SYS_G];
 		_ASSERT(a.IsArray());
 		dim = nu*nu;
-		_ASSERT( compareDeviceScenarioArray<real_t>( ptrMyEngine->getSysMatG(), testNodeArray, dim));
+		_ASSERT( compareDeviceScenarioArray<real_t>( ptrMyEngine->getSysMatG(), testNodeArray, dim, numPredHorizon));
 		a = jsonDocument[VARNAME_TEST_XMIN];
 		_ASSERT(a.IsArray());
 		dim = nx;
-		_ASSERT( compareDeviceScenarioArray<real_t>( ptrMyEngine->getSysXmin(), testNodeArray, dim));
+		_ASSERT( compareDeviceScenarioArray<real_t>( ptrMyEngine->getSysXmin(), testNodeArray, dim, numPredHorizon));
 		a = jsonDocument[VARNAME_TEST_XMAX];
 		_ASSERT(a.IsArray());
 		dim = nx;
-		_ASSERT( compareDeviceScenarioArray<real_t>( ptrMyEngine->getSysXmax(), testNodeArray, dim));
+		_ASSERT( compareDeviceScenarioArray<real_t>( ptrMyEngine->getSysXmax(), testNodeArray, dim, numPredHorizon));
 		a = jsonDocument[VARNAME_TEST_XS];
 		_ASSERT(a.IsArray());
 		dim = nx;
-		_ASSERT( compareDeviceScenarioArray( ptrMyEngine->getSysXs(), testNodeArray, dim));
+		_ASSERT( compareDeviceScenarioArray( ptrMyEngine->getSysXs(), testNodeArray, dim, numPredHorizon));
 		a = jsonDocument[VARNAME_TEST_UMIN];
 		_ASSERT(a.IsArray());
 		dim = nu;
-		_ASSERT( compareDeviceScenarioArray( ptrMyEngine->getSysUmin(), testNodeArray, dim));
+		_ASSERT( compareDeviceScenarioArray( ptrMyEngine->getSysUmin(), testNodeArray, dim, numPredHorizon));
 		a = jsonDocument[VARNAME_TEST_UMAX];
 		_ASSERT(a.IsArray());
 		dim = nu;
-		_ASSERT( compareDeviceScenarioArray( ptrMyEngine->getSysUmax(), testNodeArray, dim));
+		_ASSERT( compareDeviceScenarioArray( ptrMyEngine->getSysUmax(), testNodeArray, dim, numPredHorizon));
 		a = jsonDocument[VARNAME_OMEGA];
 		_ASSERT(a.IsArray());
 		dim = nv*nv;
-		_ASSERT( compareDeviceScenarioArray( ptrMyEngine->getMatOmega(), testNodeArray, dim));
+		_ASSERT( compareDeviceScenarioArray( ptrMyEngine->getMatOmega(), testNodeArray, dim, idFinalBranchStage));
 		a = jsonDocument[VARNAME_G];
 		_ASSERT(a.IsArray());
 		dim = nx*nv;
-		_ASSERT( compareDeviceScenarioArray( ptrMyEngine->getMatG(), testNodeArray, dim));
-		a = jsonDocument[VARNAME_D];
-		_ASSERT(a.IsArray());
-		dim = 2*nx*nv;
-		_ASSERT( compareDeviceScenarioArray( ptrMyEngine->getMatD(), testNodeArray, dim));
+		_ASSERT( compareDeviceScenarioArray( ptrMyEngine->getMatG(), testNodeArray, dim, idFinalBranchStage));
 		a = jsonDocument[VARNAME_THETA];
 		_ASSERT(a.IsArray());
 		dim = nx*nv;
-		_ASSERT( compareDeviceScenarioArray( ptrMyEngine->getMatTheta(), testNodeArray, dim));
+		_ASSERT( compareDeviceScenarioArray( ptrMyEngine->getMatTheta(), testNodeArray, dim, idFinalBranchStage));/**/
+		a = jsonDocument[VARNAME_D];
+		_ASSERT(a.IsArray());
+		dim = 2*nx*nv;
+		_ASSERT( compareDeviceScenarioArray( ptrMyEngine->getMatD(), testNodeArray, dim, numPredHorizon));
 		a = jsonDocument[VARNAME_F];
 		_ASSERT(a.IsArray());
 		dim = nu*nv;
-		_ASSERT( compareDeviceScenarioArray( ptrMyEngine->getMatF(), testNodeArray, dim));
-		a = jsonDocument[VARNAME_PSI];
-		_ASSERT(a.IsArray());
-		dim = nv*nu;
-		_ASSERT( compareDeviceScenarioArray( ptrMyEngine->getMatPsi(), testNodeArray, dim));
+		_ASSERT( compareDeviceScenarioArray( ptrMyEngine->getMatF(), testNodeArray, dim, numPredHorizon));
 		a = jsonDocument[VARNAME_PHI];
 		_ASSERT(a.IsArray());
 		dim = 2*nv*nx;
-		_ASSERT( compareDeviceScenarioArray( ptrMyEngine->getMatPhi(), testNodeArray, dim));
+		_ASSERT( compareDeviceScenarioArray( ptrMyEngine->getMatPhi(), testNodeArray, dim, numPredHorizon));
+		a = jsonDocument[VARNAME_PSI];
+		_ASSERT(a.IsArray());
+		dim = nv*nu;
+		_ASSERT( compareDeviceScenarioArray( ptrMyEngine->getMatPsi(), testNodeArray, dim, numPredHorizon));
 		delete [] readBuffer;
 		readBuffer = NULL;
 	}
@@ -487,6 +489,7 @@ uint_t Testing::testNewEngineTesting(){
 	uint_t ne  = ptrMyDwnNetwork->getNumMixNodes();
 	uint_t nv  = ptrMySmpcConfig->getNV();
 	uint_t nodes = ptrMyScenarioTree->getNumNodes();
+	uint_t predHorizon = ptrMyScenarioTree->getPredHorizon();
 	real_t *y = new real_t[ptrMyScenarioTree->getNumNodes()*nu*nu];
 	real_t *currentX = ptrMySmpcConfig->getCurrentX();
 	real_t *prevU = ptrMySmpcConfig->getPrevU();
@@ -499,6 +502,7 @@ uint_t Testing::testNewEngineTesting(){
 	ptrMyEngine->updateStateControl(currentX, prevU, prevDemand);
 	ptrMyEngine->eliminateInputDistubanceCoupling( ptrMyForecaster->getNominalDemand(),
 			ptrMyForecaster->getNominalPrices());
+
 	const char* fileName = pathToFileEnigne.c_str();
 	rapidjson::Document jsonDocument;
 	FILE* infile = fopen(fileName, "r");
@@ -532,59 +536,59 @@ uint_t Testing::testNewEngineTesting(){
 		a = jsonDocument[VARNAME_SYS_F];
 		_ASSERT(a.IsArray());
 		dim = 2*nx*nx;
-		_ASSERT( compareDeviceScenarioArray<real_t>( ptrMyEngine->getSysMatF(), testNodeArray, dim));
+		_ASSERT( compareDeviceScenarioArray<real_t>( ptrMyEngine->getSysMatF(), testNodeArray, dim, predHorizon));
 		a = jsonDocument[VARNAME_SYS_G];
 		_ASSERT(a.IsArray());
 		dim = nu*nu;
-		_ASSERT( compareDeviceScenarioArray<real_t>( ptrMyEngine->getSysMatG(), testNodeArray, dim));
+		_ASSERT( compareDeviceScenarioArray<real_t>( ptrMyEngine->getSysMatG(), testNodeArray, dim, predHorizon));
 		a = jsonDocument[VARNAME_TEST_XMIN];
 		_ASSERT(a.IsArray());
 		dim = nx;
-		_ASSERT( compareDeviceScenarioArray<real_t>( ptrMyEngine->getSysXmin(), testNodeArray, dim));
+		_ASSERT( compareDeviceScenarioArray<real_t>( ptrMyEngine->getSysXmin(), testNodeArray, dim, predHorizon));
 		a = jsonDocument[VARNAME_TEST_XMAX];
 		_ASSERT(a.IsArray());
 		dim = nx;
-		_ASSERT( compareDeviceScenarioArray<real_t>( ptrMyEngine->getSysXmax(), testNodeArray, dim));
+		_ASSERT( compareDeviceScenarioArray<real_t>( ptrMyEngine->getSysXmax(), testNodeArray, dim, predHorizon));
 		a = jsonDocument[VARNAME_TEST_XS];
 		_ASSERT(a.IsArray());
 		dim = nx;
-		_ASSERT( compareDeviceScenarioArray( ptrMyEngine->getSysXs(), testNodeArray, dim));
+		_ASSERT( compareDeviceScenarioArray( ptrMyEngine->getSysXs(), testNodeArray, dim, predHorizon));
 		a = jsonDocument[VARNAME_TEST_UMIN];
 		_ASSERT(a.IsArray());
 		dim = nu;
-		_ASSERT( compareDeviceScenarioArray( ptrMyEngine->getSysUmin(), testNodeArray, dim));
+		_ASSERT( compareDeviceScenarioArray( ptrMyEngine->getSysUmin(), testNodeArray, dim, predHorizon));
 		a = jsonDocument[VARNAME_TEST_UMAX];
 		_ASSERT(a.IsArray());
 		dim = nu;
-		_ASSERT( compareDeviceScenarioArray( ptrMyEngine->getSysUmax(), testNodeArray, dim));
+		_ASSERT( compareDeviceScenarioArray( ptrMyEngine->getSysUmax(), testNodeArray, dim, predHorizon));
 		a = jsonDocument[VARNAME_OMEGA];
 		_ASSERT(a.IsArray());
 		dim = nv*nv;
-		_ASSERT( compareDeviceScenarioArray( ptrMyEngine->getMatOmega(), testNodeArray, dim));
+		_ASSERT( compareDeviceScenarioArray( ptrMyEngine->getMatOmega(), testNodeArray, dim, predHorizon));
 		a = jsonDocument[VARNAME_G];
 		_ASSERT(a.IsArray());
 		dim = nx*nv;
-		_ASSERT( compareDeviceScenarioArray( ptrMyEngine->getMatG(), testNodeArray, dim));
+		_ASSERT( compareDeviceScenarioArray( ptrMyEngine->getMatG(), testNodeArray, dim, predHorizon));
 		a = jsonDocument[VARNAME_D];
 		_ASSERT(a.IsArray());
 		dim = 2*nx*nv;
-		_ASSERT( compareDeviceScenarioArray( ptrMyEngine->getMatD(), testNodeArray, dim));
+		_ASSERT( compareDeviceScenarioArray( ptrMyEngine->getMatD(), testNodeArray, dim, predHorizon));
 		a = jsonDocument[VARNAME_THETA];
 		_ASSERT(a.IsArray());
 		dim = nx*nv;
-		_ASSERT( compareDeviceScenarioArray( ptrMyEngine->getMatTheta(), testNodeArray, dim));
+		_ASSERT( compareDeviceScenarioArray( ptrMyEngine->getMatTheta(), testNodeArray, dim, predHorizon));
 		a = jsonDocument[VARNAME_F];
 		_ASSERT(a.IsArray());
 		dim = nu*nv;
-		_ASSERT( compareDeviceScenarioArray( ptrMyEngine->getMatF(), testNodeArray, dim));
+		_ASSERT( compareDeviceScenarioArray( ptrMyEngine->getMatF(), testNodeArray, dim, predHorizon));
 		a = jsonDocument[VARNAME_PSI];
 		_ASSERT(a.IsArray());
 		dim = nv*nu;
-		_ASSERT( compareDeviceScenarioArray( ptrMyEngine->getMatPsi(), testNodeArray, dim));
+		_ASSERT( compareDeviceScenarioArray( ptrMyEngine->getMatPsi(), testNodeArray, dim, predHorizon));
 		a = jsonDocument[VARNAME_PHI];
 		_ASSERT(a.IsArray());
 		dim = 2*nv*nx;
-		_ASSERT( compareDeviceScenarioArray( ptrMyEngine->getMatPhi(), testNodeArray, dim));
+		_ASSERT( compareDeviceScenarioArray( ptrMyEngine->getMatPhi(), testNodeArray, dim, predHorizon));
 		delete [] readBuffer;
 		readBuffer = NULL;
 	}
