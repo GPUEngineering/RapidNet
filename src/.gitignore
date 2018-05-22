@@ -1,2 +1,6 @@
 /.ptp-sync/
 /Debug/
+*.tmp
+*.o
+*.a
+*.log
