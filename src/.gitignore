@@ -1,6 +1,9 @@
 /.ptp-sync/
 /Debug/
+<<<<<<< HEAD
 *.tmp
 *.o
 *.a
 *.log
+=======
+>>>>>>> refs/remotes/eclipse_auto/master
