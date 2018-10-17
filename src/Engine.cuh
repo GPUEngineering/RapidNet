@@ -36,8 +36,8 @@
 /**
  * Class : Engine
  * Usage : This class contains all the preproccessed information for the
- *         APG algorithm. This class allocates the memory for the scenario tree
- *         system and the algorithm matrices in GPU.
+ *         APG and LBFGS-global FBE algorithm. This class allocates the memory
+ *         for the scenario tree system and the algorithm matrices in GPU.
  *         methods :
  *          - allocateScenarioTreeDevice
  *          - initialiseScenarioTreeDevice
@@ -320,6 +320,12 @@ public:
 	 * status of the demand uncertanity
 	 */
 	bool getDemandUncertantiy();
+	/*
+	 * bool to indicate gloablFbe algorithm
+	 *  APG algorithm 0  or false - default
+	 *  globalFbe algorithm 1 or true
+	 */
+	bool getGlobalFbeFlag();
 	/*  SETTER'S IN THE ENGINE  */
 	/*
 	 * Option for uncertainty in price
@@ -452,7 +458,7 @@ private:
 	/**
 	 * previous uhat
 	 */
-	real_t  *devVecPreviousUhat;
+	real_t *devVecPreviousUhat;
 	/* --- NETWORK CONSTRAINTS --- */
 
 	/**
@@ -479,8 +485,6 @@ private:
 	 * actuator/cotrol maximum
 	 */
 	real_t  *devSysUmax;
-
-
 
 
 	/* --- COST FUNCTION --- */
@@ -622,13 +626,18 @@ private:
 	 */
 	real_t *devMatWv;
 	/*
-	 * Flag for to use the scenario tree for the price (default is set to 1 or true)
+	 * Flag to use the scenario tree for the price (default is set to 1 or true)
 	 */
 	bool priceUncertaintyFlag;
 	/*
-	 * Flag for to use the scenario tree for the price (default is set to 1 or true)
+	 * Flag to use the scenario tree for the price (default is set to 1 or true)
 	 */
 	bool demandUncertaintyFlag;
+	/*
+	 * Flag to indicate the algorithm used (default 0 or false; uses APG
+	 * algorithm)
+	 */
+	bool globalFbeFlag;
 	/**
 	 * cublas handler
 	 */

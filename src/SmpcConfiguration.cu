@@ -111,6 +111,12 @@ SmpcConfiguration::SmpcConfiguration(string pathToFile){
 		a = jsonDocument[PATH_FORECASTER_FILE];
 		_ASSERT(a.IsString());
 		pathToForecaster = a.GetString();
+		a = jsonDocument[ALGORITHM_CONTROL];
+		_ASSERT(a.IsString());
+		algorithmName = a.GetString();
+		a = jsonDocument[VARNAME_LBFGS_BUFFER_SIZE];
+		_ASSERT(a.IsArray());
+		lbfgsBufferSize = (uint_t) a[0].GetFloat();
 		pathToConfiguration = pathToFile;
 		delete [] readBuffer;
 		readBuffer = NULL;
@@ -130,6 +136,9 @@ uint_t SmpcConfiguration::getND(){
 }
 uint_t SmpcConfiguration::getNV(){
 	return NV;
+}
+uint_t SmpcConfiguration::getLbfgsBufferSize(){
+	return lbfgsBufferSize;
 }
 real_t* SmpcConfiguration::getMatL(){
 	return matL;
@@ -184,6 +193,10 @@ string SmpcConfiguration::getPathToScenarioTree(){
 
 string SmpcConfiguration::getPathToForecaster(){
 	return pathToForecaster;
+}
+
+string SmpcConfiguration::getOptimisationAlgorithm(){
+	return algorithmName;
 }
 
 real_t SmpcConfiguration::getWeightEconomical(){

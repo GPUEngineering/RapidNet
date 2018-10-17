@@ -164,6 +164,34 @@ SmpcController::SmpcController(string pathToConfigFile){
 	ptrMyForecaster = new Forecaster( pathToForecaster );
 	ptrMyEngine = new Engine( ptrMySmpcConfig );
 
+	stepSize = ptrMySmpcConfig->getStepSize();
+	factorStepFlag = false;
+	simulatorFlag = true;
+	bool globalFbeStatus = ptrMyEngine->getGlobalFbeFlag();
+
+	vecPrimalInfs = new real_t[ptrMySmpcConfig->getMaxIterations()];
+
+	economicKpi = 0;
+	smoothKpi = 0;
+	safeKpi = 0;
+	networkKpi = 0;
+
+	if( globalFbeStatus )
+
+	else
+		this->allocateApgAlgorithm();
+
+	//ptrMyNetwork = NULL;
+	//ptrMyScenarioTree = NULL;
+}
+
+/*
+ * Allocate memory of the APG algorithm
+ *   - dual and accelerated vectors (psi, xi)
+ *   - primal variables (x, u and t)
+ *   - primal infeasibility (Hz - t)
+ */
+void SmpcController::allocateApgAlgorithm(){
 	DwnNetwork* ptrMyNetwork = ptrMyEngine->getDwnNetwork();
 	ScenarioTree* ptrMyScenarioTree = ptrMyEngine->getScenarioTree();
 
@@ -172,9 +200,6 @@ SmpcController::SmpcController(string pathToConfigFile){
 	uint_t nv = ptrMySmpcConfig->getNV();
 	uint_t ns = ptrMyScenarioTree->getNumScenarios();
 	uint_t nodes = ptrMyScenarioTree->getNumNodes();
-	stepSize = ptrMySmpcConfig->getStepSize();
-	factorStepFlag = false;
-	simulatorFlag = true;
 
 	_CUDA( cudaMalloc((void**)&devVecX, nx*nodes*sizeof(real_t)) );
 	_CUDA( cudaMalloc((void**)&devVecU, nu*nodes*sizeof(real_t)) );
@@ -256,13 +281,6 @@ SmpcController::SmpcController(string pathToConfigFile){
 	_CUDA( cudaMemcpy(devPtrVecQ, ptrVecQ, ns*sizeof(real_t*), cudaMemcpyHostToDevice));
 	_CUDA( cudaMemcpy(devPtrVecR, ptrVecR, ns*sizeof(real_t*), cudaMemcpyHostToDevice));
 
-	vecPrimalInfs = new real_t[ptrMySmpcConfig->getMaxIterations()];
-
-	economicKpi = 0;
-	smoothKpi = 0;
-	safeKpi = 0;
-	networkKpi = 0;
-
 	delete [] ptrVecX;
 	delete [] ptrVecU;
 	delete [] ptrVecV;
@@ -281,8 +299,7 @@ SmpcController::SmpcController(string pathToConfigFile){
 	ptrVecPrimalPsi = NULL;
 	ptrVecQ = NULL;
 	ptrVecR = NULL;
-	//ptrMyNetwork = NULL;
-	//ptrMyScenarioTree = NULL;
+
 }
 
 /**

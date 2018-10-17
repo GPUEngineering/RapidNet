@@ -189,7 +189,16 @@ protected:
 	void updateSmpcConfiguration(real_t* updateState,
 			real_t* control,
 			real_t* demand);
-//private:
+	/**
+	 * Allocate memory for APG algorithm
+	 */
+	void allocateApgAlgorithm();
+	/**
+	* Allocate memory for globalFbe
+	*/
+	void allocateGlobalFbeAlgorithm();
+
+private:
 	/**
 	 * Pointer to an Engine object.
 	 * The Engine is responsible for the factor step.

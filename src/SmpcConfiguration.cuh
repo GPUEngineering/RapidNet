@@ -43,7 +43,8 @@
 #define PATH_NETWORK_FILE "pathToNetwork"
 #define PATH_SCENARIO_TREE_FILE "pathToScenarioTree"
 #define PATH_FORECASTER_FILE "pathToForecaster"
-
+#define ALGORITHM_CONTROL "algorithmName"
+#define VARNAME_LBFGS_BUFFER_SIZE "lbfgsBufferSize"
 
 class SmpcConfiguration{
 public:
@@ -75,6 +76,10 @@ public:
 	 *  control-disturbance equality
 	 */
 	uint_t getNV();
+	/*
+	 * Get the size of the LBFGS buffer
+	 */
+	uint_t getLbfgsBufferSize();
 	/**
 	 * Affine space representation for the control-disturbance equality
 	 */
@@ -139,6 +144,10 @@ public:
 	 * Get the scalar for the economical operation
 	 */
 	real_t getWeightEconomical();
+	/*
+	 * Get the algorithm to solve the SMPC optimisation
+	 */
+	string getOptimisationAlgorithm();
 	/** SETTER'S FOR THE CONTROLLER CONFIGURATION OBJECT**/
 	/*
 	 * update the current state from the controller
@@ -192,6 +201,10 @@ private:
 	 * Dimension of the control after eliminating the equality constraints
 	 */
 	uint_t NV;
+	/*
+	 * lbfgs buffer size
+	 */
+	uint_t lbfgsBufferSize;
 	/**
 	 * TODO should be calculated by the controller
 	 * Affine subspace for the control-disturbance coupling
@@ -256,6 +269,10 @@ private:
 	 * path to forecaster json file
 	 */
 	string pathToForecaster;
+	/*
+	 * algorithm used to solve the SMPC
+	 */
+	string algorithmName;
 	/**
 	 *
 	 */

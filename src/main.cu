@@ -9,7 +9,7 @@
 #include "test/Testing.cuh"
 
 int main(void){
-	uint_t TESTING = 0;
+	uint_t TESTING = 1;
 	if (TESTING){
 		Testing *myTesting = new Testing();
 		_ASSERT( myTesting->testNetwork() );
@@ -17,7 +17,7 @@ int main(void){
 		_ASSERT( myTesting->testForecaster() );
 		_ASSERT( myTesting->testControllerConfig() );
 		_ASSERT( myTesting->testEngineTesting() );
-		_ASSERT( myTesting->testSmpcController());
+		_ASSERT( myTesting->testSmpcController() );
 		//myTesting->testNewEngineTesting();
 	}else{
 		startTicToc();

@@ -34,11 +34,20 @@ Engine::Engine(DwnNetwork *myNetwork, ScenarioTree *myScenarioTree, SmpcConfigur
 	uint_t nu = ptrMyNetwork->getNumControls();
 	uint_t nv = ptrMySmpcConfig->getNV();
 	uint_t nodes = ptrMyScenarioTree->getNumNodes();
+	string algorithmName = ptrMySmpcConfig->getOptimisationAlgorithm();
 	allocateSystemDevice();
 	allocateScenarioTreeDevice();
 	cublasCreate(&handle);
 	priceUncertaintyFlag = true;
 	demandUncertaintyFlag = true;
+	if( algorithmName.compare("globalFbeAlgorithm") == 0){
+		cout << " algorithm based on SMPC " << algorithmName <<endl;
+		globalFbeFlag = true;
+
+	}else{
+		cout << " algorithm based on SMPC " << algorithmName <<endl;
+		globalFbeFlag = false;
+	}
 
 	_CUDA( cudaMalloc((void**)&devMatPhi, 2*nodes*nv*nx*sizeof(real_t)) );
 	_CUDA( cudaMalloc((void**)&devMatPsi, nodes*nu*nv*sizeof(real_t)) );
@@ -111,6 +120,7 @@ Engine::Engine(SmpcConfiguration *smpcConfig){
 	ptrMySmpcConfig = smpcConfig;
 	string pathToNetwork = ptrMySmpcConfig->getPathToNetwork();
 	string pathToScenarioTree = ptrMySmpcConfig->getPathToScenarioTree();
+	string algorithmName = ptrMySmpcConfig->getOptimisationAlgorithm();
 	ptrMyNetwork = new DwnNetwork( pathToNetwork );
 	ptrMyScenarioTree = new ScenarioTree( pathToScenarioTree );
 
@@ -124,12 +134,21 @@ Engine::Engine(SmpcConfiguration *smpcConfig){
 	uint_t *nodesPerStageCumul = ptrMyScenarioTree->getNodesPerStageCumul();
 	uint_t idFinalBranchNode = ptrMyScenarioTree->getFinalBranchNode();
 	uint_t iStageCumulNodes, currentNode;
-	cout << "Number of scenrios " << ns << endl;
+	cout << "Number of scenarios " << ns << endl;
 	allocateSystemDevice();
 	allocateScenarioTreeDevice();
 	cublasCreate(&handle);
 	priceUncertaintyFlag = true;
 	demandUncertaintyFlag = true;
+
+	if( algorithmName.compare("globalFbeAlgorithm") == 0){
+		cout << " algorithm based on SMPC " << algorithmName <<endl;
+		globalFbeFlag = true;
+
+	}else{
+		cout << " algorithm based on SMPC " << algorithmName <<endl;
+		globalFbeFlag = false;
+	}
 
 	_CUDA( cudaMalloc((void**)&devMatPhi, 2*nodes*nv*nx*sizeof(real_t)) );
 	_CUDA( cudaMalloc((void**)&devMatPsi, nodes*nu*nv*sizeof(real_t)) );
@@ -172,8 +191,6 @@ Engine::Engine(SmpcConfiguration *smpcConfig){
 		ptrMatF[iNode] = &devMatF[iNode*nv*nu];
 		if(iNode < ns)
 			ptrMatG[iNode] = &devMatG[iNode*nv*nx];
-		//ptrMatOmega[iNode] = &devMatOmega[iNode*nv*nv];
-		//ptrMatTheta[iNode] = &devMatTheta[iNode*nx*nv];
 	}
 
 	for(uint_t iStage = 0; iStage < N; iStage++){
@@ -520,6 +537,24 @@ void Engine::calculateMatLandMatLhat(){
 			devMatS, devMatU, nu, devMatVT, ne, devWork, lwork, devNotWork, devInfo);
 
 	_CUDA( cudaMemcpy(&infoGpu, devInfo, sizeof(int), cudaMemcpyDeviceToHost) );
+	switch(cusolverStatus)
+	{
+	case CUSOLVER_STATUS_SUCCESS:
+		cout << "SVD computation success" << endl;
+		break;
+	case CUSOLVER_STATUS_NOT_INITIALIZED :
+		cout << "Library cuSolver not initialized correctly" << endl;
+		break;
+	case CUSOLVER_STATUS_INVALID_VALUE:
+		cout << "Invalid parameters passed" << endl;
+		break;
+	case CUSOLVER_STATUS_INTERNAL_ERROR:
+		cout << "Internal operation failed" << endl;
+		break;
+	case CUSOLVER_STATUS_EXECUTION_FAILED:
+		cout << "Execution failed" << endl;
+		break;
+	}
 	assert(CUSOLVER_STATUS_SUCCESS == cusolverStatus);
 
 	// step 4 : psudo inverse of E = U(:, 1:ne)*inv(S)(1:ne, 1:ne)*VT
@@ -1045,10 +1080,16 @@ bool Engine::getPriceUncertainty(){
 	return priceUncertaintyFlag;
 }
 /**
- * status of the demand uncertanity
+ * status of the demand uncertainty
  */
 bool Engine::getDemandUncertantiy(){
 	return demandUncertaintyFlag;
+}
+/*
+ * Flag to indicate status of the globalFbe algorithm
+ */
+bool Engine::getGlobalFbeFlag(){
+	return globalFbeFlag;
 }
 /*  SETTER'S IN THE ENGINE  */
 /*
