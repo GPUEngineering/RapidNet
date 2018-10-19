@@ -190,6 +190,19 @@ protected:
 			real_t* control,
 			real_t* demand);
 	/**
+	 * intialise the lbfgs-buffer at he beginning of the algorithm
+	 */
+	void initaliseLbfgBuffer();
+	/**
+	 * calculate the residual Hx - t
+	 */
+	void computeResidual();
+	/**
+	 * calculate the lbfgs direction
+	 */
+	void computeLbfgsDirection();
+
+	/**
 	 * Allocate memory for APG algorithm
 	 */
 	void allocateApgAlgorithm();
@@ -197,7 +210,6 @@ protected:
 	* Allocate memory for globalFbe
 	*/
 	void allocateGlobalFbeAlgorithm();
-
 private:
 	/**
 	 * Pointer to an Engine object.
@@ -330,6 +342,62 @@ private:
 	 * Step size
 	 */
 	real_t stepSize;
+
+	/* ----- globalFbe Algorithm ----*/
+	/*
+	 * pointer to lbfgs update xi
+	 */
+	real_t *devVecPrevXi;
+	/*
+	 * pointer to lbfgs update psi
+	 */
+	real_t *devVecPrevPsi;
+	/*
+	 * pointer to the FBE gradient xi in the device
+	 */
+	real_t *devVecGradientFbeXi;
+	/*
+	 * pointer to the FBE gradient psi in the device
+	 */
+	real_t *devVecGradientFbePsi;
+	/*
+	 * pointer to the previous FBE gradient xi in the device
+	 */
+	real_t *devVecPrevGradientFbeXi;
+	/*
+	 * pointer to the previous FBE gradient psi in the device
+	 */
+	real_t *devVecPrevGradientFbePsi;
+	/*
+	 * pointer to the direction from the LBFGS xi in the device
+	 */
+	real_t *devVecLbfgsDirXi;
+	/*
+	 * pointer to the direction from the LBFGS psi in the device
+	 */
+	real_t *devVecLbfgsDirPsi;
+	/* --- LBFGS buffer --- */
+	/*
+	 * matrix s in the lfbs-buffer s = x_{k} - x_{k - 1}
+	 */
+	real_t *devLbfgsBufferMatS;
+	/*
+	 * matrix y in the lbfgs-buffer y = \delta F_{k} - \delta F_{k - 1}
+	 */
+	real_t *devLbfgsBufferMatY;
+	/*
+	 * vector rho in the lbfgs-buffer rho_k = 1/(y_k*s_k)
+	 */
+	real_t *lbfgsBufferRho;
+
+	uint_t lbfgsBufferCol;
+
+	uint_t lbfgsBufferMemory;
+
+	uint_t lbfgsSkipCount;
+
+	real_t lbfgsBufferHessian;
+
 	/**
 	 * Flag Factor step
 	 */
@@ -358,6 +426,14 @@ private:
 	 * KPI to measure the network utility of the system
 	 */
 	real_t networkKpi;
+	/*
+	 * Allocate memory for the LBFGS-buffer in the device
+	 */
+	void allocateLbfgsBufferDevice();
+	/*
+	 * deallocate the memory of the gloablFbe in the device
+	 */
+	void deallocateglobalFbeDevice();
 };
 
 #endif /* SMPCONTROLLERCLASS_CUH_ */
