@@ -313,6 +313,10 @@ public:
 	 */
 	real_t* getSysUmax();
 	/**
+	 * price/ alpha for the control
+	 */
+	real_t* getPriceAlpha();
+	/**
 	 * status of price uncertainty
 	 */
 	bool getPriceUncertainty();
@@ -497,6 +501,10 @@ private:
 	 * pointer to smooth operation cost W
 	 */
 	real_t **devPtrSysCostW;
+	/**
+	 * economical cost
+	 */
+	real_t *devVecAlpha;
 
 
 	/* --- SCENARIO TREE --- */

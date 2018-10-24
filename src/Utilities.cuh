@@ -249,6 +249,18 @@ __global__ void preconditionConstraintU(
 		uint_t numBlock);
 
 /**
+ * @param devVecU
+ * @param devProbNode
+ * @param dim
+ * @param numBlock
+ */
+__global__ void scaleVecProbalitity(
+		real_t* devVecU,
+		real_t* devProbNode,
+		uint_t dim,
+		uint_t numBlock);
+
+/**
  * Sets up the timer.
  *
  * Must be called before any invocation to

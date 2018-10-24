@@ -164,6 +164,7 @@ Engine::Engine(SmpcConfiguration *smpcConfig){
 	_CUDA( cudaMalloc((void**)&devVecUhat, nodes*nu*sizeof(real_t)) );
 	_CUDA( cudaMalloc((void**)&devVecBeta, nodes*nv*sizeof(real_t)) );
 	_CUDA( cudaMalloc((void**)&devVecE, nodes*nx*sizeof(real_t)) );
+	_CUDA( cudaMalloc((void**)&devVecAlpha, nodes*nu*sizeof(real_t)));
 
 	_CUDA( cudaMalloc((void**)&devPtrMatPhi, nodes*sizeof(real_t*)) );
 	_CUDA( cudaMalloc((void**)&devPtrMatPsi, nodes*sizeof(real_t*)) );
@@ -1074,6 +1075,13 @@ cublasHandle_t Engine::getCublasHandle(){
 }
 
 /**
+ * alpha that corresponds to the economical operational price
+ */
+real_t* Engine::getPriceAlpha(){
+	return devVecAlpha;
+}
+
+/**
  * status of price uncertainty
  */
 bool Engine::getPriceUncertainty(){
@@ -1129,7 +1137,6 @@ void Engine::eliminateInputDistubanceCoupling(real_t* nominalDemand, real_t *nom
 	real_t **devPtrVecUhat, *devVecDeltaUhat, *devVecZeta;
 	real_t *devVecAlphaHat;
 	real_t *devVecAlpha1;
-	real_t *devVecAlpha;
 	real_t *devVecAlphaBar;
 	real_t *devMatRhat;
 	uint_t *nodeStage = ptrMyScenarioTree->getStageNodes();
@@ -1147,7 +1154,6 @@ void Engine::eliminateInputDistubanceCoupling(real_t* nominalDemand, real_t *nom
 	_CUDA( cudaMalloc((void**)&devPtrVecUhat, nodes*sizeof(real_t*)) );
 	_CUDA( cudaMalloc((void**)&devVecAlphaHat, N*nu*sizeof(real_t)) );
 	_CUDA( cudaMalloc((void**)&devVecAlpha1, nu*sizeof(real_t)) );
-	_CUDA( cudaMalloc((void**)&devVecAlpha, nodes*nu*sizeof(real_t)));
 	_CUDA( cudaMalloc((void**)&devVecAlphaBar, nodes*nv*sizeof(real_t)) );
 	_CUDA( cudaMalloc((void**)&devMatRhat, nu*nv*sizeof(real_t)) );
 	_CUDA( cudaMalloc((void**)&devVecDeltaUhat, nu*nodes*sizeof(real_t)) );
@@ -1238,7 +1244,6 @@ void Engine::eliminateInputDistubanceCoupling(real_t* nominalDemand, real_t *nom
 	_CUDA(cudaFree(devPtrVecE));
 	_CUDA(cudaFree(devPtrVecDemand));
 	_CUDA(cudaFree(devPtrVecUhat));
-	_CUDA(cudaFree(devVecAlpha));
 	_CUDA(cudaFree(devVecAlphaHat));
 	_CUDA(cudaFree(devVecAlpha1));
 	_CUDA(cudaFree(devVecAlphaBar));
@@ -1258,7 +1263,6 @@ void Engine::eliminateInputDistubanceCoupling(real_t* nominalDemand, real_t *nom
 	devPtrVecDemand = NULL;
 	devPtrVecUhat = NULL;
 	devVecAlphaHat = NULL;
-	devVecAlpha = NULL;
 	devVecAlpha1 = NULL;
 	devVecAlphaBar = NULL;
 	devMatRhat = NULL;
@@ -1413,6 +1417,7 @@ Engine::~Engine(){
 	_CUDA(cudaFree(devVecUhat));
 	_CUDA(cudaFree(devVecBeta));
 	_CUDA(cudaFree(devVecE));
+	_CUDA(cudaFree(devVecAlpha));
 
 	_CUDA(cudaFree(devPtrMatPhi));
 	_CUDA(cudaFree(devPtrMatPsi));
@@ -1434,6 +1439,7 @@ Engine::~Engine(){
 	devVecUhat = NULL;
 	devVecBeta = NULL;
 	devVecE = NULL;
+	devVecAlpha = NULL;
 
 	devPtrMatPhi = NULL;
 	devPtrMatPsi = NULL;

@@ -402,7 +402,25 @@ __global__ void preconditionConstraintU(
 		devUmax[tid] = scaleU * devUmax[tid];
 		devUmin[tid] = scaleU * devUmin[tid];
 	}
+}
 
+/**
+ * @param devVecU
+ * @param devProbNode
+ * @param dim
+ * @param numBlock
+ */
+__global__ void scaleVecProbalitity(
+		real_t* devVecU,
+		real_t* devProbNode,
+		uint_t dim,
+		uint_t numBlock){
+	uint_t tid = blockIdx.x*blockDim.x + threadIdx.x;
+	uint_t currentThread = threadIdx.x;
+	uint_t currentBlock = blockIdx.x;
+	if( currentBlock < numBlock & currentThread < dim){
+		devVecU[tid] = probNode[currentBlock]*devVecU[tid];
+	}
 }
 
 

@@ -147,6 +147,10 @@ public:
 	void updateKpi(real_t* state,
 			real_t* control);
 	/**
+	 * Get the value of the FBE during the iteration
+	 */
+	real_t* getValueFbe();
+	/**
 	 * Destructor. Frees allocated memory.
 	 */
 	~SmpcController();
@@ -161,6 +165,13 @@ protected:
 	 * algorithm for the proximal gradient algorithm
 	 */
 	void solveStep();
+	/**
+	 * Computes the dual gradient.This is the main computational
+	 * algorithm for the proximal gradient algorithm at the
+	 * @ param   devPtrVecXi pointer to the dual vector xi
+	 * @ param   devPtrVecPsi pointer to the dual vector psi
+	 */
+	void solveStep(real_t **devPtrVecXi, real_t **devPtrVecPsi);
 	/**
 	 * Computes the proximal operator of g at the current point and updates
 	 * (primal psi, primal xi) - Hx, (dual psi, dual xi) - z.
@@ -190,18 +201,34 @@ protected:
 			real_t* control,
 			real_t* demand);
 	/**
-	 * intialise the lbfgs-buffer at he beginning of the algorithm
-	 */
-	void initaliseLbfgBuffer();
-	/**
 	 * calculate the residual Hx - t
 	 */
-	void computeResidual();
+	void computeFixedPointResidual();
+	/**
+	 * compute the hessian-oracle
+	 */
+	void computeHessianOracalGlobalFbe();
+	/**
+	 * compute the gradient of the Fbe
+	 */
+	void computeGradientFbe();
 	/**
 	 * calculate the lbfgs direction
 	 */
 	void computeLbfgsDirection();
-
+	/**
+	 * compute the line search update of the tau
+	 */
+	void computeLineSearchLbfgsUpdate(real_t valueFbeYvar);
+	/**
+	 * This method executes the APG algorithm and returns the primal infeasibility.
+	 * @return primalInfeasibilty;
+	 */
+	uint_t algorithmGlobalFbe();
+	/**
+	 * calculate the value of FBE
+	 */
+	real_t computeValueFbe();
 	/**
 	 * Allocate memory for APG algorithm
 	 */
@@ -310,9 +337,9 @@ private:
 	 */
 	real_t **devPtrVecPrimalXi;
 	/**
-	 * Pointer array for primal infeasibility Hx-z
+	 * Pointer array for the residual
 	 */
-	real_t *devVecPrimalInfeasibilty;
+	real_t *devVecResidual;
 	/**
 	 * Pointer for cost Q
 	 */
@@ -345,11 +372,27 @@ private:
 
 	/* ----- globalFbe Algorithm ----*/
 	/*
-	 * pointer to lbfgs update xi
+	 * Hessian-direction in variable X
+	 */
+	real_t *devVecXdir;
+	/*
+	 * Hessian-direction in variable U
+	 */
+	real_t *devVecUdir;
+	/**
+	 * Pointer to device primal Xi
+	 */
+	real_t *devVecPrimalXiDir;
+	/**
+	 * Pointer to device primal Psi
+	 */
+	real_t *devVecPrimalPsiDir;
+	/*
+	 * pointer to lbfgs previous xi
 	 */
 	real_t *devVecPrevXi;
 	/*
-	 * pointer to lbfgs update psi
+	 * pointer to lbfgs previous psi
 	 */
 	real_t *devVecPrevPsi;
 	/*
@@ -376,6 +419,30 @@ private:
 	 * pointer to the direction from the LBFGS psi in the device
 	 */
 	real_t *devVecLbfgsDirPsi;
+	/*
+	 * pointer array to the device pointer of Hessian-direction in X
+	 */
+	real_t **devPtrVecXdir;
+	/*
+	 * pointer array to the device pointer of Hessian-direction in U
+	 */
+	real_t **devPtrVecUdir;
+	/*
+	 * pointer array to the device pointer of Hessian-direction in X
+	 */
+	real_t **devPtrVecGradFbeXi;
+	/*
+	 * pointer array to the device pointer of Hessian-direction in U
+	 */
+	real_t **devPtrVecGradFbePsi;
+	/**
+	 * Pointer to device primal Xi
+	 */
+	real_t *devPtrVecPrimalXiDir;
+	/**
+	 * Pointer to device primal Psi
+	 */
+	real_t *devPtrVecPrimalPsiDir;
 	/* --- LBFGS buffer --- */
 	/*
 	 * matrix s in the lfbs-buffer s = x_{k} - x_{k - 1}
@@ -397,6 +464,12 @@ private:
 	uint_t lbfgsSkipCount;
 
 	real_t lbfgsBufferHessian;
+
+	real_t valueFunGxBox;
+
+	real_t valueFunGxSafe;
+
+	real_t valueFunGuBox;
 
 	/**
 	 * Flag Factor step
@@ -426,6 +499,22 @@ private:
 	 * KPI to measure the network utility of the system
 	 */
 	real_t networkKpi;
+	/*
+	 * value of the fbe
+	 */
+	real_t* vecValueFbe;
+	/**
+	 * intialise the lbfgs-buffer at he beginning of the algorithm
+	 */
+	void initaliseLbfgBuffer();
+	/**
+	 * intialise the dual vectors in the APG
+	 */
+	void initialiseApgAlgorithm();
+	/**
+	 * intialise the dual vectors in the APG
+	 */
+	void initialiseFbeAlgorithm();
 	/*
 	 * Allocate memory for the LBFGS-buffer in the device
 	 */
