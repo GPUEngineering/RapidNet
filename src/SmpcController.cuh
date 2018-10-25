@@ -508,13 +508,9 @@ private:
 	 */
 	void initaliseLbfgBuffer();
 	/**
-	 * intialise the dual vectors in the APG
+	 * intialise the dual vectors in the optimisation algorithm
 	 */
-	void initialiseApgAlgorithm();
-	/**
-	 * intialise the dual vectors in the APG
-	 */
-	void initialiseFbeAlgorithm();
+	void initialiseAlgorithm();
 	/*
 	 * Allocate memory for the LBFGS-buffer in the device
 	 */

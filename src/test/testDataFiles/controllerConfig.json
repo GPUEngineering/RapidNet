@@ -51,13 +51,15 @@
 5.224101e+00, 
 7.998018e+01],
 "prevUhat" : [2.519617e+00, 7.558852e+00, -2.519617e+00, 0, -1.007847e+01, -2.519617e+00],
-"prevV" : [1.877919e+03, 1.694176e+03, 4.449698e+02, 3.030670e+03],
-"prevU" : [2.860407e+03, 9.719264e+00, 8.489685e+02, 1.694176e+03, -7.918058e+00, 2.001719e+03],
+"prevV" : [1.914083e+03, 1.278120e+03, 1.133221e+03, 2.616269e+03],
+"prevU" : [2.871065e+03, 4.787820e+02, 8.450482e+02, 1.278120e+03, 4.611447e+02, 1.547235e+03],
 "stepSize" : [1.000000e-04],
 "maxIterations" : [500],
 "penaltyStateX" : [10000],
 "penaltySafetyX" : [100],
 "pathToNetwork" : "../test/testDataFiles/network.json",
 "pathToScenarioTree" : "../test/testDataFiles/scenarioTree.json",
-"pathToForecaster" : "../test/testDataFiles/forecastor.json"
+"pathToForecaster" : "../test/testDataFiles/forecastor.json",
+"algorithmName" : "proximalAlgorithm",
+"lbfgsBufferSize" : [5]
 }

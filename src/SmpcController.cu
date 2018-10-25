@@ -56,10 +56,10 @@ SmpcController::SmpcController(Forecaster *myForecaster, Engine *myEngine, SmpcC
 	safeKpi = 0;
 	networkKpi = 0;
 
+	allocateApgAlgorithm();
+
 	if( globalFbeStatus ){
-		this->allocateGlobalFbeAlgorithm();
-	}else{
-		this->allocateApgAlgorithm();
+		allocateGlobalFbeAlgorithm();
 	}
 
 }
@@ -87,10 +87,10 @@ SmpcController::SmpcController(string pathToConfigFile){
 	safeKpi = 0;
 	networkKpi = 0;
 
-	this->allocateApgAlgorithm();
+	allocateApgAlgorithm();
 
 	if( globalFbeStatus ){
-		this->allocateGlobalFbeAlgorithm();
+		allocateGlobalFbeAlgorithm();
 	}
 }
 
@@ -338,7 +338,7 @@ void SmpcController::allocateLbfgsBufferDevice(){
 	_CUDA( cudaMemcpy(lbfgsBufferRho, devLbfgsBufferMatY, bufferSize*sizeof(real_t), cudaMemcpyDeviceToDevice));
 }
 
-void SmpcController::initialiseApgAlgorithm(){
+void SmpcController::initialiseAlgorithm(){
 	uint_t nodes = ptrMyEngine->getScenarioTree()->getNumNodes();
 	uint_t nx = ptrMyEngine->getDwnNetwork()->getNumTanks();
 	uint_t nu = ptrMyEngine->getDwnNetwork()->getNumControls();
@@ -353,26 +353,15 @@ void SmpcController::initialiseApgAlgorithm(){
 	_CUDA( cudaMemset(devVecPrimalPsi, 0, nu*nodes*sizeof(real_t)) );
 	_CUDA( cudaMemset(devVecDualXi, 0, 2*nx*nodes*sizeof(real_t)));
 	_CUDA( cudaMemset(devVecDualPsi, 0, nu*nodes*sizeof(real_t)) );
+
+	if(ptrMyEngine->getGlobalFbeFlag()){
+		_CUDA( cudaMemset(devVecPrevXi, 0, 2*nx*nodes*sizeof(real_t)) );
+		_CUDA( cudaMemset(devVecPrevPsi, 0, nu*nodes*sizeof(real_t)) );
+		_CUDA( cudaMemset(devVecGradientFbeXi, 0, 2*nx*nodes*sizeof(real_t)));
+		_CUDA( cudaMemset(devVecGradientFbePsi, 0, nu*nodes*sizeof(real_t)));
+	}
 }
 
-void SmpcController::initialiseFbeAlgorithm(){
-	uint_t nodes = ptrMyEngine->getScenarioTree()->getNumNodes();
-	uint_t nx = ptrMyEngine->getDwnNetwork()->getNumTanks();
-	uint_t nu = ptrMyEngine->getDwnNetwork()->getNumControls();
-
-	_CUDA( cudaMemset(devVecXi, 0, 2*nx*nodes*sizeof(real_t)) );
-	_CUDA( cudaMemset(devVecPsi, 0, nu*nodes*sizeof(real_t)) );
-	_CUDA( cudaMemset(devVecPrevXi, 0, 2*nx*nodes*sizeof(real_t)) );
-	_CUDA( cudaMemset(devVecPrevPsi, 0, nu*nodes*sizeof(real_t)) );
-	_CUDA( cudaMemset(devVecUpdateXi, 0, 2*nx*nodes*sizeof(real_t)) );
-	_CUDA( cudaMemset(devVecUpdatePsi, 0, nu*nodes*sizeof(real_t)) );
-	_CUDA( cudaMemset(devVecPrimalXi, 0, 2*nx*nodes*sizeof(real_t)) );
-	_CUDA( cudaMemset(devVecPrimalPsi, 0, nu*nodes*sizeof(real_t)) );
-	_CUDA( cudaMemset(devVecDualXi, 0, 2*nx*nodes*sizeof(real_t)));
-	_CUDA( cudaMemset(devVecDualPsi, 0, nu*nodes*sizeof(real_t)) );
-	_CUDA( cudaMemset(devVecGradientFbeXi, 0, 2*nx*nodes*sizeof(real_t)));
-	_CUDA( cudaMemset(devVecGradientFbePsi, 0, nu*nodes*sizeof(real_t)));
-}
 
 void SmpcController::initaliseLbfgBuffer(){
 	uint_t nx = ptrMySmpcConfig->getNX();
@@ -1395,7 +1384,7 @@ real_t SmpcController::computeValueFbe(){
  * @return primalInfeasibilty;
  */
 uint_t SmpcController::algorithmApg(){
-	initialiseApgAlgorithm();
+	initialiseAlgorithm();
 	real_t theta[2] = {1, 1};
 	real_t lambda;
 	uint_t maxIndex;
@@ -1423,7 +1412,7 @@ uint_t SmpcController::algorithmApg(){
  */
 uint_t SmpcController::algorithmGlobalFbe(){
 
-	initialiseFbeAlgorithm();
+	initialiseAlgorithm();
 	initaliseLbfgBuffer();
 
 	uint_t maxIndex;
