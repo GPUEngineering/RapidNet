@@ -41,11 +41,11 @@ Engine::Engine(DwnNetwork *myNetwork, ScenarioTree *myScenarioTree, SmpcConfigur
 	priceUncertaintyFlag = true;
 	demandUncertaintyFlag = true;
 	if( algorithmName.compare("globalFbeAlgorithm") == 0){
-		cout << " algorithm based on SMPC " << algorithmName <<endl;
+		cout << "algorithm based on SMPC " << algorithmName <<endl;
 		globalFbeFlag = true;
 
 	}else{
-		cout << " algorithm based on SMPC " << algorithmName <<endl;
+		cout << "algorithm based on SMPC " << algorithmName <<endl;
 		globalFbeFlag = false;
 	}
 

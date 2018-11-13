@@ -50,6 +50,7 @@ SmpcController::SmpcController(Forecaster *myForecaster, Engine *myEngine, SmpcC
 
 	vecPrimalInfs = new real_t[ptrMySmpcConfig->getMaxIterations()];
 	vecValueFbe = new real_t[ptrMySmpcConfig->getMaxIterations()];
+	vecTau = new real_t[ptrMySmpcConfig->getMaxIterations()];
 
 	economicKpi = 0;
 	smoothKpi = 0;
@@ -81,6 +82,7 @@ SmpcController::SmpcController(string pathToConfigFile){
 
 	vecPrimalInfs = new real_t[ptrMySmpcConfig->getMaxIterations()];
 	vecValueFbe = new real_t[ptrMySmpcConfig->getMaxIterations()];
+	vecTau = new real_t[ptrMySmpcConfig->getMaxIterations()];
 
 	economicKpi = 0;
 	smoothKpi = 0;
@@ -1688,4 +1690,5 @@ SmpcController::~SmpcController(){
 
 	vecPrimalInfs = NULL;
 	vecValueFbe = NULL;
+	vecTau = NULL;
 }

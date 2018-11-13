@@ -12,12 +12,14 @@ int main(void){
 	uint_t TESTING = 1;
 	if (TESTING){
 		Testing *myTesting = new Testing();
-		//_ASSERT( myTesting->testNetwork() );
-		//_ASSERT( myTesting->testScenarioTree() );
-		//_ASSERT( myTesting->testForecaster() );
-		//_ASSERT( myTesting->testControllerConfig() );
-		//_ASSERT( myTesting->testEngineTesting() );
-		//_ASSERT( myTesting->testSmpcController() );
+		_ASSERT( myTesting->testNetwork() );
+		_ASSERT( myTesting->testScenarioTree() );
+		_ASSERT( myTesting->testForecaster() );
+		_ASSERT( myTesting->testControllerConfig() );
+		_ASSERT( myTesting->testEngineTesting() );
+		_ASSERT( myTesting->testSmpcController() );
+		//Testing *otherTesting = new Testing();
+		//_ASSERT( otherTesting->testSmpcFbeController() );
 		_ASSERT( myTesting->testSmpcFbeController() );
 		//myTesting->testNewEngineTesting();
 	}else{

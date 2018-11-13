@@ -509,7 +509,7 @@ uint_t Testing::testSmpcController(){
 	_ASSERT( ptrMyTestSmpc->testProximalStep());
 	_ASSERT( ptrMyTestSmpc->testDualUpdate() );
 
-	cout << "completed testing of the controller" << endl;
+	cout << "completed testing of the APG controller" << endl;
 	delete ptrMyDwnNetwork;
 	delete ptrMyScenarioTree;
 	delete ptrMySmpcConfig;
@@ -518,6 +518,11 @@ uint_t Testing::testSmpcController(){
 	delete ptrMyTestSmpc;
 	ptrMyDwnNetwork = NULL;
 	ptrMyScenarioTree = NULL;
+	ptrMySmpcConfig = NULL;
+	ptrMyForecaster = NULL;
+	ptrMySmpcConfig = NULL;
+	ptrMyTestSmpc = NULL;
+
 
 	delete [] y;
 	return 1;
@@ -546,6 +551,8 @@ uint_t Testing::testSmpcFbeController(){
 
 	cout << "completed testing global FBE algorithm in smpc" << endl;
 	delete ptrMyForecaster;
+	delete ptrMyTestSmpc;
+	ptrMyTestSmpc = NULL;
 	ptrMyForecaster = NULL;
 
 	return 1;
