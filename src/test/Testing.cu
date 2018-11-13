@@ -21,12 +21,12 @@
 #include "Testing.cuh"
 
 Testing::Testing(){
-	pathToFileEnigne = "../test/testDataFiles/engine.json";
 	pathToFileForecaster = "../test/testDataFiles/forecastor.json";
 	pathToFileNetwork = "../test/testDataFiles/network.json";
 	pathToFileScenarioTree = "../test/testDataFiles/scenarioTree.json";
 	pathToFileControllerConfig = "../test/testDataFiles/controllerConfig.json";
 	pathToFileEnigne = "../test/testDataFiles/engineTest.json";
+	pathToFileControllerFbeConfig = "../test/testDataFiles/controllerFbeConfig.json";
 }
 
 template<typename T>
@@ -233,10 +233,6 @@ uint_t Testing::testForecaster(){
 		a = jsonDocument[VARNAME_DEMAND_SIM];
 		_ASSERT( a.IsArray() );
 		_ASSERT( compareArray<real_t>( ptrMyForecaster->getNominalDemand()) );
-		/*for(uint_t iCount = 0; iCount < a.Size(); iCount++){
-			cout << ptrMyForecaster->getNominalDemand()[iCount] << " "<< a[iCount].GetFloat()<< " ";
-		}
-		cout << endl;*/
 		ptrMyForecaster->predictPrices( timeInst );
 		a = jsonDocument[VARNAME_PRICE_SIM];
 		_ASSERT( a.IsArray() );
@@ -337,6 +333,9 @@ uint_t Testing::testControllerConfig(){
 	return 1;
 }
 
+/**
+ * testing the engine
+ */
 uint_t Testing::testEngineTesting(){
 	//DwnNetwork *ptrMyDwnNetwork = new DwnNetwork(pathToFileNetwork);
 	//ScenarioTree *ptrMyScenarioTree = new ScenarioTree( pathToFileScenarioTree );
@@ -369,6 +368,7 @@ uint_t Testing::testEngineTesting(){
 	ptrMyEngine->updateStateControl(currentX, prevU, prevDemand);
 	ptrMyEngine->eliminateInputDistubanceCoupling( ptrMyForecaster->getNominalDemand(),
 			ptrMyForecaster->getNominalPrices());
+
 	const char* fileName = pathToFileEnigne.c_str();
 	rapidjson::Document jsonDocument;
 	FILE* infile = fopen(fileName, "r");
@@ -397,6 +397,9 @@ uint_t Testing::testEngineTesting(){
 		a = jsonDocument[VARNAME_L];
 		_ASSERT(a.IsArray());
 		_ASSERT( compareDeviceArray<real_t>( ptrMyEngine->getSysMatL() ) );
+		a = jsonDocument[VARNAME_TEST_ALPHA_PRICE];
+		_ASSERT(a.IsArray());
+		_ASSERT( compareDeviceArray<real_t>( ptrMyEngine->getPriceAlpha() ) );
 		a = jsonDocument[VARNAME_SYS_F];
 		_ASSERT(a.IsArray());
 		dim = 2*nx*nx;
@@ -472,7 +475,83 @@ uint_t Testing::testEngineTesting(){
 	return 1;
 }
 
+/**
+ * testing the apg algorithm of the smpc controller
+ */
+uint_t Testing::testSmpcController(){
 
+	TestSmpcController *ptrMyTestSmpc = new TestSmpcController( pathToFileControllerConfig );
+	DwnNetwork *ptrMyDwnNetwork = ptrMyTestSmpc->getDwnNetwork();
+	ScenarioTree *ptrMyScenarioTree = ptrMyTestSmpc->getScenarioTree();
+	SmpcConfiguration *ptrMySmpcConfig = ptrMyTestSmpc->getSmpcConfiguration();
+	Forecaster *ptrMyForecaster = ptrMyTestSmpc->getForecaster();
+	Engine *ptrMyEngine = ptrMyTestSmpc->getEngine();
+
+	uint_t nx  = ptrMyDwnNetwork->getNumTanks();
+	uint_t nu  = ptrMyDwnNetwork->getNumControls();
+	uint_t nv  = ptrMySmpcConfig->getNV();
+	uint_t nodes = ptrMyScenarioTree->getNumNodes();
+	real_t *y = new real_t[ptrMyScenarioTree->getNumNodes()*nu*nu];
+	real_t *currentX = ptrMySmpcConfig->getCurrentX();
+	real_t *prevU = ptrMySmpcConfig->getPrevU();
+	real_t *prevDemand = ptrMySmpcConfig->getPrevDemand();
+
+	uint_t timeInst = 1;
+	ptrMyForecaster->predictDemand( timeInst );
+	ptrMyForecaster->predictPrices( timeInst );
+	/*ptrMyEngine->factorStep();
+	ptrMyEngine->updateStateControl(currentX, prevU, prevDemand);
+	ptrMyEngine->eliminateInputDistubanceCoupling( ptrMyForecaster->getNominalDemand(),
+			ptrMyForecaster->getNominalPrices());*/
+
+	_ASSERT( ptrMyTestSmpc->testExtrapolation() );
+	_ASSERT( ptrMyTestSmpc->testSoveStep() );
+	_ASSERT( ptrMyTestSmpc->testProximalStep());
+	_ASSERT( ptrMyTestSmpc->testDualUpdate() );
+
+	cout << "completed testing of the controller" << endl;
+	delete ptrMyDwnNetwork;
+	delete ptrMyScenarioTree;
+	delete ptrMySmpcConfig;
+	delete ptrMyForecaster;
+	delete ptrMyEngine;
+	delete ptrMyTestSmpc;
+	ptrMyDwnNetwork = NULL;
+	ptrMyScenarioTree = NULL;
+
+	delete [] y;
+	return 1;
+}
+
+/**
+ * testing the smpc controller with global FBE
+ */
+uint_t Testing::testSmpcFbeController(){
+	TestSmpcController *ptrMyTestSmpc = new TestSmpcController( pathToFileControllerFbeConfig );
+	Forecaster *ptrMyForecaster = ptrMyTestSmpc->getForecaster();
+
+	uint_t timeInst = 1;
+	ptrMyForecaster->predictDemand( timeInst );
+	ptrMyForecaster->predictPrices( timeInst );
+
+	_ASSERT( ptrMyTestSmpc->testSoveStep() );
+	_ASSERT( ptrMyTestSmpc->testProximalStep());
+	_ASSERT( ptrMyTestSmpc->testFbeFixedPointResidual() );
+	_ASSERT( ptrMyTestSmpc->testHessianOracalGlobalFbe() );
+	_ASSERT( ptrMyTestSmpc->testFbeGradient() );
+	_ASSERT( ptrMyTestSmpc->testValueFbe() );
+	_ASSERT( ptrMyTestSmpc->testLbfgsDirection() );
+	_ASSERT( ptrMyTestSmpc->testFbeLineSearch() );
+	_ASSERT( ptrMyTestSmpc->testFbeDualUpdate() );
+
+	cout << "completed testing global FBE algorithm in smpc" << endl;
+	delete ptrMyForecaster;
+	ptrMyForecaster = NULL;
+
+	return 1;
+}
+
+/*
 uint_t Testing::testNewEngineTesting(){
 	SmpcConfiguration *ptrMySmpcConfig = new SmpcConfiguration( pathToFileControllerConfig );
 	Forecaster *ptrMyForecaster = new Forecaster( pathToFileForecaster );
@@ -606,56 +685,8 @@ uint_t Testing::testNewEngineTesting(){
 
 	cout << "Completed testing the Engine" << endl;
 	return 1;
-}
+}*/
 
-uint_t Testing::testSmpcController(){
-	//DwnNetwork *ptrMyDwnNetwork = new DwnNetwork(pathToFileNetwork);
-	//ScenarioTree *ptrMyScenarioTree = new ScenarioTree( pathToFileScenarioTree );
-	//SmpcConfiguration *ptrMySmpcConfig = new SmpcConfiguration( pathToFileControllerConfig );
-	//Forecaster *ptrMyForecaster = new Forecaster( pathToFileForecaster );
-	//Engine *ptrMyEngine = new Engine( ptrMyDwnNetwork, ptrMyScenarioTree, ptrMySmpcConfig );
-	//TestSmpcController *ptrMyTestSmpc = new TestSmpcController(ptrMyForecaster, ptrMyEngine, ptrMySmpcConfig);
-	TestSmpcController *ptrMyTestSmpc = new TestSmpcController( pathToFileControllerConfig );
-	DwnNetwork *ptrMyDwnNetwork = ptrMyTestSmpc->getDwnNetwork();
-	ScenarioTree *ptrMyScenarioTree = ptrMyTestSmpc->getScenarioTree();
-	SmpcConfiguration *ptrMySmpcConfig = ptrMyTestSmpc->getSmpcConfiguration();
-	Forecaster *ptrMyForecaster = ptrMyTestSmpc->getForecaster();
-	Engine *ptrMyEngine = ptrMyTestSmpc->getEngine();
-
-	uint_t nx  = ptrMyDwnNetwork->getNumTanks();
-	uint_t nu  = ptrMyDwnNetwork->getNumControls();
-	uint_t nv  = ptrMySmpcConfig->getNV();
-	uint_t nodes = ptrMyScenarioTree->getNumNodes();
-	real_t *y = new real_t[ptrMyScenarioTree->getNumNodes()*nu*nu];
-	real_t *currentX = ptrMySmpcConfig->getCurrentX();
-	real_t *prevU = ptrMySmpcConfig->getPrevU();
-	real_t *prevDemand = ptrMySmpcConfig->getPrevDemand();
-
-	uint_t timeInst = 1;
-	ptrMyForecaster->predictDemand( timeInst );
-	ptrMyForecaster->predictPrices( timeInst );
-	/*ptrMyEngine->factorStep();
-	ptrMyEngine->updateStateControl(currentX, prevU, prevDemand);
-	ptrMyEngine->eliminateInputDistubanceCoupling( ptrMyForecaster->getNominalDemand(),
-			ptrMyForecaster->getNominalPrices());*/
-
-	_ASSERT( ptrMyTestSmpc->testExtrapolation() );
-	_ASSERT( ptrMyTestSmpc->testSoveStep() );
-	_ASSERT( ptrMyTestSmpc->testProximalStep());
-	_ASSERT( ptrMyTestSmpc->testDualUpdate() );
-
-	cout << "completed testing of the controller" << endl;
-	delete ptrMyDwnNetwork;
-	delete ptrMyScenarioTree;
-	delete ptrMySmpcConfig;
-	delete ptrMyForecaster;
-	delete ptrMyEngine;
-	delete ptrMyTestSmpc;
-	ptrMyDwnNetwork = NULL;
-	ptrMyScenarioTree = NULL;
-
-	return 1;
-}
 Testing::~Testing(){
 
 }

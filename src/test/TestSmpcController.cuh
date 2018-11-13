@@ -46,6 +46,31 @@
 #define VARNAME_TEST_PRIMAL_INFS_XI "primalInfsXi"
 #define VARNAME_TEST_PRIMAL_INFS_PSI "primalInfsPsi"
 #define VARNAME_TEST_TEMP_V  "tempV"
+#define VARNAME_TEST_X_DIR "fbeHessianDirXdir"
+#define VARNAME_TEST_U_DIR "fbeHessianDirUdir"
+#define VARNAME_TEST_GRAD_FBE_XI "fbeGradXi"
+#define VARNAME_TEST_GRAD_FBE_PSI "fbeGradPsi"
+#define VARNAME_TEST_PREV_GRAD_FBE_XI "fbeGradOldXi"
+#define VARNAME_TEST_PREV_GRAD_FBE_PSI "fbeGradOldPsi"
+#define VARNAME_TEST_LBFGS_MAT_S "matS"
+#define VARNAME_TEST_LBFGS_MAT_Y "matY"
+#define VARNAME_TEST_LBFGS_COL "colLbfgs"
+#define VARNAME_TEST_LBFGS_MEM "memLbfgs"
+#define VARNAME_TEST_LBFGS_INV_RHO "vecInvRho"
+#define VARNAME_TEST_LBFGS_H "H"
+#define VARNAME_TEST_LBFGS_DIR_XI "lbfgsDirXi"
+#define VARNAME_TEST_LBFGS_DIR_PSI "lbfgsDirPsi"
+#define VARNAME_TEST_UPDATE_LBFGS_MAT_S "updateMatS"
+#define VARNAME_TEST_UPDATE_LBFGS_MAT_Y "updateMatY"
+#define VARNAME_TEST_UPDATE_LBFGS_COL "updateColLbfgs"
+#define VARNAME_TEST_UPDATE_LBFGS_MEM "updateMemLbfgs"
+#define VARNAME_TEST_UPDATE_LBFGS_INV_RHO "updateVecInvRho"
+#define VARNAME_TEST_UPDATE_LBFGS_H "updateH"
+#define VARNAME_TEST_FBE_COST "fbeObjDual"
+#define VARNAME_TEST_UPDATE_RESIDUAL_XI "updateResidualXi"
+#define VARNAME_TEST_UPDATE_RESIDUAL_PSI "updateResidualPsi"
+#define VARNAME_TEST_TAU "tau"
+
 
 
 class TestSmpcController : public SmpcController{
@@ -86,6 +111,41 @@ public :
 	uint_t testDualUpdate();
 
 	/**
+	 * Function of test the fixed point residual
+	 */
+	uint_t testFbeFixedPointResidual();
+
+	/**
+	 * Function to test the lbfgs direction
+	 */
+	uint_t testHessianOracalGlobalFbe();
+
+	/**
+	 * Function to test the fbe gradient
+	 */
+
+	uint_t testFbeGradient();
+
+	/**
+	 * function to test the lbfgs direction
+	 */
+	uint_t testLbfgsDirection();
+
+	/**
+	 * function to test the value FBE
+	 */
+	uint_t testValueFbe();
+
+	/**
+	 * function to test the line search update in
+	 * the FBE
+	 */
+	uint_t testFbeLineSearch();
+	/**
+	 * function to test the dual update in the global FBE algorithm
+	 */
+	uint_t testFbeDualUpdate();
+	/**
 	 * Destructor
 	 */
 	~TestSmpcController();
@@ -98,14 +158,29 @@ private:
 	uint_t compareDeviceArray(T* deviceArray);
 
 	/**
+	 * Function to compare the deviceArrayA and deviceArrayB
+	 * @param     deviceArrayA    device array
+	 * @param     deviceArrayB    host array
+	 * @param     dim             dimension of the array
+	 */
+	template<typename T>
+	uint_t compareDeviceArray(T* deviceArrayA, T* hostArrayA, uint_t dim);
+
+	/**
 	 * Function to set a deviceArray with the input from the json file
 	 */
 	template<typename T>
 	void setDeviceArray(T* deviceArrary, uint_t dim);
 	/*
 	 * path to the json file which contain the test parameters
+	 * smpc for the apg algorithm
 	 */
 	string pathToFileSmpc;
+	/*
+	 * path to the json file which contain the test parameters
+	 * smpc for the globalFbe algorithm
+	 */
+	string pathToFileGlobalFbeSmpc;
 	/**
 	 * Object to retrive the information from the json file
 	 */

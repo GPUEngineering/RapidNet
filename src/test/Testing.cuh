@@ -47,6 +47,7 @@
 #define VARNAME_TEST_XS "xs"
 #define VARNAME_TEST_UMIN "umin"
 #define VARNAME_TEST_UMAX "umax"
+#define VARNAME_TEST_ALPHA_PRICE "costAlpha"
 
 
 
@@ -60,6 +61,7 @@ public:
 	uint_t testEngineTesting();
 	uint_t testSmpcController();
 	uint_t testNewEngineTesting();
+	uint_t testSmpcFbeController();
 	~Testing();
 private:
 	template<typename T> uint_t compareArray(T* arrayA);
@@ -71,6 +73,7 @@ private:
 	string pathToFileScenarioTree;
 	string pathToFileControllerConfig;
 	string pathToFileEnigne;
+	string pathToFileControllerFbeConfig;
 	rapidjson::Value a;
 };
 

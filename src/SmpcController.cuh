@@ -166,13 +166,6 @@ protected:
 	 */
 	void solveStep();
 	/**
-	 * Computes the dual gradient.This is the main computational
-	 * algorithm for the proximal gradient algorithm at the
-	 * @ param   devPtrVecXi pointer to the dual vector xi
-	 * @ param   devPtrVecPsi pointer to the dual vector psi
-	 */
-	void solveStep(real_t **devPtrVecXi, real_t **devPtrVecPsi);
-	/**
 	 * Computes the proximal operator of g at the current point and updates
 	 * (primal psi, primal xi) - Hx, (dual psi, dual xi) - z.
 	 */
@@ -218,8 +211,11 @@ protected:
 	void computeLbfgsDirection();
 	/**
 	 * compute the line search update of the tau
+	 * @param   valueFbeYvar    the value of the fbe at the current dual variable Y
+	 *
+	 * @param   real_t          step-size in the direction of the lbfgs direction
 	 */
-	void computeLineSearchLbfgsUpdate(real_t valueFbeYvar);
+	real_t computeLineSearchLbfgsUpdate(real_t valueFbeYvar);
 	/**
 	 * This method executes the APG algorithm and returns the primal infeasibility.
 	 * @return primalInfeasibilty;
@@ -237,7 +233,7 @@ protected:
 	* Allocate memory for globalFbe
 	*/
 	void allocateGlobalFbeAlgorithm();
-private:
+//private:
 	/**
 	 * Pointer to an Engine object.
 	 * The Engine is responsible for the factor step.
@@ -438,11 +434,11 @@ private:
 	/**
 	 * Pointer to device primal Xi
 	 */
-	real_t *devPtrVecPrimalXiDir;
+	real_t **devPtrVecPrimalXiDir;
 	/**
 	 * Pointer to device primal Psi
 	 */
-	real_t *devPtrVecPrimalPsiDir;
+	real_t **devPtrVecPrimalPsiDir;
 	/* --- LBFGS buffer --- */
 	/*
 	 * matrix s in the lfbs-buffer s = x_{k} - x_{k - 1}
@@ -503,6 +499,10 @@ private:
 	 * value of the fbe
 	 */
 	real_t* vecValueFbe;
+	/*
+	 * tau in the line search
+	 */
+	real_t* vecTau;
 	/**
 	 * intialise the lbfgs-buffer at he beginning of the algorithm
 	 */

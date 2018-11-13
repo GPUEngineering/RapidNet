@@ -1103,7 +1103,7 @@ bool Engine::getGlobalFbeFlag(){
 /*
  * Option for uncertainty in price
  * @param    priceUncertaintyFlag    true to include uncertainty (default)
- *                                   false to include uncertainty (default)
+ *                                   false to exclude uncertainty
  */
 void Engine::setPriceUncertaintyFlag(bool inputFlag){
 	priceUncertaintyFlag = inputFlag;
@@ -1111,7 +1111,7 @@ void Engine::setPriceUncertaintyFlag(bool inputFlag){
 /*
  * Option for uncertainty in demand
  * @param    demandUncertaintyFlag    true to include uncertainty (default)
- *                                    false to include uncertainty (default)
+ *                                    false to exclude uncertainty
  */
 void Engine::setDemandUncertaintyFlag(bool inputFlag){
 	demandUncertaintyFlag = inputFlag;

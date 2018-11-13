@@ -419,7 +419,7 @@ __global__ void scaleVecProbalitity(
 	uint_t currentThread = threadIdx.x;
 	uint_t currentBlock = blockIdx.x;
 	if( currentBlock < numBlock & currentThread < dim){
-		devVecU[tid] = probNode[currentBlock]*devVecU[tid];
+		devVecU[tid] = devProbNode[currentBlock]*devVecU[tid];
 	}
 }
 
