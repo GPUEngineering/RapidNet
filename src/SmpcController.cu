@@ -1111,6 +1111,7 @@ real_t SmpcController::computeLineSearchLbfgsUpdate(real_t valueFbeYvar){
 
 				valueFbeWvar = computeValueFbe();
 
+				//cout << "iStep " << iStep << " " << tau << " " << valueFbeWvar - valueFbeYvar << endl;
 				if( valueFbeWvar <= valueFbeYvar){
 					iStep = iStep + 1;
 					if (iStep < maxLineSearchStep){
@@ -1125,7 +1126,7 @@ real_t SmpcController::computeLineSearchLbfgsUpdate(real_t valueFbeYvar){
 		}
 	}
 
-	return -tau;
+	return abs(tau);
 }
 
 /**
