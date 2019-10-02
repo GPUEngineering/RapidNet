@@ -210,6 +210,17 @@ protected:
 	 */
 	void computeLbfgsDirection();
 	/**
+	 * two-loop recursion in the L-BFGS algorithm
+	 */
+	void twoLoopRecursionLbfgs();
+	/**
+	 * update the LBFGS buffer for calculating the two-loop recursion
+	 * this update depend on the algorithm used
+	 *  globalFBE - use the gradient of FBE
+	 *  NAMA - use the fixed-point residual
+	 */
+	void updateLbfgsBuffer();
+	/**
 	 * compute the line search update of the tau
 	 * @param   valueFbeYvar    the value of the fbe at the current dual variable Y
 	 *
@@ -221,6 +232,11 @@ protected:
 	 * @return primalInfeasibilty;
 	 */
 	uint_t algorithmGlobalFbe();
+	/**
+	 * This method executes the NAMA algorithm and returns the primal infeasibilit
+	 * @return primalInfeasibility;
+	 */
+	uint_t algorithmNama();
 	/**
 	 * calculate the value of FBE
 	 */
@@ -337,19 +353,19 @@ protected:
 	 */
 	real_t *devVecResidual;
 	/**
-	 * Pointer for cost Q
+	 * Pointer for Q in solve step
 	 */
 	real_t *devVecQ;
 	/**
-	 * Pointer for cost R
+	 * Pointer for R in solve step
 	 */
 	real_t *devVecR;
 	/**
-	 * Pointer array for device pointers of cost Q
+	 * Pointer array for device pointers of Q in solve step
 	 */
 	real_t **devPtrVecQ;
 	/**
-	 * Pointer array for device pointers of cost R
+	 * Pointer array for device pointers of R in solve step
 	 */
 	real_t **devPtrVecR;
 	/*
@@ -368,30 +384,6 @@ protected:
 
 	/* ----- globalFbe Algorithm ----*/
 	/*
-	 * Hessian-direction in variable X
-	 */
-	real_t *devVecXdir;
-	/*
-	 * Hessian-direction in variable U
-	 */
-	real_t *devVecUdir;
-	/**
-	 * Pointer to device primal Xi
-	 */
-	real_t *devVecPrimalXiDir;
-	/**
-	 * Pointer to device primal Psi
-	 */
-	real_t *devVecPrimalPsiDir;
-	/*
-	 * pointer to lbfgs previous xi
-	 */
-	real_t *devVecPrevXi;
-	/*
-	 * pointer to lbfgs previous psi
-	 */
-	real_t *devVecPrevPsi;
-	/*
 	 * pointer to the FBE gradient xi in the device
 	 */
 	real_t *devVecGradientFbeXi;
@@ -408,6 +400,43 @@ protected:
 	 */
 	real_t *devVecPrevGradientFbePsi;
 	/*
+	 * pointer array to the device pointer of gradient of FBE xi
+	 */
+	real_t **devPtrVecGradFbeXi;
+	/*
+	 * pointer array to the device pointer of gradient of FBE psi
+	 */
+	real_t **devPtrVecGradFbePsi;
+
+	/* ----- NAMA Algorithm ----*/
+
+
+	/* ----- quasi-newton direction ----- */
+	/*
+	 * Hessian-direction in variable X
+	 */
+	real_t *devVecXdir;
+	/*
+	 * Hessian-direction in variable U
+	 */
+	real_t *devVecUdir;
+	/**
+	 * Pointer to device Hessian primal Xi
+	 */
+	real_t *devVecPrimalXiDir;
+	/**
+	 * Pointer to device Hessian primal Psi
+	 */
+	real_t *devVecPrimalPsiDir;
+	/*
+	 * pointer to lbfgs previous xi
+	 */
+	real_t *devVecPrevXi;
+	/*
+	 * pointer to lbfgs previous psi
+	 */
+	real_t *devVecPrevPsi;
+	/*
 	 * pointer to the direction from the LBFGS xi in the device
 	 */
 	real_t *devVecLbfgsDirXi;
@@ -423,22 +452,15 @@ protected:
 	 * pointer array to the device pointer of Hessian-direction in U
 	 */
 	real_t **devPtrVecUdir;
-	/*
-	 * pointer array to the device pointer of Hessian-direction in X
-	 */
-	real_t **devPtrVecGradFbeXi;
-	/*
-	 * pointer array to the device pointer of Hessian-direction in U
-	 */
-	real_t **devPtrVecGradFbePsi;
 	/**
-	 * Pointer to device primal Xi
+	 * pointer array to device pointer Hessian primal Xi
 	 */
 	real_t **devPtrVecPrimalXiDir;
 	/**
-	 * Pointer to device primal Psi
+	 * pointer to device primal Psi
 	 */
 	real_t **devPtrVecPrimalPsiDir;
+
 	/* --- LBFGS buffer --- */
 	/*
 	 * matrix s in the lfbs-buffer s = x_{k} - x_{k - 1}

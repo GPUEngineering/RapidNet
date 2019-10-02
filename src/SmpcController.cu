@@ -79,6 +79,7 @@ SmpcController::SmpcController(string pathToConfigFile){
 	factorStepFlag = false;
 	simulatorFlag = true;
 	bool globalFbeStatus = ptrMyEngine->getGlobalFbeFlag();
+	bool namaStatus = ptrMyEngine->getNamaFlag();
 
 	vecPrimalInfs = new real_t[ptrMySmpcConfig->getMaxIterations()];
 	vecValueFbe = new real_t[ptrMySmpcConfig->getMaxIterations()];
@@ -338,6 +339,8 @@ void SmpcController::initialiseAlgorithm(){
 		_CUDA( cudaMemset(devVecPrevPsi, 0, nu*nodes*sizeof(real_t)) );
 		_CUDA( cudaMemset(devVecGradientFbeXi, 0, 2*nx*nodes*sizeof(real_t)));
 		_CUDA( cudaMemset(devVecGradientFbePsi, 0, nu*nodes*sizeof(real_t)));
+	}else if (ptrMyEngine->getGlobalFbeFlag()){
+
 	}
 }
 
@@ -891,13 +894,6 @@ void SmpcController::computeHessianOracalGlobalFbe(){
 		}
 	}
 
-	/*real_t* xDirHost = new real_t[nx*nodes];
-	_CUDA( cudaMemcpy(xDirHost, devVecXdir, nx*nodes*sizeof(real_t), cudaMemcpyDeviceToHost) );
-
-	for( uint_t index = 0; index < 2*nx; index++)
-		cout << xDirHost[index] << " ";
-
-	cout<< endl;*/
 	// primalX = HxDir
 	_CUBLAS(cublasSgemmBatched(ptrMyEngine->getCublasHandle(), CUBLAS_OP_N, CUBLAS_OP_N, 2*nx, 1, nx, &alpha, (const real_t**)
 			ptrMyEngine->getPtrSysMatF(), 2*nx, (const real_t**)devPtrVecXdir, nx, &beta, devPtrVecPrimalXiDir, 2*nx, nodes) );
@@ -941,6 +937,85 @@ void SmpcController::computeGradientFbe(){
 		//	ptrMyEngine->getPtrSysMatF(), 2*nx, (const real_t**)devPtrVecXDir, nx, &alpha, devPtrVecGradFbeXi, 2*nx, nodes) );
 	//_CUBLAS(cublasSgemmBatched(ptrMyEngine->getCublasHandle(), CUBLAS_OP_N, CUBLAS_OP_N, nu, 1, nu, &alpha, (const real_t**)
 		//	ptrMyEngine->getPtrSysMatG(), nu, (const real_t**)devPtrVecUDir, nu, &alpha, devPtrVecGradFbePsi, nu, nodes) );
+}
+
+
+/*
+ * update the lbfgs buffer
+ */
+void SmpcController::updateLbfgsBuffer(){
+	uint_t nodes = ptrMyEngine->getScenarioTree()->getNumNodes();
+	uint_t nx = ptrMyEngine->getDwnNetwork()->getNumTanks();
+	uint_t nu = ptrMyEngine->getDwnNetwork()->getNumControls();
+	uint_t nDualXi = 2*nx*nodes;
+	uint_t nDualPsi = nu*nodes;
+	uint_t lbfgsBufferSize = ptrMySmpcConfig->getLbfgsBufferSize();
+	real_t negAlpha = -1;
+	real_t lbfgsBeta, lbfgsScale, invRhoVar;
+	real_t normMatYk, normGrad, normMatSk;
+	real_t gammaH;
+	uint_t indexVecStart;
+	real_t *devVecS;
+	real_t *devVecY;
+
+	_CUDA( cudaMalloc((void**)&devVecS, (nDualXi + nDualPsi)*sizeof(real_t)) );
+	_CUDA( cudaMalloc((void**)&devVecY, (nDualXi + nDualPsi)*sizeof(real_t)) );
+	// vecS = y - yOld
+	_CUDA( cudaMemcpy(devVecS, devVecXi, nDualXi*sizeof(real_t), cudaMemcpyDeviceToDevice) );
+	_CUDA( cudaMemcpy(&devVecS[nDualXi], devVecPsi, nDualPsi*sizeof(real_t), cudaMemcpyDeviceToDevice) );
+	_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), nDualXi, &negAlpha, devVecPrevXi, 1, devVecS, 1));
+	_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), nDualPsi, &negAlpha, devVecPrevPsi, 1, &devVecS[nDualXi], 1));
+
+	if (ptrMyEngine->getGlobalFbeFlag()){
+		// vecY = grad - gradOld
+		_CUDA( cudaMemcpy(devVecY, devVecGradientFbeXi, nDualXi*sizeof(real_t), cudaMemcpyDeviceToDevice) );
+		_CUDA( cudaMemcpy(&devVecY[nDualXi], devVecGradientFbePsi, nDualPsi*sizeof(real_t), cudaMemcpyDeviceToDevice) );
+		_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), nDualXi, &negAlpha, devVecPrevGradientFbeXi, 1, devVecY, 1));
+		_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), nDualPsi, &negAlpha, devVecPrevGradientFbePsi, 1, &devVecY[nDualXi], 1));
+		// normGrad = norm(fbeGradient)
+		_CUBLAS(cublasSnrm2_v2(ptrMyEngine->getCublasHandle(), nDualXi, devVecGradientFbeXi, 1, &lbfgsScale) );
+		_CUBLAS(cublasSnrm2_v2(ptrMyEngine->getCublasHandle(), nDualPsi, devVecGradientFbePsi, 1, &normGrad) );
+		normGrad = sqrt(lbfgsScale*lbfgsScale + normGrad*normGrad);
+	}
+
+	if (ptrMyEngine->getNamaFlag()){
+
+	}
+	// invRho = vecS'vecY
+	_CUBLAS(cublasSdot_v2(ptrMyEngine->getCublasHandle(), nDualXi + nDualPsi, devVecS, 1, devVecY, 1, &invRhoVar) );
+	// normMatYk = sqrt(vecY[:, lbfgsBufferCol]*vecY[:, lbfgsBufferCol])
+	_CUBLAS(cublasSnrm2_v2(ptrMyEngine->getCublasHandle(), nDualXi + nDualPsi, devVecY, 1, &normMatYk) );
+	// normMatSk = sqrt(matS[:, lbfgsBufferCol]*matS[:, lbfgsBufferCol])
+	_CUBLAS(cublasSnrm2_v2(ptrMyEngine->getCublasHandle(), nDualXi + nDualPsi, devVecS, 1, &normMatSk) );
+
+
+	if(normGrad < 1){
+		normGrad = normGrad*normGrad*normGrad;
+	}
+	if( invRhoVar/(normMatSk * normMatSk) > 1e-6*normGrad){
+		lbfgsBufferCol = 1 + (lbfgsBufferCol % lbfgsBufferSize);
+		lbfgsBufferMemory = min(lbfgsBufferMemory + 1, lbfgsBufferSize);
+		indexVecStart = lbfgsBufferCol*(nDualXi + nDualPsi);
+		_CUDA( cudaMemcpy(&devLbfgsBufferMatY[indexVecStart], devVecY, (nDualXi + nDualPsi)*sizeof(real_t),
+				cudaMemcpyDeviceToDevice) );
+		_CUDA( cudaMemcpy(&devLbfgsBufferMatS[indexVecStart], devVecS, (nDualXi + nDualPsi)*sizeof(real_t),
+				cudaMemcpyDeviceToDevice) );
+		lbfgsBufferRho[lbfgsBufferCol] = 1/invRhoVar;
+	}else{
+		lbfgsSkipCount = lbfgsSkipCount + 1;
+	}
+
+	gammaH = invRhoVar/(normMatYk * normMatYk);
+	if( gammaH < 0 || abs(gammaH - lbfgsBufferHessian) == 0){
+		lbfgsBufferHessian = 1;
+	}else{
+		lbfgsBufferHessian = gammaH;
+	}
+
+	_CUDA( cudaFree(devVecS));
+	_CUDA( cudaFree(devVecY));
+	devVecS = NULL;
+	devVecY = NULL;
 }
 
 /*
@@ -1057,6 +1132,8 @@ void SmpcController::computeLbfgsDirection(){
 	devVecS = NULL;
 	devVecY = NULL;
 }
+
+
 
 /**
  * function that compute the line search lbfgs update
@@ -1221,10 +1298,46 @@ uint_t SmpcController::algorithmApg(){
 }
 
 /**
- * This method executes the APG algorithm and returns the primal infeasibility.
+ * This method executes the global FBE algorithm and returns the primal infeasibility.
  * @return primalInfeasibilty;
  */
 uint_t SmpcController::algorithmGlobalFbe(){
+
+	initialiseAlgorithm();
+	initaliseLbfgBuffer();
+
+	uint_t maxIndex;
+	uint_t nx = ptrMyEngine->getDwnNetwork()->getNumTanks();
+	uint_t nu = ptrMyEngine->getDwnNetwork()->getNumControls();
+	uint_t nodes = ptrMyEngine->getScenarioTree()->getNumNodes();
+
+	for (uint_t iter = 0; iter < ptrMySmpcConfig->getMaxIterations(); iter++){
+		_CUDA( cudaMemcpy(devVecAcceleratedXi, devVecXi, 2*nx*nodes*sizeof(real_t), cudaMemcpyDeviceToDevice));
+		_CUDA( cudaMemcpy(devVecAcceleratedPsi, devVecPsi, nu*nodes*sizeof(real_t), cudaMemcpyDeviceToDevice));
+		solveStep();
+		proximalFunG();
+		computeFixedPointResidual();
+		computeGradientFbe();
+		if( iter > 0){
+			vecValueFbe[iter - 1] = computeValueFbe();
+			computeLbfgsDirection();
+			vecTau[iter - 1] = computeLineSearchLbfgsUpdate( vecValueFbe[iter - 1] );
+		}
+		dualUpdate();
+		_CUBLAS( cublasIsamax_v2(ptrMyEngine->getCublasHandle(), (2*nx + nu)*nodes, devVecResidual,
+				1, &maxIndex));
+		_CUDA( cudaMemcpy(&vecPrimalInfs[iter], &devVecResidual[maxIndex - 1], sizeof(real_t),
+				cudaMemcpyDeviceToHost));
+	}
+
+	return 1;
+}
+
+/**
+* This method executes the NAMA algorithm and returns the primal infeasibilit
+* @return primalInfeasibility;
+**/
+uint_t SmpcController::algorithmNama(){
 
 	initialiseAlgorithm();
 	initaliseLbfgBuffer();

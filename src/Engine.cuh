@@ -325,11 +325,24 @@ public:
 	 */
 	bool getDemandUncertantiy();
 	/*
+	 * bool to indicate APG algorithm
+	 *  default 1 or true
+	 *  globalFbe algorithm 1 or true
+	 */
+	bool getApgFlag();
+	/*
 	 * bool to indicate gloablFbe algorithm
-	 *  APG algorithm 0  or false - default
+	 *  default 0 or false
 	 *  globalFbe algorithm 1 or true
 	 */
 	bool getGlobalFbeFlag();
+	/*
+	 * bool to indicate NAMA algorithm
+	 * default 0 or false
+	 * nama algorithm 1 or true
+	*/
+	bool getNamaFlag();
+
 	/*  SETTER'S IN THE ENGINE  */
 	/*
 	 * Option for uncertainty in price
@@ -486,7 +499,7 @@ private:
 	 */
 	real_t  *devSysUmin;
 	/**
-	 * actuator/cotrol maximum
+	 * actuator/control maximum
 	 */
 	real_t  *devSysUmax;
 
@@ -642,10 +655,18 @@ private:
 	 */
 	bool demandUncertaintyFlag;
 	/*
-	 * Flag to indicate the algorithm used (default 0 or false; uses APG
-	 * algorithm)
+	 * Flag to indicate the APG algorithm status (default 1 or true)
+	 */
+	bool apgFlag;
+	/*
+	 * Flag to indicate the global FBE algorithm  (default 0 or false)
 	 */
 	bool globalFbeFlag;
+	/*
+	 * Flag to indicate the whether NAMA algorithm is used (default 0 or false; uses APG
+	 * algorithm)
+	*/
+	bool namaFlag;
 	/**
 	 * cublas handler
 	 */

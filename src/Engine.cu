@@ -40,14 +40,21 @@ Engine::Engine(DwnNetwork *myNetwork, ScenarioTree *myScenarioTree, SmpcConfigur
 	cublasCreate(&handle);
 	priceUncertaintyFlag = true;
 	demandUncertaintyFlag = true;
-	if( algorithmName.compare("globalFbeAlgorithm") == 0){
-		cout << "algorithm based on SMPC " << algorithmName <<endl;
-		globalFbeFlag = true;
 
+	if( algorithmName.compare("globalFbeAlgorithm") == 0){
+		globalFbeFlag = true;
+		namaFlag = false;
+		apgFlag = false;
+	}else if(algorithmName.compare("namaAlgorithm") == 0){
+		namaFlag = true;
+		globalFbeFlag = false;
+		apgFlag = false;
 	}else{
-		cout << "algorithm based on SMPC " << algorithmName <<endl;
+		apgFlag = true;
+		namaFlag = false;
 		globalFbeFlag = false;
 	}
+	cout << "algorithm based on SMPC " << algorithmName <<endl;
 
 	_CUDA( cudaMalloc((void**)&devMatPhi, 2*nodes*nv*nx*sizeof(real_t)) );
 	_CUDA( cudaMalloc((void**)&devMatPsi, nodes*nu*nv*sizeof(real_t)) );
@@ -142,13 +149,19 @@ Engine::Engine(SmpcConfiguration *smpcConfig){
 	demandUncertaintyFlag = true;
 
 	if( algorithmName.compare("globalFbeAlgorithm") == 0){
-		cout << " algorithm based on SMPC " << algorithmName <<endl;
 		globalFbeFlag = true;
-
+		namaFlag = false;
+		apgFlag = false;
+	}else if(algorithmName.compare("namaAlgorithm") == 0){
+		namaFlag = true;
+		globalFbeFlag = false;
+		apgFlag = false;
 	}else{
-		cout << " algorithm based on SMPC " << algorithmName <<endl;
+		apgFlag = true;
+		namaFlag = false;
 		globalFbeFlag = false;
 	}
+	cout << "algorithm based on SMPC " << algorithmName <<endl;
 
 	_CUDA( cudaMalloc((void**)&devMatPhi, 2*nodes*nv*nx*sizeof(real_t)) );
 	_CUDA( cudaMalloc((void**)&devMatPsi, nodes*nu*nv*sizeof(real_t)) );
@@ -1094,11 +1107,25 @@ bool Engine::getDemandUncertantiy(){
 	return demandUncertaintyFlag;
 }
 /*
+ * Flag to indicate status of the APG algorithm
+ */
+bool Engine::getApgFlag(){
+	return apgFlag;
+}
+
+/*
  * Flag to indicate status of the globalFbe algorithm
  */
 bool Engine::getGlobalFbeFlag(){
 	return globalFbeFlag;
 }
+/*
+ * Flag to indicate status of the NAMA algorithm
+ */
+bool Engine::getNamaFlag(){
+	return namaFlag;
+}
+
 /*  SETTER'S IN THE ENGINE  */
 /*
  * Option for uncertainty in price
