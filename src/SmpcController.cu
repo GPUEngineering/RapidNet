@@ -42,13 +42,12 @@ SmpcController::SmpcController(Forecaster *myForecaster, Engine *myEngine, SmpcC
 	uint_t ns = ptrMyScenarioTree->getNumScenarios();
 	uint_t nodes = ptrMyScenarioTree->getNumNodes();
 
-
 	stepSize = ptrMySmpcConfig->getStepSize();
 	factorStepFlag = false;
 	simulatorFlag = true;
 	bool globalFbeStatus = ptrMyEngine->getGlobalFbeFlag();
 
-	vecPrimalInfs = new real_t[ptrMySmpcConfig->getMaxIterations()];
+	vecPrimalInfs = new real_t[ptrMySmpcConfig->getMaxIterations() + 1];
 	vecValueFbe = new real_t[ptrMySmpcConfig->getMaxIterations()];
 	vecTau = new real_t[ptrMySmpcConfig->getMaxIterations()];
 
@@ -65,10 +64,8 @@ SmpcController::SmpcController(Forecaster *myForecaster, Engine *myEngine, SmpcC
 
 }
 
-/**
- * Construct a new Controller with a given engine.
- * @param  pathToConfigFile   path to the controller configuration file
- */
+
+
 SmpcController::SmpcController(string pathToConfigFile){
 	ptrMySmpcConfig = new SmpcConfiguration( pathToConfigFile );
 	string pathToForecaster = ptrMySmpcConfig->getPathToForecaster();
@@ -78,10 +75,11 @@ SmpcController::SmpcController(string pathToConfigFile){
 	stepSize = ptrMySmpcConfig->getStepSize();
 	factorStepFlag = false;
 	simulatorFlag = true;
+	bool apgStatus = ptrMyEngine->getApgFlag();
 	bool globalFbeStatus = ptrMyEngine->getGlobalFbeFlag();
 	bool namaStatus = ptrMyEngine->getNamaFlag();
 
-	vecPrimalInfs = new real_t[ptrMySmpcConfig->getMaxIterations()];
+	vecPrimalInfs = new real_t[ptrMySmpcConfig->getMaxIterations() + 1];
 	vecValueFbe = new real_t[ptrMySmpcConfig->getMaxIterations()];
 	vecTau = new real_t[ptrMySmpcConfig->getMaxIterations()];
 
@@ -90,19 +88,121 @@ SmpcController::SmpcController(string pathToConfigFile){
 	safeKpi = 0;
 	networkKpi = 0;
 
-	allocateApgAlgorithm();
+	allocateSmpcController();
 
 	if( globalFbeStatus ){
 		allocateGlobalFbeAlgorithm();
+	}else if( namaStatus ){
+
+	}else if(apgStatus){
+		allocateApgAlgorithm();
+	}else{
+		cerr << "No algorithm is selected flag is set " << __FILE__ << "\nLine = " << __LINE__;
 	}
 }
 
-/*
- * Allocate memory of the APG algorithm
- *   - dual and accelerated vectors (psi, xi)
- *   - primal variables (x, u and t)
- *   - primal infeasibility (Hz - t)
- */
+
+
+void SmpcController::allocateSmpcController(){
+	uint_t nx = ptrMyEngine->getDwnNetwork()->getNumTanks();
+	uint_t nu = ptrMyEngine->getDwnNetwork()->getNumControls();
+	uint_t nv = ptrMySmpcConfig->getNV();
+	uint_t ns = ptrMyEngine->getScenarioTree()->getNumScenarios();
+	uint_t nodes = ptrMyEngine->getScenarioTree()->getNumNodes();
+
+	_CUDA( cudaMalloc((void**)&devVecX, nx*nodes*sizeof(real_t)) );
+	_CUDA( cudaMalloc((void**)&devVecU, nu*nodes*sizeof(real_t)) );
+	_CUDA( cudaMalloc((void**)&devVecV, nv*nodes*sizeof(real_t)) );
+	_CUDA( cudaMalloc((void**)&devVecXi, 2*nx*nodes*sizeof(real_t)) );
+	_CUDA( cudaMalloc((void**)&devVecPsi, nu*nodes*sizeof(real_t)) );
+	_CUDA( cudaMalloc((void**)&devVecPrimalXi, 2*nx*nodes*sizeof(real_t)) );
+	_CUDA( cudaMalloc((void**)&devVecPrimalPsi, nu*nodes*sizeof(real_t)) );
+	_CUDA( cudaMalloc((void**)&devVecFixedPointResidualXi, 2*nx*nodes*sizeof(real_t)) );
+	_CUDA( cudaMalloc((void**)&devVecFixedPointResidualPsi, nu*nodes*sizeof(real_t)) );
+	_CUDA( cudaMalloc((void**)&devVecDualXi, 2*nx*nodes*sizeof(real_t)) );
+	_CUDA( cudaMalloc((void**)&devVecDualPsi, nu*nodes*sizeof(real_t)) );
+	_CUDA( cudaMalloc((void**)&devVecUpdateXi, 2*nx*nodes*sizeof(real_t)) );
+	_CUDA( cudaMalloc((void**)&devVecUpdatePsi, nu*nodes*sizeof(real_t)) );
+	_CUDA( cudaMalloc((void**)&devVecQ, ns*nx*sizeof(real_t)) );
+	_CUDA( cudaMalloc((void**)&devVecR, ns*nv*sizeof(real_t)) );
+	_CUDA( cudaMalloc((void**)&devControlAction, nu*sizeof(real_t)) );
+	_CUDA( cudaMalloc((void**)&devStateUpdate, nx*sizeof(real_t)) );
+
+	_CUDA( cudaMalloc((void**)&devPtrVecX, nodes*sizeof(real_t*)) );
+	_CUDA( cudaMalloc((void**)&devPtrVecU, nodes*sizeof(real_t*)) );
+	_CUDA( cudaMalloc((void**)&devPtrVecV, nodes*sizeof(real_t*)) );
+	_CUDA( cudaMalloc((void**)&devPtrVecSolveStepXi, nodes*sizeof(real_t)) );
+	_CUDA( cudaMalloc((void**)&devPtrVecSolveStepPsi, nodes*sizeof(real_t)) );
+	_CUDA( cudaMalloc((void**)&devPtrVecPrimalXi, nodes*sizeof(real_t*)) );
+	_CUDA( cudaMalloc((void**)&devPtrVecPrimalPsi, nodes*sizeof(real_t*)) );
+	_CUDA( cudaMalloc((void**)&devPtrVecQ, ns*sizeof(real_t*)) );
+	_CUDA( cudaMalloc((void**)&devPtrVecR, ns*sizeof(real_t*)) );
+
+	real_t** ptrVecX = new real_t*[nodes];
+	real_t** ptrVecU = new real_t*[nodes];
+	real_t** ptrVecV = new real_t*[nodes];
+	real_t** ptrVecPrimalXi = new real_t*[nodes];
+	real_t** ptrVecPrimalPsi = new real_t*[nodes];
+	real_t** ptrVecQ = new real_t*[ns];
+	real_t** ptrVecR = new real_t*[ns];
+
+	for(uint_t iNode = 0; iNode < nodes; iNode++){
+		ptrVecX[iNode] = &devVecX[iNode*nx];
+		ptrVecU[iNode] = &devVecU[iNode*nu];
+		ptrVecV[iNode] = &devVecV[iNode*nv];
+		ptrVecPrimalXi[iNode] = &devVecPrimalXi[2*iNode*nx];
+		ptrVecPrimalPsi[iNode] = &devVecPrimalPsi[iNode*nu];
+	}
+	for(uint_t iScenario = 0; iScenario < ns; iScenario++){
+		ptrVecQ[iScenario] = &devVecQ[iScenario*nx];
+		ptrVecR[iScenario] = &devVecR[iScenario*nv];
+	}
+
+	_CUDA( cudaMemset(devVecU, 0, nu*nodes*sizeof(real_t)) );
+	_CUDA( cudaMemset(devVecXi, 0, 2*nx*nodes*sizeof(real_t)) );
+	_CUDA( cudaMemset(devVecPsi, 0, nu*nodes*sizeof(real_t)) );
+	_CUDA( cudaMemset(devVecPrimalXi, 0, 2*nx*nodes*sizeof(real_t)) );
+	_CUDA( cudaMemset(devVecPrimalPsi, 0, nu*nodes*sizeof(real_t)) );
+	_CUDA( cudaMemset(devVecDualXi, 0, 2*nx*nodes*sizeof(real_t)));
+	_CUDA( cudaMemset(devVecDualPsi, 0, nu*nodes*sizeof(real_t)) );
+	_CUDA( cudaMemset(devVecUpdateXi, 0, 2*nx*nodes*sizeof(real_t)) );
+	_CUDA( cudaMemset(devVecUpdatePsi, 0, nu*nodes*sizeof(real_t)) );
+	//_CUDA( cudaMemset(devVecResidual, 0, (2*nx + nu)*nodes*sizeof(real_t)) );
+	_CUDA( cudaMemset(devVecFixedPointResidualXi, 0, 2*nx*nodes*sizeof(real_t)) );
+	_CUDA( cudaMemset(devVecFixedPointResidualPsi, 0, nu*nodes*sizeof(real_t)) );
+
+	_CUDA( cudaMemset(devVecR, 0, ns*nv*sizeof(real_t)) );
+	_CUDA( cudaMemset(devVecQ, 0, ns*nx*sizeof(real_t)) );
+	_CUDA( cudaMemset(devControlAction, 0, nu*sizeof(real_t)) );
+	_CUDA( cudaMemset(devStateUpdate, 0, nx*sizeof(real_t)) );
+
+	_CUDA( cudaMemcpy(devPtrVecX, ptrVecX, nodes*sizeof(real_t*), cudaMemcpyHostToDevice) );
+	_CUDA( cudaMemcpy(devPtrVecU, ptrVecU, nodes*sizeof(real_t*), cudaMemcpyHostToDevice) );
+	_CUDA( cudaMemcpy(devPtrVecV, ptrVecV, nodes*sizeof(real_t*), cudaMemcpyHostToDevice) );
+	_CUDA( cudaMemcpy(devPtrVecPrimalXi, ptrVecPrimalXi, nodes*sizeof(real_t*),cudaMemcpyHostToDevice) );
+	_CUDA( cudaMemcpy(devPtrVecPrimalPsi, ptrVecPrimalPsi, nodes*sizeof(real_t*),cudaMemcpyHostToDevice) );
+	_CUDA( cudaMemcpy(devPtrVecQ, ptrVecQ, ns*sizeof(real_t*), cudaMemcpyHostToDevice));
+	_CUDA( cudaMemcpy(devPtrVecR, ptrVecR, ns*sizeof(real_t*), cudaMemcpyHostToDevice));
+
+	delete [] ptrVecX;
+	delete [] ptrVecU;
+	delete [] ptrVecV;
+	delete [] ptrVecPrimalXi;
+	delete [] ptrVecPrimalPsi;
+	delete [] ptrVecQ;
+	delete [] ptrVecR;
+	ptrVecX = NULL;
+	ptrVecU = NULL;
+	ptrVecV = NULL;
+	ptrVecPrimalXi = NULL;
+	ptrVecPrimalPsi = NULL;
+	ptrVecQ = NULL;
+	ptrVecR = NULL;
+
+}
+
+
+
 void SmpcController::allocateApgAlgorithm(){
 	uint_t nx = ptrMyEngine->getDwnNetwork()->getNumTanks();
 	uint_t nu = ptrMyEngine->getDwnNetwork()->getNumControls();
@@ -115,118 +215,61 @@ void SmpcController::allocateApgAlgorithm(){
 	lbfgsSkipCount = 0;
 	lbfgsBufferHessian = 1;
 
-	_CUDA( cudaMalloc((void**)&devVecX, nx*nodes*sizeof(real_t)) );
-	_CUDA( cudaMalloc((void**)&devVecU, nu*nodes*sizeof(real_t)) );
-	_CUDA( cudaMalloc((void**)&devVecV, nv*nodes*sizeof(real_t)) );
-	_CUDA( cudaMalloc((void**)&devVecXi, 2*nx*nodes*sizeof(real_t)) );
-	_CUDA( cudaMalloc((void**)&devVecPsi, nu*nodes*sizeof(real_t)) );
+	//ptrVecAcceleratedXi = new real_t*[nodes];
+	//ptrVecAcceleratedPsi = new real_t*[nodes];
+
+	ptrVecAcceleratedXi = new real_t*[nodes];
+	ptrVecAcceleratedPsi = new real_t*[nodes];
+
 	_CUDA( cudaMalloc((void**)&devVecAcceleratedXi, 2*nx*nodes*sizeof(real_t)) );
 	_CUDA( cudaMalloc((void**)&devVecAcceleratedPsi, nu*nodes*sizeof(real_t)) );
-	_CUDA( cudaMalloc((void**)&devVecPrimalXi, 2*nx*nodes*sizeof(real_t)) );
-	_CUDA( cudaMalloc((void**)&devVecPrimalPsi, nu*nodes*sizeof(real_t)) );
-	_CUDA( cudaMalloc((void**)&devVecDualXi, 2*nx*nodes*sizeof(real_t)) );
-	_CUDA( cudaMalloc((void**)&devVecDualPsi, nu*nodes*sizeof(real_t)) );
-	_CUDA( cudaMalloc((void**)&devVecUpdateXi, 2*nx*nodes*sizeof(real_t)) );
-	_CUDA( cudaMalloc((void**)&devVecUpdatePsi, nu*nodes*sizeof(real_t)) );
-	_CUDA( cudaMalloc((void**)&devVecResidual, (2*nx + nu)*nodes*sizeof(real_t)) );
-	_CUDA( cudaMalloc((void**)&devVecQ, ns*nx*sizeof(real_t)) );
-	_CUDA( cudaMalloc((void**)&devVecR, ns*nv*sizeof(real_t)) );
-	_CUDA( cudaMalloc((void**)&devControlAction, nu*sizeof(real_t)) );
-	_CUDA( cudaMalloc((void**)&devStateUpdate, nx*sizeof(real_t)) );
 
-	_CUDA( cudaMalloc((void**)&devPtrVecX, nodes*sizeof(real_t*)) );
-	_CUDA( cudaMalloc((void**)&devPtrVecU, nodes*sizeof(real_t*)) );
-	_CUDA( cudaMalloc((void**)&devPtrVecV, nodes*sizeof(real_t*)) );
-	_CUDA( cudaMalloc((void**)&devPtrVecAcceleratedXi, nodes*sizeof(real_t*)) );
-	_CUDA( cudaMalloc((void**)&devPtrVecAcceleratedPsi, nodes*sizeof(real_t*)) );
-	_CUDA( cudaMalloc((void**)&devPtrVecPrimalXi, nodes*sizeof(real_t*)) );
-	_CUDA( cudaMalloc((void**)&devPtrVecPrimalPsi, nodes*sizeof(real_t*)) );
-	_CUDA( cudaMalloc((void**)&devPtrVecQ, ns*sizeof(real_t*)) );
-	_CUDA( cudaMalloc((void**)&devPtrVecR, ns*sizeof(real_t*)) );
+	//_CUDA( cudaMalloc((void**)&devPtrVecAcceleratedXi, nodes*sizeof(real_t*)) );
+	//_CUDA( cudaMalloc((void**)&devPtrVecAcceleratedPsi, nodes*sizeof(real_t*)) );
 
-	real_t** ptrVecX = new real_t*[nodes];
-	real_t** ptrVecU = new real_t*[nodes];
-	real_t** ptrVecV = new real_t*[nodes];
-	real_t** ptrVecAcceleratedXi = new real_t*[nodes];
-	real_t** ptrVecAcceleratedPsi = new real_t*[nodes];
-	real_t** ptrVecPrimalXi = new real_t*[nodes];
-	real_t** ptrVecPrimalPsi = new real_t*[nodes];
-	real_t** ptrVecQ = new real_t*[ns];
-	real_t** ptrVecR = new real_t*[ns];
-
-	for(uint_t iScenario = 0; iScenario < ns; iScenario++){
-		ptrVecQ[iScenario] = &devVecQ[iScenario*nx];
-		ptrVecR[iScenario] = &devVecR[iScenario*nv];
-	}
 	for(uint_t iNode = 0; iNode < nodes; iNode++){
-		ptrVecX[iNode] = &devVecX[iNode*nx];
-		ptrVecU[iNode] = &devVecU[iNode*nu];
-		ptrVecV[iNode] = &devVecV[iNode*nv];
 		ptrVecAcceleratedXi[iNode] = &devVecAcceleratedXi[2*iNode*nx];
 		ptrVecAcceleratedPsi[iNode] = &devVecAcceleratedPsi[iNode*nu];
-		ptrVecPrimalXi[iNode] = &devVecPrimalXi[2*iNode*nx];
-		ptrVecPrimalPsi[iNode] = &devVecPrimalPsi[iNode*nu];
 	}
 
-	_CUDA( cudaMemset(devVecU, 0, nu*nodes*sizeof(real_t)) );
-	_CUDA( cudaMemset(devVecXi, 0, 2*nx*nodes*sizeof(real_t)) );
-	_CUDA( cudaMemset(devVecPsi, 0, nu*nodes*sizeof(real_t)) );
 	_CUDA( cudaMemset(devVecAcceleratedXi, 0, 2*nx*nodes*sizeof(real_t)) );
 	_CUDA( cudaMemset(devVecAcceleratedPsi, 0, nu*nodes*sizeof(real_t)) );
-	_CUDA( cudaMemset(devVecUpdateXi, 0, 2*nx*nodes*sizeof(real_t)) );
-	_CUDA( cudaMemset(devVecUpdatePsi, 0, nu*nodes*sizeof(real_t)) );
-	_CUDA( cudaMemset(devVecPrimalXi, 0, 2*nx*nodes*sizeof(real_t)) );
-	_CUDA( cudaMemset(devVecPrimalPsi, 0, nu*nodes*sizeof(real_t)) );
-	_CUDA( cudaMemset(devVecDualXi, 0, 2*nx*nodes*sizeof(real_t)));
-	_CUDA( cudaMemset(devVecDualPsi, 0, nu*nodes*sizeof(real_t)) );
-	_CUDA( cudaMemset(devVecResidual, 0, (2*nx + nu)*nodes*sizeof(real_t)) );
-	_CUDA( cudaMemset(devVecR, 0, ns*nv*sizeof(real_t)) );
-	_CUDA( cudaMemset(devVecQ, 0, ns*nx*sizeof(real_t)) );
-	_CUDA( cudaMemset(devControlAction, 0, nu*sizeof(real_t)) );
-	_CUDA( cudaMemset(devStateUpdate, 0, nx*sizeof(real_t)) );
 
-	_CUDA( cudaMemcpy(devPtrVecX, ptrVecX, nodes*sizeof(real_t*), cudaMemcpyHostToDevice) );
-	_CUDA( cudaMemcpy(devPtrVecU, ptrVecU, nodes*sizeof(real_t*), cudaMemcpyHostToDevice) );
-	_CUDA( cudaMemcpy(devPtrVecV, ptrVecV, nodes*sizeof(real_t*), cudaMemcpyHostToDevice) );
-	_CUDA( cudaMemcpy(devPtrVecAcceleratedXi, ptrVecAcceleratedXi, nodes*sizeof(real_t*), cudaMemcpyHostToDevice) );
-	_CUDA( cudaMemcpy(devPtrVecAcceleratedPsi, ptrVecAcceleratedPsi, nodes*sizeof(real_t*), cudaMemcpyHostToDevice) );
-	_CUDA( cudaMemcpy(devPtrVecPrimalXi, ptrVecPrimalXi, nodes*sizeof(real_t*),cudaMemcpyHostToDevice) );
-	_CUDA( cudaMemcpy(devPtrVecPrimalPsi, ptrVecPrimalPsi, nodes*sizeof(real_t*),cudaMemcpyHostToDevice) );
-	_CUDA( cudaMemcpy(devPtrVecQ, ptrVecQ, ns*sizeof(real_t*), cudaMemcpyHostToDevice));
-	_CUDA( cudaMemcpy(devPtrVecR, ptrVecR, ns*sizeof(real_t*), cudaMemcpyHostToDevice));
+	//_CUDA( cudaMemcpy(devPtrVecAcceleratedXi, ptrVecAcceleratedXi, nodes*sizeof(real_t*), cudaMemcpyHostToDevice) );
+	//_CUDA( cudaMemcpy(devPtrVecAcceleratedPsi, ptrVecAcceleratedPsi, nodes*sizeof(real_t*), cudaMemcpyHostToDevice) );
 
-	delete [] ptrVecX;
-	delete [] ptrVecU;
-	delete [] ptrVecV;
-	delete [] ptrVecAcceleratedXi;
-	delete [] ptrVecAcceleratedPsi;
-	delete [] ptrVecPrimalXi;
-	delete [] ptrVecPrimalPsi;
-	delete [] ptrVecQ;
-	delete [] ptrVecR;
-	ptrVecX = NULL;
-	ptrVecU = NULL;
-	ptrVecV = NULL;
-	ptrVecAcceleratedXi = NULL;
-	ptrVecAcceleratedPsi = NULL;
-	ptrVecPrimalXi = NULL;
-	ptrVecPrimalPsi = NULL;
-	ptrVecQ = NULL;
-	ptrVecR = NULL;
 }
 
-/*
- * Allocate memory of the APG algorithm
- *   - dual and accelerated vectors (psi, xi)
- *   - primal variables (x, u and t)
- *   - primal infeasibility (Hz - t)
- */
+
+void SmpcController::allocateLbfgsBuffer(){
+	uint_t nx = ptrMySmpcConfig->getNX();
+	uint_t nu = ptrMySmpcConfig->getNU();
+	uint_t nodes = ptrMyEngine->getScenarioTree()->getNumNodes();
+	uint_t bufferSize = ptrMySmpcConfig->getLbfgsBufferSize();
+	uint_t ny = 2*nx + nu;
+
+	_CUDA( cudaMalloc((void**)&devLbfgsBufferMatS, ny*nodes*bufferSize*sizeof(real_t)) );
+	_CUDA( cudaMalloc((void**)&devLbfgsBufferMatY, ny*nodes*bufferSize*sizeof(real_t)) );
+
+	lbfgsBufferRho = new real_t[bufferSize];
+
+	_CUDA( cudaMemset(devLbfgsBufferMatS, 0, ny*nodes*bufferSize*sizeof(real_t)) );
+	_CUDA( cudaMemset(devLbfgsBufferMatY, 0, nu*nodes*sizeof(real_t)) );
+	_CUDA( cudaMemcpy(lbfgsBufferRho, devLbfgsBufferMatY, bufferSize*sizeof(real_t), cudaMemcpyDeviceToHost));
+}
+
+
 void SmpcController::allocateGlobalFbeAlgorithm(){
 	uint_t nx = ptrMyEngine->getDwnNetwork()->getNumTanks();
 	uint_t nu = ptrMyEngine->getDwnNetwork()->getNumControls();
 	uint_t nv = ptrMySmpcConfig->getNV();
 	uint_t ns = ptrMyEngine->getScenarioTree()->getNumScenarios();
 	uint_t nodes = ptrMyEngine->getScenarioTree()->getNumNodes();
+
+	lbfgsBufferCol = 0;
+	lbfgsBufferMemory = 0;
+	lbfgsSkipCount = 0;
+	lbfgsBufferHessian = 1;
 
 	allocateLbfgsBufferDevice();
 
@@ -256,8 +299,12 @@ void SmpcController::allocateGlobalFbeAlgorithm(){
 	real_t** ptrVecGradFbePsi = new real_t*[nodes];
 	real_t** ptrVecPrimalXiDir = new real_t*[nodes];
 	real_t** ptrVecPrimalPsiDir =  new real_t*[nodes];
+	ptrVecXi = new real_t*[nodes];
+	ptrVecPsi = new real_t*[nodes];
 
 	for(uint_t iNode = 0; iNode < nodes; iNode++){
+		ptrVecXi[iNode] = &devVecDualXi[2*iNode*nx];
+		ptrVecPsi[iNode] = &devVecDualPsi[iNode*nu];
 		ptrVecXdir[iNode] = &devVecXdir[iNode*nx];
 		ptrVecUdir[iNode] = &devVecUdir[iNode*nu];
 		ptrVecGradFbeXi[iNode] = &devVecGradientFbeXi[2*iNode*nx];
@@ -301,22 +348,98 @@ void SmpcController::allocateGlobalFbeAlgorithm(){
 	ptrVecPrimalPsiDir = NULL;
 }
 
-void SmpcController::allocateLbfgsBufferDevice(){
-	uint_t nx = ptrMySmpcConfig->getNX();
-	uint_t nu = ptrMySmpcConfig->getNU();
+
+
+void SmpcController::allocateNamaAlgorithm(){
+	uint_t nx = ptrMyEngine->getDwnNetwork()->getNumTanks();
+	uint_t nu = ptrMyEngine->getDwnNetwork()->getNumControls();
+	uint_t nv = ptrMySmpcConfig->getNV();
+	uint_t ns = ptrMyEngine->getScenarioTree()->getNumScenarios();
 	uint_t nodes = ptrMyEngine->getScenarioTree()->getNumNodes();
-	uint_t bufferSize = ptrMySmpcConfig->getLbfgsBufferSize();
-	uint_t ny = 2*nx + nu;
 
-	_CUDA( cudaMalloc((void**)&devLbfgsBufferMatS, ny*nodes*bufferSize*sizeof(real_t)) );
-	_CUDA( cudaMalloc((void**)&devLbfgsBufferMatY, ny*nodes*bufferSize*sizeof(real_t)) );
+	lbfgsBufferCol = 0;
+	lbfgsBufferMemory = 0;
+	lbfgsSkipCount = 0;
+	lbfgsBufferHessian = 1;
 
-	lbfgsBufferRho = new real_t[bufferSize];
+	allocateLbfgsBufferDevice();
 
-	_CUDA( cudaMemset(devLbfgsBufferMatS, 0, ny*nodes*bufferSize*sizeof(real_t)) );
-	_CUDA( cudaMemset(devLbfgsBufferMatY, 0, nu*nodes*sizeof(real_t)) );
-	_CUDA( cudaMemcpy(lbfgsBufferRho, devLbfgsBufferMatY, bufferSize*sizeof(real_t), cudaMemcpyDeviceToHost));
+	_CUDA( cudaMalloc((void**)&devVecPrevXi, 2*nx*nodes*sizeof(real_t)) );
+	_CUDA( cudaMalloc((void**)&devVecPrevPsi, nu*nodes*sizeof(real_t)) );
+	_CUDA( cudaMalloc((void**)&devVecGradientFbeXi, 2*nx*nodes*sizeof(real_t)));
+	_CUDA( cudaMalloc((void**)&devVecGradientFbePsi, nu*nodes*sizeof(real_t)));
+	_CUDA( cudaMalloc((void**)&devVecPrevGradientFbeXi, 2*nx*nodes*sizeof(real_t)));
+	_CUDA( cudaMalloc((void**)&devVecPrevGradientFbePsi, nu*nodes*sizeof(real_t)));
+	_CUDA( cudaMalloc((void**)&devVecLbfgsDirXi, 2*nx*nodes*sizeof(real_t)));
+	_CUDA( cudaMalloc((void**)&devVecLbfgsDirPsi, nu*nodes*sizeof(real_t)));
+	_CUDA( cudaMalloc((void**)&devVecXdir, nx*nodes*sizeof(real_t)));
+	_CUDA( cudaMalloc((void**)&devVecUdir, nu*nodes*sizeof(real_t)));
+	_CUDA( cudaMalloc((void**)&devVecPrimalXiDir, 2*nx*nodes*sizeof(real_t)));
+	_CUDA( cudaMalloc((void**)&devVecPrimalPsiDir, nu*nodes*sizeof(real_t)));
+
+	_CUDA( cudaMalloc((void**)&devPtrVecXdir, nodes*sizeof(real_t*)) );
+	_CUDA( cudaMalloc((void**)&devPtrVecUdir, nodes*sizeof(real_t*)) );
+	_CUDA( cudaMalloc((void**)&devPtrVecGradFbeXi, nodes*sizeof(real_t*)) );
+	_CUDA( cudaMalloc((void**)&devPtrVecGradFbePsi, nodes*sizeof(real_t*)) );
+	_CUDA( cudaMalloc((void**)&devPtrVecPrimalXiDir, nodes*sizeof(real_t*)) );
+	_CUDA( cudaMalloc((void**)&devPtrVecPrimalPsiDir, nodes*sizeof(real_t*)) );
+
+	real_t** ptrVecXdir = new real_t*[nodes];
+	real_t** ptrVecUdir = new real_t*[nodes];
+	real_t** ptrVecGradFbeXi = new real_t*[nodes];
+	real_t** ptrVecGradFbePsi = new real_t*[nodes];
+	real_t** ptrVecPrimalXiDir = new real_t*[nodes];
+	real_t** ptrVecPrimalPsiDir =  new real_t*[nodes];
+	ptrVecXi = new real_t*[nodes];
+	ptrVecPsi = new real_t*[nodes];
+
+	for(uint_t iNode = 0; iNode < nodes; iNode++){
+		ptrVecXi[iNode] = &devVecDualXi[2*iNode*nx];
+		ptrVecPsi[iNode] = &devVecDualPsi[iNode*nu];
+		ptrVecXdir[iNode] = &devVecXdir[iNode*nx];
+		ptrVecUdir[iNode] = &devVecUdir[iNode*nu];
+		ptrVecGradFbeXi[iNode] = &devVecGradientFbeXi[2*iNode*nx];
+		ptrVecGradFbePsi[iNode] = &devVecGradientFbePsi[iNode*nu];
+		ptrVecPrimalXiDir[iNode] = &devVecPrimalXiDir[2*iNode*nx];
+		ptrVecPrimalPsiDir[iNode] = &devVecPrimalPsiDir[iNode*nu];
+	}
+
+	_CUDA( cudaMemset(devVecPrevXi, 0, 2*nx*nodes*sizeof(real_t)) );
+	_CUDA( cudaMemset(devVecPrevPsi, 0, nu*nodes*sizeof(real_t)) );
+	_CUDA( cudaMemset(devVecGradientFbeXi, 0, 2*nx*nodes*sizeof(real_t)) );
+	_CUDA( cudaMemset(devVecGradientFbePsi, 0, nu*nodes*sizeof(real_t)) );
+	_CUDA( cudaMemset(devVecPrevGradientFbeXi, 0, 2*nx*nodes*sizeof(real_t)) );
+	_CUDA( cudaMemset(devVecPrevGradientFbePsi, 0, nu*nodes*sizeof(real_t)) );
+	_CUDA( cudaMemset(devVecLbfgsDirXi, 0, 2*nx*nodes*sizeof(real_t)) );
+	_CUDA( cudaMemset(devVecLbfgsDirPsi, 0, nu*nodes*sizeof(real_t)) );
+	_CUDA( cudaMemset(devVecXdir, 0, nx*nodes*sizeof(real_t)) );
+	_CUDA( cudaMemset(devVecUdir, 0, nu*nodes*sizeof(real_t)) );
+	_CUDA( cudaMemset(devVecPrimalXiDir, 0, 2*nx*nodes*sizeof(real_t)) );
+	_CUDA( cudaMemset(devVecPrimalPsiDir, 0, nu*nodes*sizeof(real_t)) );
+
+	_CUDA( cudaMemcpy(devPtrVecXdir, ptrVecXdir, nodes*sizeof(real_t*), cudaMemcpyHostToDevice) );
+	_CUDA( cudaMemcpy(devPtrVecUdir, ptrVecUdir, nodes*sizeof(real_t*), cudaMemcpyHostToDevice) );
+	_CUDA( cudaMemcpy(devPtrVecGradFbeXi, ptrVecGradFbeXi, nodes*sizeof(real_t*), cudaMemcpyHostToDevice) );
+	_CUDA( cudaMemcpy(devPtrVecGradFbePsi, ptrVecGradFbePsi, nodes*sizeof(real_t*), cudaMemcpyHostToDevice) );
+	_CUDA( cudaMemcpy(devPtrVecPrimalXiDir, ptrVecPrimalXiDir, nodes*sizeof(real_t*), cudaMemcpyHostToDevice) );
+	_CUDA( cudaMemcpy(devPtrVecPrimalPsiDir, ptrVecPrimalPsiDir, nodes*sizeof(real_t*), cudaMemcpyHostToDevice) );
+
+	delete [] ptrVecXdir;
+	delete [] ptrVecUdir;
+	delete [] ptrVecGradFbeXi;
+	delete [] ptrVecGradFbePsi;
+	delete [] ptrVecPrimalXiDir;
+	delete [] ptrVecPrimalPsiDir;
+
+	ptrVecXdir = NULL;
+	ptrVecUdir = NULL;
+	ptrVecGradFbeXi = NULL;
+	ptrVecGradFbePsi = NULL;
+	ptrVecPrimalXiDir = NULL;
+	ptrVecPrimalPsiDir = NULL;
 }
+
+
 
 void SmpcController::initialiseAlgorithm(){
 	uint_t nodes = ptrMyEngine->getScenarioTree()->getNumNodes();
@@ -325,8 +448,6 @@ void SmpcController::initialiseAlgorithm(){
 
 	_CUDA( cudaMemset(devVecXi, 0, 2*nx*nodes*sizeof(real_t)) );
 	_CUDA( cudaMemset(devVecPsi, 0, nu*nodes*sizeof(real_t)) );
-	_CUDA( cudaMemset(devVecAcceleratedXi, 0, 2*nx*nodes*sizeof(real_t)) );
-	_CUDA( cudaMemset(devVecAcceleratedPsi, 0, nu*nodes*sizeof(real_t)) );
 	_CUDA( cudaMemset(devVecUpdateXi, 0, 2*nx*nodes*sizeof(real_t)) );
 	_CUDA( cudaMemset(devVecUpdatePsi, 0, nu*nodes*sizeof(real_t)) );
 	_CUDA( cudaMemset(devVecPrimalXi, 0, 2*nx*nodes*sizeof(real_t)) );
@@ -334,12 +455,17 @@ void SmpcController::initialiseAlgorithm(){
 	_CUDA( cudaMemset(devVecDualXi, 0, 2*nx*nodes*sizeof(real_t)));
 	_CUDA( cudaMemset(devVecDualPsi, 0, nu*nodes*sizeof(real_t)) );
 
+	if( ptrMyEngine->getApgFlag()){
+		_CUDA( cudaMemset(devVecAcceleratedXi, 0, 2*nx*nodes*sizeof(real_t)) );
+		_CUDA( cudaMemset(devVecAcceleratedPsi, 0, nu*nodes*sizeof(real_t)) );
+	}
+
 	if(ptrMyEngine->getGlobalFbeFlag()){
 		_CUDA( cudaMemset(devVecPrevXi, 0, 2*nx*nodes*sizeof(real_t)) );
 		_CUDA( cudaMemset(devVecPrevPsi, 0, nu*nodes*sizeof(real_t)) );
 		_CUDA( cudaMemset(devVecGradientFbeXi, 0, 2*nx*nodes*sizeof(real_t)));
 		_CUDA( cudaMemset(devVecGradientFbePsi, 0, nu*nodes*sizeof(real_t)));
-	}else if (ptrMyEngine->getGlobalFbeFlag()){
+	}else if (ptrMyEngine->getNamaFlag()){
 
 	}
 }
@@ -378,6 +504,24 @@ void SmpcController::initialiseSmpcController(){
 	ptrMyEngine->updateStateControl(currentX, prevU, prevDemand);
 	ptrMyEngine->eliminateInputDistubanceCoupling( ptrMyForecaster->getNominalDemand(),
 			ptrMyForecaster->getNominalPrices());
+}
+
+/**
+ * Function to copy the vector for solve step
+ * apg - accelerated dual gradient
+ * fbe - dual vector
+ */
+void SmpcController::copyVecForSolveStep(){
+	ScenarioTree* ptrMyScenarioTree = ptrMyEngine->getScenarioTree();
+	uint_t nodes = ptrMyScenarioTree->getNumNodes();
+
+	if (ptrMyEngine->getApgFlag()){
+		_CUDA( cudaMemcpy(devPtrVecSolveStepXi, ptrVecAcceleratedXi, nodes*sizeof(real_t*), cudaMemcpyHostToDevice) );
+		_CUDA( cudaMemcpy(devPtrVecSolveStepPsi, ptrVecAcceleratedXi, nodes*sizeof(real_t*), cudaMemcpyHostToDevice) );
+	}else{
+		_CUDA( cudaMemcpy(devPtrVecSolveStepXi, ptrVecXi, nodes*sizeof(real_t*), cudaMemcpyHostToDevice) );
+		_CUDA( cudaMemcpy(devPtrVecSolveStepPsi, ptrVecPsi, nodes*sizeof(real_t*), cudaMemcpyHostToDevice) );
+	}
 }
 
 /**
@@ -465,13 +609,13 @@ void SmpcController::solveStep(){
 		// v=Psi*psi+v
 		_CUBLAS(cublasSgemmBatched(ptrMyEngine->getCublasHandle(), CUBLAS_OP_N, CUBLAS_OP_N, nv, 1, nu, &alpha,
 				(const real_t**)&ptrMyEngine->getPtrMatPsi()[iStageCumulNodes], nv,
-				(const real_t**)&devPtrVecAcceleratedPsi[iStageCumulNodes], nu, &alpha, &devPtrVecV
+				(const real_t**)&devPtrVecSolveStepPsi[iStageCumulNodes], nu, &alpha, &devPtrVecV
 				[iStageCumulNodes], nv, iStageNodes));
 
 		// v=Phi*xi+v
 		_CUBLAS(cublasSgemmBatched(ptrMyEngine->getCublasHandle(), CUBLAS_OP_N, CUBLAS_OP_N, nv, 1, 2*nx, &alpha,
 				(const real_t**)&ptrMyEngine->getPtrMatPhi()[iStageCumulNodes], nv, (const real_t**)
-				&devPtrVecAcceleratedXi[iStageCumulNodes], 2*nx, &alpha, &devPtrVecV[iStageCumulNodes],
+				&devPtrVecSolveStepXi[iStageCumulNodes], 2*nx, &alpha, &devPtrVecV[iStageCumulNodes],
 				nv, iStageNodes));
 
 		// r=sigma
@@ -481,18 +625,15 @@ void SmpcController::solveStep(){
 		// r=D*xi+r
 		_CUBLAS(cublasSgemmBatched(ptrMyEngine->getCublasHandle(), CUBLAS_OP_N, CUBLAS_OP_N, nv, 1, 2*nx, &alpha,
 				(const real_t**)&ptrMyEngine->getPtrMatD()[iStageCumulNodes], nv, (const real_t**)
-				&devPtrVecAcceleratedXi[iStageCumulNodes], 2*nx, &alpha, devPtrVecR, nv, iStageNodes));
+				&devPtrVecSolveStepXi[iStageCumulNodes], 2*nx, &alpha, devPtrVecR, nv, iStageNodes));
 
 		// r=f*psi+r
 		_CUBLAS(cublasSgemmBatched(ptrMyEngine->getCublasHandle(), CUBLAS_OP_N, CUBLAS_OP_N, nv, 1, nu, &alpha,
 				(const real_t**)&ptrMyEngine->getPtrMatF()[iStageCumulNodes], nv, (const real_t**)
-				&devPtrVecAcceleratedPsi[iStageCumulNodes], nu, &alpha, devPtrVecR, nv, iStageNodes));
+				&devPtrVecSolveStepPsi[iStageCumulNodes], nu, &alpha, devPtrVecR, nv, iStageNodes));
 
 		if(iStage < N-1){
 			// r=g*q+r
-			//_CUBLAS(cublasSgemmBatched(ptrMyEngine->getCublasHandle(), CUBLAS_OP_N, CUBLAS_OP_N, nv, 1, nx, &alpha,
-			//		(const real_t**)&ptrMyEngine->getPtrMatG()[iStageCumulNodes], nv, (const real_t**)devPtrVecQ,
-			//		nx, &alpha, devPtrVecR, nv, iStageNodes));
 			_CUBLAS(cublasSgemmBatched(ptrMyEngine->getCublasHandle(), CUBLAS_OP_N, CUBLAS_OP_N, nv, 1, nx, &alpha,
 					(const real_t**)&ptrMyEngine->getPtrMatG()[0], nv, (const real_t**)devPtrVecQ,
 					nx, &alpha, devPtrVecR, nv, iStageNodes));
@@ -502,12 +643,12 @@ void SmpcController::solveStep(){
 			// q=F'xi+q
 			_CUBLAS(cublasSgemmBatched(ptrMyEngine->getCublasHandle(), CUBLAS_OP_T, CUBLAS_OP_N, nx, 1, 2*nx, &alpha,
 					(const real_t**)&ptrMyEngine->getPtrSysMatF()[iStageCumulNodes], 2*nx, (const real_t**)
-					&devPtrVecAcceleratedXi[iStageCumulNodes], 2*nx, &alpha, devPtrVecQ, nx, iStageNodes));
+					&devPtrVecSolveStepXi[iStageCumulNodes], 2*nx, &alpha, devPtrVecQ, nx, iStageNodes));
 		}else{
 			// q=F'xi
 			_CUBLAS(cublasSgemmBatched(ptrMyEngine->getCublasHandle(), CUBLAS_OP_T, CUBLAS_OP_N, nx, 1, 2*nx, &alpha,
 					(const real_t**)&ptrMyEngine->getPtrSysMatF()[iStageCumulNodes], 2*nx, (const real_t**)
-					&devPtrVecAcceleratedXi[iStageCumulNodes], 2*nx, &beta, devPtrVecQ, nx, iStageNodes));
+					&devPtrVecSolveStepXi[iStageCumulNodes], 2*nx, &beta, devPtrVecQ, nx, iStageNodes));
 		}
 
 		if(iStage > 0){
@@ -695,10 +836,10 @@ void SmpcController::computeFixedPointResidual(){
 	real_t negAlpha = -1;
 
 	//Hx - z
-	_CUDA(cudaMemcpy(devVecResidual, devVecPrimalXi, nDualx*sizeof(real_t), cudaMemcpyDeviceToDevice));
-	_CUDA(cudaMemcpy(&devVecResidual[nDualx], devVecPrimalPsi, nDualu*sizeof(real_t), cudaMemcpyDeviceToDevice));
-	_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), nDualx, &negAlpha, devVecDualXi, 1, devVecResidual, 1));
-	_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), nDualu, &negAlpha, devVecDualPsi, 1, &devVecResidual[nDualx], 1));
+	_CUDA(cudaMemcpy(devVecFixedPointResidualXi, devVecPrimalXi, nDualx*sizeof(real_t), cudaMemcpyDeviceToDevice));
+	_CUDA(cudaMemcpy(devVecFixedPointResidualPsi, devVecPrimalPsi, nDualu*sizeof(real_t), cudaMemcpyDeviceToDevice));
+	_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), nDualx, &negAlpha, devVecDualXi, 1, devVecFixedPointResidualXi, 1));
+	_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), nDualu, &negAlpha, devVecDualPsi, 1, devVecFixedPointResidualPsi, 1));
 }
 
 /**
@@ -719,16 +860,15 @@ void SmpcController::dualUpdate(){
 		// y = w + \lambda(Hz - t)
 		_CUDA( cudaMemcpy(devVecXi, devVecAcceleratedXi, 2*nx*nodes*sizeof(real_t), cudaMemcpyDeviceToDevice));
 		_CUDA( cudaMemcpy(devVecPsi, devVecAcceleratedPsi, nu*nodes*sizeof(real_t), cudaMemcpyDeviceToDevice));
-		_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), 2*nx*nodes, &stepSize, devVecResidual, 1, devVecXi, 1) );
-		_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), nu*nodes, &stepSize, &devVecResidual[2*nx*nodes], 1,
-				devVecPsi, 1) );
+		_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), 2*nx*nodes, &stepSize, devVecFixedPointResidualXi, 1, devVecXi, 1) );
+		_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), nu*nodes, &stepSize, devVecFixedPointResidualPsi, 1, devVecPsi, 1) );
+
 	}else{
 		// y = w + \lambda(Hx - z)
 		_CUDA( cudaMemcpy(devVecUpdateXi, devVecAcceleratedXi, 2*nx*nodes*sizeof(real_t), cudaMemcpyDeviceToDevice));
 		_CUDA( cudaMemcpy(devVecUpdatePsi, devVecAcceleratedPsi, nu*nodes*sizeof(real_t), cudaMemcpyDeviceToDevice));
-		_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), 2*nx*nodes, &stepSize, devVecResidual, 1, devVecUpdateXi, 1) );
-		_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), nu*nodes, &stepSize, &devVecResidual[2*nx*nodes], 1,
-				devVecUpdatePsi, 1) );
+		_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), 2*nx*nodes, &stepSize, devVecFixedPointResidualXi, 1, devVecUpdateXi, 1) );
+		_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), nu*nodes, &stepSize, devVecFixedPointResidualPsi, 1, devVecUpdatePsi, 1) );
 	}
 }
 
@@ -909,7 +1049,7 @@ void SmpcController::computeHessianOracalGlobalFbe(){
 }
 
 /**
- * compute the gradient of the Fbe
+ * compute the gradient of the FBE
  */
 void SmpcController::computeGradientFbe(){
 	uint_t nx = ptrMyEngine->getDwnNetwork()->getNumTanks();
@@ -921,8 +1061,8 @@ void SmpcController::computeGradientFbe(){
 	real_t negAlpha = -1;
 
 	// gradFbe = -(Hz - t)
-	_CUDA( cudaMemcpy(devVecGradientFbeXi, devVecResidual, 2*nx*nodes*sizeof(real_t), cudaMemcpyDeviceToDevice));
-	_CUDA( cudaMemcpy(devVecGradientFbePsi, &devVecResidual[2*nx*nodes], nu*nodes*sizeof(real_t), cudaMemcpyDeviceToDevice));
+	_CUDA( cudaMemcpy(devVecGradientFbeXi, devVecFixedPointResidualXi, 2*nx*nodes*sizeof(real_t), cudaMemcpyDeviceToDevice));
+	_CUDA( cudaMemcpy(devVecGradientFbePsi, devVecFixedPointResidualPsi, nu*nodes*sizeof(real_t), cudaMemcpyDeviceToDevice));
 	_CUBLAS( cublasSscal_v2(ptrMyEngine->getCublasHandle(), 2*nx*nodes, &negAlpha, devVecGradientFbeXi, 1));
 	_CUBLAS( cublasSscal_v2(ptrMyEngine->getCublasHandle(), nu*nodes, &negAlpha, devVecGradientFbePsi, 1));
 
@@ -933,10 +1073,6 @@ void SmpcController::computeGradientFbe(){
 	_CUBLAS( cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), 2*nx*nodes, &stepSize, devVecPrimalXiDir, 1, devVecGradientFbeXi, 1));
 	_CUBLAS( cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), nu*nodes, &stepSize, devVecPrimalPsiDir, 1, devVecGradientFbePsi, 1));
 
-	//_CUBLAS(cublasSgemmBatched(ptrMyEngine->getCublasHandle(), CUBLAS_OP_N, CUBLAS_OP_N, 2*nx, 1, nx, &stepSize, (const real_t**)
-		//	ptrMyEngine->getPtrSysMatF(), 2*nx, (const real_t**)devPtrVecXDir, nx, &alpha, devPtrVecGradFbeXi, 2*nx, nodes) );
-	//_CUBLAS(cublasSgemmBatched(ptrMyEngine->getCublasHandle(), CUBLAS_OP_N, CUBLAS_OP_N, nu, 1, nu, &alpha, (const real_t**)
-		//	ptrMyEngine->getPtrSysMatG(), nu, (const real_t**)devPtrVecUDir, nu, &alpha, devPtrVecGradFbePsi, nu, nodes) );
 }
 
 
@@ -949,12 +1085,12 @@ void SmpcController::updateLbfgsBuffer(){
 	uint_t nu = ptrMyEngine->getDwnNetwork()->getNumControls();
 	uint_t nDualXi = 2*nx*nodes;
 	uint_t nDualPsi = nu*nodes;
+	uint_t indexVecStart;
 	uint_t lbfgsBufferSize = ptrMySmpcConfig->getLbfgsBufferSize();
 	real_t negAlpha = -1;
-	real_t lbfgsBeta, lbfgsScale, invRhoVar;
+	real_t lbfgsScale, invRhoVar;
 	real_t normMatYk, normGrad, normMatSk;
 	real_t gammaH;
-	uint_t indexVecStart;
 	real_t *devVecS;
 	real_t *devVecY;
 
@@ -1012,6 +1148,18 @@ void SmpcController::updateLbfgsBuffer(){
 		lbfgsBufferHessian = gammaH;
 	}
 
+	if( ptrMyEngine->getGlobalFbeFlag() ){
+		// lbfgsDir = -gradFbe
+		_CUDA( cudaMemcpy(devVecLbfgsDirXi, devVecGradientFbeXi, nDualXi*sizeof(real_t), cudaMemcpyDeviceToDevice));
+		_CUDA( cudaMemcpy(devVecLbfgsDirPsi, devVecGradientFbePsi, nDualPsi*sizeof(real_t), cudaMemcpyDeviceToDevice));
+		_CUBLAS( cublasSscal_v2(ptrMyEngine->getCublasHandle(), nDualXi, &negAlpha, devVecLbfgsDirXi, 1));
+		_CUBLAS( cublasSscal_v2(ptrMyEngine->getCublasHandle(), nDualPsi, &negAlpha, devVecLbfgsDirPsi, 1));
+	}
+
+	if( ptrMyEngine->getNamaFlag() ){
+		// lbfgsDir = -fixedPointResidual
+	}
+
 	_CUDA( cudaFree(devVecS));
 	_CUDA( cudaFree(devVecY));
 	devVecS = NULL;
@@ -1019,9 +1167,9 @@ void SmpcController::updateLbfgsBuffer(){
 }
 
 /*
- * compute lbfgs direction
+ * two-loop recursion algorithm for the Lbfgs algorithm
  */
-void SmpcController::computeLbfgsDirection(){
+void SmpcController::twoLoopRecursionLbfgs(){
 	uint_t nodes = ptrMyEngine->getScenarioTree()->getNumNodes();
 	uint_t nx = ptrMyEngine->getDwnNetwork()->getNumTanks();
 	uint_t nu = ptrMyEngine->getDwnNetwork()->getNumControls();
@@ -1029,81 +1177,25 @@ void SmpcController::computeLbfgsDirection(){
 	uint_t nDualPsi = nu*nodes;
 	uint_t lbfgsBufferSize = ptrMySmpcConfig->getLbfgsBufferSize();
 	real_t lbfgsAlpha[lbfgsBufferSize];
-	real_t negAlpha = -1;
-	real_t lbfgsBeta, lbfgsScale, invRhoVar;
-	real_t normMatYk, normGrad, normMatSk;
-	real_t gammaH;
+	real_t lbfgsBeta, lbfgsScale;
 	uint_t iCol, indexVecStart;
-	real_t *devVecS;
-	real_t *devVecY;
-
-	_CUDA( cudaMalloc((void**)&devVecS, (nDualXi + nDualPsi)*sizeof(real_t)) );
-	_CUDA( cudaMalloc((void**)&devVecY, (nDualXi + nDualPsi)*sizeof(real_t)) );
-	// vecS = y - yOld
-	_CUDA( cudaMemcpy(devVecS, devVecXi, nDualXi*sizeof(real_t), cudaMemcpyDeviceToDevice) );
-	_CUDA( cudaMemcpy(&devVecS[nDualXi], devVecPsi, nDualPsi*sizeof(real_t), cudaMemcpyDeviceToDevice) );
-	_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), nDualXi, &negAlpha, devVecPrevXi, 1, devVecS, 1));
-	_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), nDualPsi, &negAlpha, devVecPrevPsi, 1, &devVecS[nDualXi], 1));
-	// vecY = grad - gradOld
-	_CUDA( cudaMemcpy(devVecY, devVecGradientFbeXi, nDualXi*sizeof(real_t), cudaMemcpyDeviceToDevice) );
-	_CUDA( cudaMemcpy(&devVecY[nDualXi], devVecGradientFbePsi, nDualPsi*sizeof(real_t), cudaMemcpyDeviceToDevice) );
-	_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), nDualXi, &negAlpha, devVecPrevGradientFbeXi, 1, devVecY, 1));
-	_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), nDualPsi, &negAlpha, devVecPrevGradientFbePsi, 1, &devVecY[nDualXi], 1));
-	// invRho = vecS'vecY
-	_CUBLAS(cublasSdot_v2(ptrMyEngine->getCublasHandle(), nDualXi + nDualPsi, devVecS, 1, devVecY, 1, &invRhoVar) );
-	// normMatYk = sqrt(vecY[:, lbfgsBufferCol]*vecY[:, lbfgsBufferCol])
-	_CUBLAS(cublasSnrm2_v2(ptrMyEngine->getCublasHandle(), nDualXi + nDualPsi, devVecY, 1, &normMatYk) );
-	// normMatSk = sqrt(matS[:, lbfgsBufferCol]*matS[:, lbfgsBufferCol])
-	_CUBLAS(cublasSnrm2_v2(ptrMyEngine->getCublasHandle(), nDualXi + nDualPsi, devVecS, 1, &normMatSk) );
-	// normGrad = norm(fbeGradient)
-	_CUBLAS(cublasSnrm2_v2(ptrMyEngine->getCublasHandle(), nDualXi, devVecGradientFbeXi, 1, &lbfgsScale) );
-	_CUBLAS(cublasSnrm2_v2(ptrMyEngine->getCublasHandle(), nDualPsi, devVecGradientFbePsi, 1, &normGrad) );
-	normGrad = sqrt(lbfgsScale*lbfgsScale + normGrad*normGrad);
-
-	if(normGrad < 1){
-		normGrad = normGrad*normGrad*normGrad;
-	}
-	if( invRhoVar/(normMatSk * normMatSk) > 1e-6*normGrad){
-		lbfgsBufferCol = 1 + (lbfgsBufferCol % lbfgsBufferSize);
-		lbfgsBufferMemory = min(lbfgsBufferMemory + 1, lbfgsBufferSize);
-		indexVecStart = lbfgsBufferCol*(nDualXi + nDualPsi);
-		_CUDA( cudaMemcpy(&devLbfgsBufferMatY[indexVecStart], devVecY, (nDualXi + nDualPsi)*sizeof(real_t),
-			cudaMemcpyDeviceToDevice) );
-		_CUDA( cudaMemcpy(&devLbfgsBufferMatS[indexVecStart], devVecS, (nDualXi + nDualPsi)*sizeof(real_t),
-			cudaMemcpyDeviceToDevice) );
-		lbfgsBufferRho[lbfgsBufferCol] = 1/invRhoVar;
-	}else{
-		lbfgsSkipCount = lbfgsSkipCount + 1;
-	}
-
-	gammaH = invRhoVar/(normMatYk * normMatYk);
-	if( gammaH < 0 || abs(gammaH - lbfgsBufferHessian) == 0){
-		lbfgsBufferHessian = 1;
-	}else{
-		lbfgsBufferHessian = gammaH;
-	}
 
 	// two-loop recursion
-	// lbfgsDir = -gradFbe
-	_CUDA( cudaMemcpy(devVecLbfgsDirXi, devVecGradientFbeXi, nDualXi*sizeof(real_t), cudaMemcpyDeviceToDevice));
-	_CUDA( cudaMemcpy(devVecLbfgsDirPsi, devVecGradientFbePsi, nDualPsi*sizeof(real_t), cudaMemcpyDeviceToDevice));
-	_CUBLAS( cublasSscal_v2(ptrMyEngine->getCublasHandle(), nDualXi, &negAlpha, devVecLbfgsDirXi, 1));
-	_CUBLAS( cublasSscal_v2(ptrMyEngine->getCublasHandle(), nDualPsi, &negAlpha, devVecLbfgsDirPsi, 1));
 	for(uint_t iSize = 0; iSize < lbfgsBufferMemory; iSize++){
 		iCol = lbfgsBufferCol - iSize;
 		if (iCol < 0)
 			iCol = lbfgsBufferMemory + iCol;
 		indexVecStart = iCol*(nDualXi + nDualPsi);
 		_CUBLAS( cublasSdot_v2(ptrMyEngine->getCublasHandle(), nDualXi, &devLbfgsBufferMatS[indexVecStart], 1,
-				 devVecLbfgsDirXi, 1, &lbfgsAlpha[iCol]));
+				devVecLbfgsDirXi, 1, &lbfgsAlpha[iCol]));
 		_CUBLAS( cublasSdot_v2(ptrMyEngine->getCublasHandle(), nDualPsi, &devLbfgsBufferMatS[indexVecStart + nDualXi], 1,
-				 devVecLbfgsDirPsi, 1, &lbfgsBeta));
+				devVecLbfgsDirPsi, 1, &lbfgsBeta));
 		lbfgsAlpha[iCol] = lbfgsBufferRho[iCol]*(lbfgsAlpha[iCol] + lbfgsBeta);
 		lbfgsScale = -lbfgsAlpha[iCol];
 		_CUBLAS( cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), nDualXi, &lbfgsScale, &devLbfgsBufferMatY[indexVecStart], 1,
-				 devVecLbfgsDirXi, 1) );
+				devVecLbfgsDirXi, 1) );
 		_CUBLAS( cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), nDualPsi, &lbfgsScale, &devLbfgsBufferMatY[indexVecStart + nDualXi], 1,
-				 devVecLbfgsDirPsi, 1) );
+				devVecLbfgsDirPsi, 1) );
 	}
 
 	_CUBLAS( cublasSscal_v2(ptrMyEngine->getCublasHandle(), nDualXi, &lbfgsBufferHessian, devVecLbfgsDirXi, 1) );
@@ -1127,12 +1219,19 @@ void SmpcController::computeLbfgsDirection(){
 				devVecLbfgsDirPsi, 1) );
 	}
 
-	_CUDA( cudaFree(devVecS));
-	_CUDA( cudaFree(devVecY));
-	devVecS = NULL;
-	devVecY = NULL;
 }
 
+
+/*
+ * compute lbfgs direction
+ */
+
+void SmpcController::computeLbfgsDirection(){
+
+	updateLbfgsBuffer();
+
+	twoLoopRecursionLbfgs();
+}
 
 
 /**
@@ -1206,9 +1305,8 @@ real_t SmpcController::computeLineSearchLbfgsUpdate(real_t valueFbeYvar){
 	return abs(tau);
 }
 
-/**
- * compute the value of the Fbe
- */
+
+
 real_t SmpcController::computeValueFbe(){
 	uint_t nodes = ptrMyEngine->getScenarioTree()->getNumNodes();
 	uint_t nx = ptrMyEngine->getDwnNetwork()->getNumTanks();
@@ -1227,15 +1325,15 @@ real_t SmpcController::computeValueFbe(){
 	_CUDA( cudaMemcpy(devCostMatW, ptrMySmpcConfig->getCostW(), nu*nu*sizeof(real_t), cudaMemcpyHostToDevice) );
 
 	// w'(Hz-t), accXi'residualXi + accPi'residualPi
-	_CUBLAS( cublasSdot_v2(ptrMyEngine->getCublasHandle(), 2*nx*nodes, devVecAcceleratedXi, 1, devVecResidual,
+	_CUBLAS( cublasSdot_v2(ptrMyEngine->getCublasHandle(), 2*nx*nodes, devVecAcceleratedXi, 1, devVecFixedPointResidualXi,
 			1, &valueXi));
-	_CUBLAS( cublasSdot_v2(ptrMyEngine->getCublasHandle(), nu*nodes, devVecAcceleratedPsi, 1,&devVecResidual[2*nx*nodes],
+	_CUBLAS( cublasSdot_v2(ptrMyEngine->getCublasHandle(), nu*nodes, devVecAcceleratedPsi, 1, devVecFixedPointResidualPsi,
 			1, &valuePsi));
 	costFbeUpdate = valueXi + valuePsi;
 
 	// norm(residual)
-	_CUBLAS( cublasSnrm2_v2(ptrMyEngine->getCublasHandle(), 2*nx*nodes, devVecResidual, 1, &valueXi));
-	_CUBLAS( cublasSnrm2_v2(ptrMyEngine->getCublasHandle(), nu*nodes, &devVecResidual[2*nx*nodes], 1, &valuePsi));
+	_CUBLAS( cublasSnrm2_v2(ptrMyEngine->getCublasHandle(), 2*nx*nodes, devVecFixedPointResidualXi, 1, &valueXi));
+	_CUBLAS( cublasSnrm2_v2(ptrMyEngine->getCublasHandle(), nu*nodes, devVecFixedPointResidualPsi, 1, &valuePsi));
 	costFbeUpdate = costFbeUpdate + 0.5*stepSize*(valueXi*valueXi + valuePsi*valuePsi);
 
 	// add the value g
@@ -1267,18 +1365,18 @@ real_t SmpcController::computeValueFbe(){
 }
 
 
-/**
- * This method executes the APG algorithm and returns the primal infeasibility.
- * @return primalInfeasibilty;
- */
 uint_t SmpcController::algorithmApg(){
-	initialiseAlgorithm();
+
 	uint_t nx = ptrMyEngine->getDwnNetwork()->getNumTanks();
 	uint_t nu = ptrMyEngine->getDwnNetwork()->getNumControls();
 	uint_t nodes = ptrMyEngine->getScenarioTree()->getNumNodes();
 	real_t theta[2] = {1, 1};
 	real_t lambda;
 	uint_t maxIndex;
+
+	initialiseAlgorithm();
+	copyVecForSolveStep();
+
 	for (uint_t iter = 0; iter < ptrMySmpcConfig->getMaxIterations(); iter++){
 		lambda = theta[1]*(1/theta[0] - 1);
 		dualExtrapolationStep(lambda);
@@ -1288,32 +1386,35 @@ uint_t SmpcController::algorithmApg(){
 		dualUpdate();
 		theta[0] = theta[1];
 		theta[1] = 0.5*(sqrt(pow(theta[1], 4) + 4*pow(theta[1], 2)) - pow(theta[1], 2));
-		_CUBLAS( cublasIsamax_v2(ptrMyEngine->getCublasHandle(), (2*nx + nu)*nodes, devVecResidual,
+
+		_CUBLAS( cublasIsamax_v2(ptrMyEngine->getCublasHandle(), 2*nx*nodes, devVecFixedPointResidualXi,
 				1, &maxIndex));
-		_CUDA( cudaMemcpy(&vecPrimalInfs[iter], &devVecResidual[maxIndex - 1], sizeof(real_t),
+		_CUDA( cudaMemcpy(&vecPrimalInfs[iter], &devVecFixedPointResidualXi[maxIndex - 1], sizeof(real_t),
 				cudaMemcpyDeviceToHost));
+		_CUBLAS( cublasIsamax_v2(ptrMyEngine->getCublasHandle(), nu*nodes, devVecFixedPointResidualPsi,
+				1, &maxIndex));
+		_CUDA( cudaMemcpy(&vecPrimalInfs[iter + 1], &devVecFixedPointResidualPsi[maxIndex - 1], sizeof(real_t),
+				cudaMemcpyDeviceToHost));
+		vecPrimalInfs[iter] = max( vecPrimalInfs[iter], vecPrimalInfs[iter + 1]);
 	}
 
 	return 1;
 }
 
-/**
- * This method executes the global FBE algorithm and returns the primal infeasibility.
- * @return primalInfeasibilty;
- */
-uint_t SmpcController::algorithmGlobalFbe(){
 
-	initialiseAlgorithm();
-	initaliseLbfgBuffer();
+
+uint_t SmpcController::algorithmGlobalFbe(){
 
 	uint_t maxIndex;
 	uint_t nx = ptrMyEngine->getDwnNetwork()->getNumTanks();
 	uint_t nu = ptrMyEngine->getDwnNetwork()->getNumControls();
 	uint_t nodes = ptrMyEngine->getScenarioTree()->getNumNodes();
 
+	initialiseAlgorithm();
+	initaliseLbfgBuffer();
+	copyVecForSolveStep();
+
 	for (uint_t iter = 0; iter < ptrMySmpcConfig->getMaxIterations(); iter++){
-		_CUDA( cudaMemcpy(devVecAcceleratedXi, devVecXi, 2*nx*nodes*sizeof(real_t), cudaMemcpyDeviceToDevice));
-		_CUDA( cudaMemcpy(devVecAcceleratedPsi, devVecPsi, nu*nodes*sizeof(real_t), cudaMemcpyDeviceToDevice));
 		solveStep();
 		proximalFunG();
 		computeFixedPointResidual();
@@ -1324,19 +1425,22 @@ uint_t SmpcController::algorithmGlobalFbe(){
 			vecTau[iter - 1] = computeLineSearchLbfgsUpdate( vecValueFbe[iter - 1] );
 		}
 		dualUpdate();
-		_CUBLAS( cublasIsamax_v2(ptrMyEngine->getCublasHandle(), (2*nx + nu)*nodes, devVecResidual,
+		_CUBLAS( cublasIsamax_v2(ptrMyEngine->getCublasHandle(), 2*nx*nodes, devVecFixedPointResidualXi,
 				1, &maxIndex));
-		_CUDA( cudaMemcpy(&vecPrimalInfs[iter], &devVecResidual[maxIndex - 1], sizeof(real_t),
+		_CUDA( cudaMemcpy(&vecPrimalInfs[iter], &devVecFixedPointResidualXi[maxIndex - 1], sizeof(real_t),
 				cudaMemcpyDeviceToHost));
+		_CUBLAS( cublasIsamax_v2(ptrMyEngine->getCublasHandle(), nu*nodes, devVecFixedPointResidualPsi,
+				1, &maxIndex));
+		_CUDA( cudaMemcpy(&vecPrimalInfs[iter + 1], &devVecFixedPointResidualPsi[maxIndex - 1], sizeof(real_t),
+				cudaMemcpyDeviceToHost));
+		vecPrimalInfs[iter] = max( vecPrimalInfs[iter], vecPrimalInfs[iter + 1]);
 	}
 
 	return 1;
 }
 
-/**
-* This method executes the NAMA algorithm and returns the primal infeasibilit
-* @return primalInfeasibility;
-**/
+
+
 uint_t SmpcController::algorithmNama(){
 
 	initialiseAlgorithm();
@@ -1360,10 +1464,15 @@ uint_t SmpcController::algorithmNama(){
 			vecTau[iter - 1] = computeLineSearchLbfgsUpdate( vecValueFbe[iter - 1] );
 		}
 		dualUpdate();
-		_CUBLAS( cublasIsamax_v2(ptrMyEngine->getCublasHandle(), (2*nx + nu)*nodes, devVecResidual,
+		_CUBLAS( cublasIsamax_v2(ptrMyEngine->getCublasHandle(), 2*nx*nodes, devVecFixedPointResidualXi,
 				1, &maxIndex));
-		_CUDA( cudaMemcpy(&vecPrimalInfs[iter], &devVecResidual[maxIndex - 1], sizeof(real_t),
+		_CUDA( cudaMemcpy(&vecPrimalInfs[iter], &devVecFixedPointResidualXi[maxIndex - 1], sizeof(real_t),
 				cudaMemcpyDeviceToHost));
+		_CUBLAS( cublasIsamax_v2(ptrMyEngine->getCublasHandle(), nu*nodes, devVecFixedPointResidualPsi,
+				1, &maxIndex));
+		_CUDA( cudaMemcpy(&vecPrimalInfs[iter + 1], &devVecFixedPointResidualPsi[maxIndex - 1], sizeof(real_t),
+				cudaMemcpyDeviceToHost));
+		vecPrimalInfs[iter] = max( vecPrimalInfs[iter], vecPrimalInfs[iter + 1]);
 	}
 
 	return 1;
@@ -1686,30 +1795,69 @@ real_t* SmpcController::getValueFbe(){
 	return vecValueFbe;
 }
 
-void SmpcController::deallocateglobalFbeDevice(){
-	_CUDA( cudaFree(devVecXdir));
-	_CUDA( cudaFree(devVecUdir));
-	_CUDA( cudaFree(devVecPrimalXiDir));
-	_CUDA( cudaFree(devVecPrimalPsiDir));
+/**
+ * deallocate APG memory
+ */
+void SmpcController::deallocateApgAlgorithm(){
+	_CUDA( cudaFree(devVecAcceleratedXi) );
+	_CUDA( cudaFree(devVecAcceleratedPsi) );
+	free(ptrVecAcceleratedPsi);
+	free(ptrVecAcceleratedXi);
+
+	devVecAcceleratedXi = NULL;
+	devVecAcceleratedPsi = NULL;
+
+	delete [] ptrVecAcceleratedXi;
+	delete [] ptrVecAcceleratedPsi;
+}
+
+/**
+ * deallocate LBFGS direction
+ */
+void SmpcController::deallocateLbfgsDirection(){
+	_CUDA( cudaFree(devVecLbfgsDirXi) );
+	_CUDA( cudaFree(devVecLbfgsDirPsi) );
+
+	_CUDA( cudaFree(devLbfgsBufferMatS) );
+	_CUDA( cudaFree(devLbfgsBufferMatY) );
+	free(lbfgsBufferRho);
+
+	devVecLbfgsDirXi = NULL;
+	devVecLbfgsDirPsi = NULL;
+
+	devLbfgsBufferMatS = NULL;
+	devLbfgsBufferMatY = NULL;
+	lbfgsBufferRho = NULL;
+}
+
+/**
+ * deallocate global FBE algorithm
+ */
+void SmpcController::deallocateGlobalFbeAlgorithm(){
+
+	deallocateLbfgsDirection();
+
 	_CUDA( cudaFree(devVecPrevXi) );
 	_CUDA( cudaFree(devVecPrevPsi) );
 	_CUDA( cudaFree(devVecGradientFbeXi) );
 	_CUDA( cudaFree(devVecGradientFbePsi) );
 	_CUDA( cudaFree(devVecPrevGradientFbeXi) );
 	_CUDA( cudaFree(devVecPrevGradientFbePsi) );
-	_CUDA( cudaFree(devVecLbfgsDirXi) );
-	_CUDA( cudaFree(devVecLbfgsDirPsi) );
 
-	_CUDA( cudaFree(devPtrVecXdir));
-	_CUDA( cudaFree(devPtrVecUdir));
-	_CUDA( cudaFree(devPtrVecGradFbeXi));
-	_CUDA( cudaFree(devPtrVecGradFbePsi));
-	_CUDA( cudaFree(devPtrVecPrimalXiDir));
-	_CUDA( cudaFree(devPtrVecPrimalPsiDir));
+	_CUDA( cudaFree(devVecXdir) );
+	_CUDA( cudaFree(devVecUdir) );
+	_CUDA( cudaFree(devVecPrimalXiDir) );
+	_CUDA( cudaFree(devVecPrimalPsiDir) );
 
-	_CUDA( cudaFree(devLbfgsBufferMatS) );
-	_CUDA( cudaFree(devLbfgsBufferMatY) );
-	free(lbfgsBufferRho);
+	_CUDA( cudaFree(devPtrVecXdir) );
+	_CUDA( cudaFree(devPtrVecUdir) );
+	_CUDA( cudaFree(devPtrVecGradFbeXi) );
+	_CUDA( cudaFree(devPtrVecGradFbePsi) );
+	_CUDA( cudaFree(devPtrVecPrimalXiDir) );
+	_CUDA( cudaFree(devPtrVecPrimalPsiDir) );
+
+	free(ptrVecXi);
+	free(ptrVecPsi);
 
 	devVecPrevXi = NULL;
 	devVecPrevPsi = NULL;
@@ -1717,16 +1865,11 @@ void SmpcController::deallocateglobalFbeDevice(){
 	devVecGradientFbePsi = NULL;
 	devVecPrevGradientFbeXi = NULL;
 	devVecPrevGradientFbePsi = NULL;
-	devVecLbfgsDirXi = NULL;
-	devVecLbfgsDirPsi = NULL;
+
 	devVecXdir = NULL;
 	devVecUdir = NULL;
 	devVecPrimalXiDir = NULL;
 	devVecPrimalPsiDir = NULL;
-
-	devLbfgsBufferMatS = NULL;
-	devLbfgsBufferMatY = NULL;
-	lbfgsBufferRho = NULL;
 
 	devPtrVecXdir = NULL;
 	devPtrVecUdir = NULL;
@@ -1734,23 +1877,37 @@ void SmpcController::deallocateglobalFbeDevice(){
 	devPtrVecGradFbePsi = NULL;
 	devPtrVecPrimalXiDir = NULL;
 	devPtrVecPrimalPsiDir = NULL;
+
+	ptrVecXi = NULL;
+	ptrVecPsi = NULL;
 }
 
-SmpcController::~SmpcController(){
+/**
+ * deallocate NAMA algorithm
+ */
+void SmpcController::deallocateNamaAlgorithm(){
+	deallocateLbfgsDirection();
+}
+
+/**
+ * deallocate SMPC
+ */
+void SmpcController::deallocateSmpcController(){
 	_CUDA( cudaFree(devVecX) );
 	_CUDA( cudaFree(devVecU) );
 	_CUDA( cudaFree(devVecV) );
 	_CUDA( cudaFree(devVecXi) );
 	_CUDA( cudaFree(devVecPsi) );
-	_CUDA( cudaFree(devVecAcceleratedXi) );
-	_CUDA( cudaFree(devVecAcceleratedPsi) );
+	_CUDA( cudaFree(devVecUpdateXi) );
+	_CUDA( cudaFree(devVecUpdatePsi) );
+
 	_CUDA( cudaFree(devVecPrimalXi) );
 	_CUDA( cudaFree(devVecPrimalPsi) );
 	_CUDA( cudaFree(devVecDualXi) );
 	_CUDA( cudaFree(devVecDualPsi) );
-	_CUDA( cudaFree(devVecUpdateXi) );
-	_CUDA( cudaFree(devVecUpdatePsi) );
-	_CUDA( cudaFree(devVecResidual) );
+	_CUDA( cudaFree(devVecFixedPointResidualXi) );
+	_CUDA( cudaFree(devVecFixedPointResidualPsi) );
+
 	_CUDA( cudaFree(devVecQ) );
 	_CUDA( cudaFree(devVecR) );
 	_CUDA( cudaFree(devControlAction) );
@@ -1759,34 +1916,34 @@ SmpcController::~SmpcController(){
 	_CUDA( cudaFree(devPtrVecX) );
 	_CUDA( cudaFree(devPtrVecU) );
 	_CUDA( cudaFree(devPtrVecV) );
-	_CUDA( cudaFree(devPtrVecAcceleratedXi) );
-	_CUDA( cudaFree(devPtrVecAcceleratedPsi) );
 	_CUDA( cudaFree(devPtrVecPrimalXi) );
 	_CUDA( cudaFree(devPtrVecPrimalPsi) );
 	_CUDA( cudaFree(devPtrVecQ));
 	_CUDA( cudaFree(devPtrVecR));
 
+	_CUDA( cudaFree(devPtrVecSolveStepXi) );
+	_CUDA( cudaFree(devPtrVecSolveStepPsi) );
+
 	delete [] vecPrimalInfs;
 	delete [] vecValueFbe;
 	delete [] vecTau;
 
-	if(ptrMyEngine->getGlobalFbeFlag())
-		deallocateglobalFbeDevice();
 
 	devVecX = NULL;
 	devVecU = NULL;
 	devVecV = NULL;
 	devVecXi = NULL;
 	devVecPsi = NULL;
-	devVecAcceleratedXi = NULL;
-	devVecAcceleratedPsi = NULL;
+	devVecUpdateXi = NULL;
+	devVecUpdatePsi = NULL;
+
 	devVecPrimalXi = NULL;
 	devVecPrimalPsi = NULL;
 	devVecDualXi = NULL;
 	devVecDualPsi = NULL;
-	devVecUpdateXi = NULL;
-	devVecUpdatePsi = NULL;
-	devVecResidual = NULL;
+	devVecFixedPointResidualXi = NULL;
+	devVecFixedPointResidualPsi = NULL;
+
 	devVecQ = NULL;
 	devVecR = NULL;
 	devControlAction = NULL;
@@ -1795,14 +1952,29 @@ SmpcController::~SmpcController(){
 	devPtrVecX = NULL;
 	devPtrVecU = NULL;
 	devPtrVecV = NULL;
-	devPtrVecAcceleratedXi = NULL;
-	devPtrVecAcceleratedPsi = NULL;
 	devPtrVecPrimalXi = NULL;
 	devPtrVecPrimalPsi = NULL;
 	devPtrVecQ = NULL;
 	devPtrVecR = NULL;
+	devPtrVecSolveStepXi = NULL;
+	devPtrVecSolveStepPsi = NULL;
 
 	vecPrimalInfs = NULL;
 	vecValueFbe = NULL;
 	vecTau = NULL;
+
+}
+
+
+SmpcController::~SmpcController(){
+
+	deallocateSmpcController();
+
+	if( ptrMyEngine->getGlobalFbeFlag() ){
+		deallocateGlobalFbe();
+	}else if( ptrMyEngine->getNamaFlag() ){
+		deallocateNama();
+	}else if( ptrMyEngine->getApgFlag() ){
+		deallocateApg();
+	}
 }

@@ -354,10 +354,12 @@ uint_t TestSmpcController::testDualUpdate(){
 		_ASSERT( compareDeviceArray<real_t>(devVecUpdatePsi ) );
 		a = jsonDocument[VARNAME_TEST_PRIMAL_INFS_XI];
 		_ASSERT(a.IsArray());
-		_ASSERT( compareDeviceArray<real_t>(devVecResidual ) );
+		//_ASSERT( compareDeviceArray<real_t>(devVecResidual ) );
+		_ASSERT( compareDeviceArray<real_t>(devVecFixedPointResidualXi ) );
 		a = jsonDocument[VARNAME_TEST_PRIMAL_INFS_PSI];
 		_ASSERT(a.IsArray());
-		_ASSERT( compareDeviceArray<real_t>(&devVecResidual[2*nx*nodes] ) );
+		//_ASSERT( compareDeviceArray<real_t>(&devVecResidual[2*nx*nodes] ) );
+		_ASSERT( compareDeviceArray<real_t>(devVecFixedPointResidualPsi ) );
 		delete [] readBuffer;
 		readBuffer = NULL;
 	}
@@ -408,10 +410,12 @@ uint_t TestSmpcController::testFbeFixedPointResidual(){
 
 		a = jsonDocument[VARNAME_TEST_PRIMAL_INFS_XI];
 		_ASSERT(a.IsArray());
-		_ASSERT( compareDeviceArray<real_t>(devVecResidual ) );
+		//_ASSERT( compareDeviceArray<real_t>(devVecResidual ) );
+		_ASSERT( compareDeviceArray<real_t>(devVecFixedPointResidualXi ) );
 		a = jsonDocument[VARNAME_TEST_PRIMAL_INFS_PSI];
 		_ASSERT(a.IsArray());
-		_ASSERT( compareDeviceArray<real_t>(&devVecResidual[2*nx*nodes]) );
+		//_ASSERT( compareDeviceArray<real_t>(&devVecResidual[2*nx*nodes]) );
+		_ASSERT( compareDeviceArray<real_t>(devVecFixedPointResidualPsi ) );
 		delete [] readBuffer;
 		readBuffer = NULL;
 	}
@@ -496,10 +500,12 @@ uint_t TestSmpcController::testFbeGradient(){
 
 		a = jsonDocument[VARNAME_TEST_PRIMAL_INFS_XI];
 		_ASSERT(a.IsArray());
-		setDeviceArray<real_t>(devVecResidual, 2*nx*nodes);
+		//setDeviceArray<real_t>(devVecResidual, 2*nx*nodes);
+		setDeviceArray<real_t>(devVecFixedPointResidualXi, 2*nx*nodes);
 		a = jsonDocument[VARNAME_TEST_PRIMAL_INFS_PSI];
 		_ASSERT(a.IsArray());
-		setDeviceArray<real_t>(&devVecResidual[2*nx*nodes], nu*nodes);
+		//setDeviceArray<real_t>(&devVecResidual[2*nx*nodes], nu*nodes);
+		setDeviceArray<real_t>(devVecFixedPointResidualPsi, nu*nodes);
 
 		computeGradientFbe();
 
@@ -673,10 +679,12 @@ uint_t TestSmpcController::testValueFbe(){
 
 		a = jsonDocument[VARNAME_TEST_PRIMAL_INFS_XI];
 		_ASSERT(a.IsArray());
-		setDeviceArray<real_t>(devVecResidual, 2*nx*nodes);
+		//setDeviceArray<real_t>(devVecResidual, 2*nx*nodes);
+		setDeviceArray<real_t>(devVecFixedPointResidualXi, 2*nx*nodes);
 		a = jsonDocument[VARNAME_TEST_PRIMAL_INFS_PSI];
 		_ASSERT(a.IsArray());
-		setDeviceArray<real_t>(&devVecResidual[2*nx*nodes], nu*nodes);
+		//setDeviceArray<real_t>(&devVecResidual[2*nx*nodes], nu*nodes);
+		setDeviceArray<real_t>(devVecFixedPointResidualPsi, nu*nodes);
 		a = jsonDocument[VARNAME_TEST_ACCELE_XI];
 		_ASSERT(a.IsArray());
 		setDeviceArray<real_t>(devVecAcceleratedXi, 2*nx*nodes);
@@ -739,10 +747,12 @@ uint_t TestSmpcController::testFbeLineSearch(){
 
 		a = jsonDocument[VARNAME_TEST_PRIMAL_INFS_XI];
 		_ASSERT(a.IsArray());
-		setDeviceArray<real_t>(devVecResidual, 2*nx*nodes);
+		//setDeviceArray<real_t>(devVecResidual, 2*nx*nodes);
+		setDeviceArray<real_t>(devVecFixedPointResidualXi, 2*nx*nodes);
 		a = jsonDocument[VARNAME_TEST_PRIMAL_INFS_PSI];
 		_ASSERT(a.IsArray());
-		setDeviceArray<real_t>(&devVecResidual[2*nx*nodes], nu*nodes);
+		//setDeviceArray<real_t>(&devVecResidual[2*nx*nodes], nu*nodes);
+		setDeviceArray<real_t>(devVecFixedPointResidualPsi, nu*nodes);
 		a = jsonDocument[VARNAME_TEST_ACCELE_XI];
 		_ASSERT(a.IsArray());
 		setDeviceArray<real_t>(devVecAcceleratedXi, 2*nx*nodes);
@@ -796,10 +806,12 @@ uint_t TestSmpcController::testFbeLineSearch(){
 		_ASSERT(abs(variable) < TOLERANCE);
 		a = jsonDocument[VARNAME_TEST_UPDATE_RESIDUAL_XI];
 		_ASSERT(a.IsArray());
-		_ASSERT( compareDeviceArray<real_t>(devVecResidual ) );
+		//_ASSERT( compareDeviceArray<real_t>(devVecResidual ) );
+		_ASSERT( compareDeviceArray<real_t>(devVecFixedPointResidualXi ) );
 		a = jsonDocument[VARNAME_TEST_UPDATE_RESIDUAL_PSI];
 		_ASSERT(a.IsArray());
-		_ASSERT( compareDeviceArray<real_t>(&devVecResidual[2*nx*nodes] ) );
+		//_ASSERT( compareDeviceArray<real_t>(&devVecResidual[2*nx*nodes] ) );
+		_ASSERT( compareDeviceArray<real_t>(devVecFixedPointResidualPsi ) );
 
 		delete [] readBuffer;
 		readBuffer = NULL;
@@ -859,10 +871,12 @@ uint_t TestSmpcController::testFbeDualUpdate(){
 		setDeviceArray<real_t>(devVecAcceleratedPsi, nu*nodes);
 		a = jsonDocument[VARNAME_TEST_UPDATE_RESIDUAL_XI];
 		_ASSERT(a.IsArray());
-		setDeviceArray<real_t>(devVecResidual, 2*nx*nodes);
+		//setDeviceArray<real_t>(devVecResidual, 2*nx*nodes);
+		setDeviceArray<real_t>(devVecFixedPointResidualXi, 2*nx*nodes);
 		a = jsonDocument[VARNAME_TEST_UPDATE_RESIDUAL_PSI];
 		_ASSERT(a.IsArray());
-		setDeviceArray<real_t>(&devVecResidual[2*nx*nodes], nu*nodes);
+		//setDeviceArray<real_t>(&devVecResidual[2*nx*nodes], nu*nodes);
+		setDeviceArray<real_t>(devVecFixedPointResidualPsi, nu*nodes);
 		a = jsonDocument[VARNAME_TEST_GRAD_FBE_XI];
 		_ASSERT(a.IsArray());
 		setDeviceArray<real_t>(devVecGradientFbeXi, 2*nx*nodes);

@@ -166,6 +166,10 @@ protected:
 	 */
 	void solveStep();
 	/**
+	 * Copy the dual vector pointers to compute the solve step.
+	 */
+	void copyVecForSolveStep();
+	/**
 	 * Computes the proximal operator of g at the current point and updates
 	 * (primal psi, primal xi) - Hx, (dual psi, dual xi) - z.
 	 */
@@ -233,14 +237,20 @@ protected:
 	 */
 	uint_t algorithmGlobalFbe();
 	/**
-	 * This method executes the NAMA algorithm and returns the primal infeasibilit
-	 * @return primalInfeasibility;
+	 * This method executes the NAMA algorithm and returns the primal infeasibility
+	 * @return primalInfeasibility
 	 */
 	uint_t algorithmNama();
 	/**
-	 * calculate the value of FBE
+	 * calculate the value of FBE algorithm and returns the primal infeasibility
+	 * @return primalInfeasibility
 	 */
 	real_t computeValueFbe();
+//private:
+	/**
+	 * allocate memory of the smpc algorithm
+	 */
+	void allocateSmpcController();
 	/**
 	 * Allocate memory for APG algorithm
 	 */
@@ -249,7 +259,42 @@ protected:
 	* Allocate memory for globalFbe
 	*/
 	void allocateGlobalFbeAlgorithm();
-//private:
+	/**
+	 * Allocate memory for globalFbe
+	 */
+	void allocateNamaAlgorithm();
+	/**
+	 * intialise the lbfgs-buffer at he beginning of the algorithm
+	 */
+	void initaliseLbfgBuffer();
+	/**
+	 * intialise the dual vectors in the optimisation algorithm
+	 */
+	void initialiseAlgorithm();
+	/*
+	 * Allocate memory for the LBFGS-buffer in the device
+	 */
+	void allocateLbfgsBuffer();
+	/*
+	 * deallocate the memory of the APG in the device
+	 */
+	void deallocateApgAlgorithm();
+	/*
+	 * deallocate the memory of the gloablFbe in the device
+	 */
+	void deallocateGlobalFbeAlgorithm();
+	/*
+	 * deallocate the memory of the NAMA in the device
+	 */
+	void deallocateNamaAlgorithm();
+	/*
+	 * Allocate memory for the LBFGS-buffer in the device
+	 */
+	void deallocateLbfgsDirection();
+	/*
+	 * deallocate the memory of the controller in the device
+	 */
+	void deallocateSmpcController();
 	/**
 	 * Pointer to an Engine object.
 	 * The Engine is responsible for the factor step.
@@ -331,15 +376,39 @@ protected:
 	 */
 	real_t **devPtrVecV;
 	/**
-	 * Pointer array for device pointers of accelerated
-	 * psi
+	 * Pointer array for the vector required for solve step Xi
 	 */
-	real_t **devPtrVecAcceleratedPsi;
+	real_t **devPtrVecSolveStepXi;
+	/**
+	 * Pointer array for the vector required for solve step Psi
+	 */
+	real_t **devPtrVecSolveStepPsi;
+	/**
+	 * pointer array for the pointer of the accelerated xi
+	 */
+	real_t **ptrVecAcceleratedXi;
+	/**
+	 * pointer array for the pointer of the accelerated psi
+	 */
+	real_t **ptrVecAcceleratedPsi;
+	/**
+	 * pointer array for the pointer of the accelerated xi
+	 */
+	real_t **ptrVecXi;
+	/**
+	 * pointer array for the pointer of the accelerated psi
+	 */
+	real_t **ptrVecPsi;
 	/**
 	 * Pointer array for device pointers of accelerated
 	 * xi
 	 */
 	real_t **devPtrVecAcceleratedXi;
+	/**
+	 * Pointer array for device pointers of accelerated
+	 * psi
+	 */
+	real_t **devPtrVecAcceleratedPsi;
 	/**
 	 * Pointer array for device pointers of primal psi
 	 */
@@ -352,6 +421,14 @@ protected:
 	 * Pointer array for the residual
 	 */
 	real_t *devVecResidual;
+	/**
+	 * Pointer for fixed-point residual xi
+	 */
+	real_t *devVecFixedPointResidualXi;
+	/**
+	 * Pointer for fixed-point residual xi
+	 */
+	real_t *devVecFixedPointResidualPsi;
 	/**
 	 * Pointer for Q in solve step
 	 */
@@ -409,8 +486,22 @@ protected:
 	real_t **devPtrVecGradFbePsi;
 
 	/* ----- NAMA Algorithm ----*/
-
-
+	/*
+	 * pointer to the previous fixed point residual
+	 */
+	real_t *devVecPrevFixedPointResidualXi;
+	/*
+	 * pointer to the previous fixed point residual
+	 */
+	real_t *devVecPrevFixedPointResidualPsi;
+	/*
+	 * pointer array to the previous fixed point residual
+	 */
+	real_t **devPtrVecFixedPointResidualXi;
+	/*
+	 * pointer array to the previous fixed point residual
+	 */
+	real_t **devPtrVecFixedPointResidualPsi;
 	/* ----- quasi-newton direction ----- */
 	/*
 	 * Hessian-direction in variable X
@@ -525,22 +616,6 @@ protected:
 	 * tau in the line search
 	 */
 	real_t* vecTau;
-	/**
-	 * intialise the lbfgs-buffer at he beginning of the algorithm
-	 */
-	void initaliseLbfgBuffer();
-	/**
-	 * intialise the dual vectors in the optimisation algorithm
-	 */
-	void initialiseAlgorithm();
-	/*
-	 * Allocate memory for the LBFGS-buffer in the device
-	 */
-	void allocateLbfgsBufferDevice();
-	/*
-	 * deallocate the memory of the gloablFbe in the device
-	 */
-	void deallocateglobalFbeDevice();
 };
 
 #endif /* SMPCONTROLLERCLASS_CUH_ */
