@@ -168,7 +168,7 @@ protected:
 	/**
 	 * Copy the dual vector pointers to compute the solve step.
 	 */
-	void copyVecForSolveStep();
+	void initialiseAlgorithmSpecificData();
 	/**
 	 * Computes the proximal operator of g at the current point and updates
 	 * (primal psi, primal xi) - Hx, (dual psi, dual xi) - z.
@@ -246,11 +246,23 @@ protected:
 	 * @return primalInfeasibility
 	 */
 	real_t computeValueFbe();
+	/**
+	 * calculate primal infeasibility (Hx - Z) at each iteration
+	 */
+	real_t updatePrimalInfeasibity();
 //private:
 	/**
 	 * allocate memory of the smpc algorithm
 	 */
 	void allocateSmpcController();
+	/*
+	 * Allocate memory for the LBFGS-buffer in the device
+	 */
+	void allocateLbfgsBuffer();
+	/*
+	 * Allocate memory for the LBFGS-buffer in the device
+	 */
+	void allocateLbfgsDirection();
 	/**
 	 * Allocate memory for APG algorithm
 	 */
@@ -271,10 +283,6 @@ protected:
 	 * intialise the dual vectors in the optimisation algorithm
 	 */
 	void initialiseAlgorithm();
-	/*
-	 * Allocate memory for the LBFGS-buffer in the device
-	 */
-	void allocateLbfgsBuffer();
 	/*
 	 * deallocate the memory of the APG in the device
 	 */
@@ -384,32 +392,6 @@ protected:
 	 */
 	real_t **devPtrVecSolveStepPsi;
 	/**
-	 * pointer array for the pointer of the accelerated xi
-	 */
-	real_t **ptrVecAcceleratedXi;
-	/**
-	 * pointer array for the pointer of the accelerated psi
-	 */
-	real_t **ptrVecAcceleratedPsi;
-	/**
-	 * pointer array for the pointer of the accelerated xi
-	 */
-	real_t **ptrVecXi;
-	/**
-	 * pointer array for the pointer of the accelerated psi
-	 */
-	real_t **ptrVecPsi;
-	/**
-	 * Pointer array for device pointers of accelerated
-	 * xi
-	 */
-	real_t **devPtrVecAcceleratedXi;
-	/**
-	 * Pointer array for device pointers of accelerated
-	 * psi
-	 */
-	real_t **devPtrVecAcceleratedPsi;
-	/**
 	 * Pointer array for device pointers of primal psi
 	 */
 	real_t **devPtrVecPrimalPsi;
@@ -429,6 +411,14 @@ protected:
 	 * Pointer for fixed-point residual xi
 	 */
 	real_t *devVecFixedPointResidualPsi;
+	/**
+	 * Pointer array for the vector required for solve step Xi
+	 */
+	real_t** ptrProximalXi;
+	/**
+	 * Pointer array for the vector required for solve step Xi
+	 */
+	real_t** ptrProximalPsi;
 	/**
 	 * Pointer for Q in solve step
 	 */
@@ -503,6 +493,15 @@ protected:
 	 */
 	real_t **devPtrVecFixedPointResidualPsi;
 	/* ----- quasi-newton direction ----- */
+	/**
+	 * Pointer array for the vector required for solve step Xi
+	 */
+	real_t **devPtrVecHessianOracleXi;
+	/**
+	 * Pointer array for the vector required for solve step Psi
+	 */
+	real_t **devPtrVecHessianOraclePsi;
+
 	/*
 	 * Hessian-direction in variable X
 	 */
@@ -553,6 +552,22 @@ protected:
 	real_t **devPtrVecPrimalPsiDir;
 
 	/* --- LBFGS buffer --- */
+	/**
+	 * pointer to the current xi in y vector of the lbfgs algorithm
+	 */
+	real_t **ptrLbfgsCurrentYvecXi;
+	/**
+	 * pointer to the current psi in y vector of the lbfgs algorithm
+	 */
+	real_t **ptrLbfgsCurrentYvecPsi;
+	/**
+	 * pointer to the previous xi in y vector of the lbfgs algorithm
+	 */
+	real_t **ptrLbfgsPreviousYvecXi;
+	/**
+	 * pointer to the previous xi in y vector of the lbfgs algorithm
+	 */
+	real_t **ptrLbfgsPreviousYvecPsi;
 	/*
 	 * matrix s in the lfbs-buffer s = x_{k} - x_{k - 1}
 	 */
