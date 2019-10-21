@@ -340,9 +340,6 @@ void SmpcController::allocateGlobalFbeAlgorithm(){
 	_CUDA( cudaMalloc((void**)&devVecPrevGradientFbeXi, 2*nx*nodes*sizeof(real_t)));
 	_CUDA( cudaMalloc((void**)&devVecPrevGradientFbePsi, nu*nodes*sizeof(real_t)));
 
-	_CUDA( cudaMalloc((void**)&devPtrVecGradFbeXi, nodes*sizeof(real_t*)) );
-	_CUDA( cudaMalloc((void**)&devPtrVecGradFbePsi, nodes*sizeof(real_t*)) );
-
 	real_t** ptrVecGradFbeXi = new real_t*[nodes];
 	real_t** ptrVecGradFbePsi = new real_t*[nodes];
 
@@ -356,8 +353,6 @@ void SmpcController::allocateGlobalFbeAlgorithm(){
 	_CUDA( cudaMemset(devVecPrevGradientFbeXi, 0, 2*nx*nodes*sizeof(real_t)) );
 	_CUDA( cudaMemset(devVecPrevGradientFbePsi, 0, nu*nodes*sizeof(real_t)) );
 
-	_CUDA( cudaMemcpy(devPtrVecGradFbeXi, ptrVecGradFbeXi, nodes*sizeof(real_t*), cudaMemcpyHostToDevice) );
-	_CUDA( cudaMemcpy(devPtrVecGradFbePsi, ptrVecGradFbePsi, nodes*sizeof(real_t*), cudaMemcpyHostToDevice) );
 	_CUDA( cudaMemcpy(devPtrVecHessianOracleXi, ptrVecGradFbeXi, nodes*sizeof(real_t*), cudaMemcpyHostToDevice) );
 	_CUDA( cudaMemcpy(devPtrVecHessianOraclePsi, ptrVecGradFbePsi, nodes*sizeof(real_t*), cudaMemcpyHostToDevice) );
 
@@ -381,9 +376,17 @@ void SmpcController::allocateNamaAlgorithm(){
 
 	_CUDA( cudaMalloc((void**)&devVecPrevFixedPointResidualXi, 2*nx*nodes*sizeof(real_t)));
 	_CUDA( cudaMalloc((void**)&devVecPrevFixedPointResidualPsi, nu*nodes*sizeof(real_t)));
+	_CUDA( cudaMalloc((void**)&devVecCurrentFixedPointResidualXi, 2*nx*nodes*sizeof(real_t)));
+	_CUDA( cudaMalloc((void**)&devVecCurrentFixedPointResidualPsi, nu*nodes*sizeof(real_t)));
 
-	_CUDA( cudaMalloc((void**)&devPtrVecFixedPointResidualXi, nodes*sizeof(real_t*)) );
-	_CUDA( cudaMalloc((void**)&devPtrVecFixedPointResidualPsi, nodes*sizeof(real_t*)) );
+	//_CUDA( cudaMalloc((void**)&devVecFixedPointXdir, nx*nodes*sizeof(real_t)));
+	//_CUDA( cudaMalloc((void**)&devVecFixedPointUdir, nu*nodes*sizeof(real_t)));
+	//_CUDA( cudaMalloc((void**)&devVecFixedPointPrimalXiDir, 2*nx*nodes*sizeof(real_t)));
+	//_CUDA( cudaMalloc((void**)&devVecFixedPointPrimalPsiDir, nu*nodes*sizeof(real_t)));
+
+
+	//_CUDA( cudaMalloc((void**)&devPtrVecFixedPointResidualXi, nodes*sizeof(real_t*)) );
+	//_CUDA( cudaMalloc((void**)&devPtrVecFixedPointResidualPsi, nodes*sizeof(real_t*)) );
 
 	real_t** ptrVecFixedPointResidualXi = new real_t*[nodes];
 	real_t** ptrVecFixedPointResidualPsi = new real_t*[nodes];
@@ -395,6 +398,12 @@ void SmpcController::allocateNamaAlgorithm(){
 
 	_CUDA( cudaMemset(devVecPrevFixedPointResidualXi, 0, 2*nx*nodes*sizeof(real_t)) );
 	_CUDA( cudaMemset(devVecPrevFixedPointResidualPsi, 0, nu*nodes*sizeof(real_t)) );
+	_CUDA( cudaMemset(devVecCurrentFixedPointResidualXi, 0, 2*nx*nodes*sizeof(real_t)) );
+	_CUDA( cudaMemset(devVecCurrentFixedPointResidualPsi, 0, nu*nodes*sizeof(real_t)) );
+	//_CUDA( cudaMemset(devVecFixedPointXdir, 0, nx*nodes*sizeof(real_t)) );
+	//_CUDA( cudaMemset(devVecFixedPointUdir, 0, nu*nodes*sizeof(real_t)) );
+	//_CUDA( cudaMemset(devVecFixedPointPrimalXiDir, 0, 2*nx*nodes*sizeof(real_t)) );
+	//_CUDA( cudaMemset(devVecFixedPointPrimalPsiDir, 0, nu*nodes*sizeof(real_t)) );
 
 	_CUDA( cudaMemcpy(devPtrVecHessianOracleXi, ptrVecFixedPointResidualXi, nodes*sizeof(real_t*), cudaMemcpyHostToDevice) );
 	_CUDA( cudaMemcpy(devPtrVecHessianOraclePsi, ptrVecFixedPointResidualPsi, nodes*sizeof(real_t*), cudaMemcpyHostToDevice) );
@@ -507,14 +516,17 @@ void SmpcController::initialiseAlgorithmSpecificData(){
 		ptrLbfgsPreviousYvecXi[0] = &devVecPrevGradientFbeXi[0];
 		ptrLbfgsPreviousYvecPsi[0] = &devVecPrevGradientFbePsi[0];
 	}else if (ptrMyEngine->getNamaFlag()){
-		ptrLbfgsCurrentYvecXi[0] = &devVecFixedPointResidualXi[0];
-		ptrLbfgsCurrentYvecPsi[0] = &devVecFixedPointResidualPsi[0];
+		//ptrLbfgsCurrentYvecXi[0] = &devVecFixedPointResidualXi[0];
+		//ptrLbfgsCurrentYvecPsi[0] = &devVecFixedPointResidualPsi[0];
+		ptrLbfgsCurrentYvecXi[0] = &devVecCurrentFixedPointResidualXi[0];
+		ptrLbfgsCurrentYvecPsi[0] = &devVecCurrentFixedPointResidualPsi[0];
 		ptrLbfgsPreviousYvecXi[0] = &devVecPrevFixedPointResidualXi[0];
 		ptrLbfgsPreviousYvecPsi[0] = &devVecPrevFixedPointResidualPsi[0];
 	}
 	ptrDevLbfgsYvec = NULL;
 
 }
+
 
 /**
  * Performs the dual extrapolation step with given parameter.
@@ -541,10 +553,6 @@ void SmpcController::dualExtrapolationStep(real_t lambda){
 		// y_{k} = y_{k-1}
 		_CUDA(cudaMemcpy(devVecXi, devVecUpdateXi, 2*nx*nodes*sizeof(real_t), cudaMemcpyDeviceToDevice));
 		_CUDA(cudaMemcpy(devVecPsi, devVecUpdatePsi, nu*nodes*sizeof(real_t), cudaMemcpyDeviceToDevice));
-	}else{
-		// y_{update} = y_{k}
-		_CUDA(cudaMemcpy(devVecAcceleratedXi, devVecXi, 2*nx*nodes*sizeof(real_t), cudaMemcpyDeviceToDevice));
-		_CUDA(cudaMemcpy(devVecAcceleratedPsi, devVecPsi, nu*nodes*sizeof(real_t), cudaMemcpyDeviceToDevice));
 	}
 }
 
@@ -579,7 +587,7 @@ void SmpcController::solveStep(){
 	_CUDA( cudaMemcpy(ptrMyEngine->getMatSigma(), ptrMyEngine->getVecBeta(), nv*nodes*sizeof(real_t),
 			cudaMemcpyDeviceToDevice) );
 
-	real_t *x = new real_t[ns*nv*nv];
+	//real_t *x = new real_t[ns*nv*nv];
 
 	//Backward substitution
 	for(uint_t iStage = N-1;iStage > -1;iStage--){
@@ -848,10 +856,16 @@ void SmpcController::dualUpdate(){
 	uint_t nx = ptrMyEngine->getDwnNetwork()->getNumTanks();
 	uint_t nu = ptrMyEngine->getDwnNetwork()->getNumControls();
 
-	if(ptrMyEngine->getGlobalFbeFlag()){
-		// gradFbePrev = gradFbe
-		_CUDA( cudaMemcpy(devVecPrevGradientFbeXi, devVecGradientFbeXi, 2*nx*nodes*sizeof(real_t), cudaMemcpyDeviceToDevice));
-		_CUDA( cudaMemcpy(devVecPrevGradientFbePsi, devVecGradientFbePsi, nu*nodes*sizeof(real_t), cudaMemcpyDeviceToDevice));
+	if( ptrMyEngine->getApgFlag()){
+		// y = w + \lambda(Hx - z)
+		_CUDA( cudaMemcpy(devVecUpdateXi, devVecAcceleratedXi, 2*nx*nodes*sizeof(real_t), cudaMemcpyDeviceToDevice));
+		_CUDA( cudaMemcpy(devVecUpdatePsi, devVecAcceleratedPsi, nu*nodes*sizeof(real_t), cudaMemcpyDeviceToDevice));
+		_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), 2*nx*nodes, &stepSize, devVecFixedPointResidualXi, 1, devVecUpdateXi, 1) );
+		_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), nu*nodes, &stepSize, devVecFixedPointResidualPsi, 1, devVecUpdatePsi, 1) );
+	}else{
+		// gradFbePrev = gradFbe  or fixedPointResidualPrev = fixedPointResidual
+		_CUDA( cudaMemcpy(ptrLbfgsPreviousYvecXi[0], ptrLbfgsCurrentYvecXi[0], 2*nx*nodes*sizeof(real_t), cudaMemcpyDeviceToDevice));
+		_CUDA( cudaMemcpy(ptrLbfgsPreviousYvecPsi[0], ptrLbfgsCurrentYvecPsi[0], nu*nodes*sizeof(real_t), cudaMemcpyDeviceToDevice));
 		// yOld = y
 		_CUDA( cudaMemcpy(devVecPrevXi, devVecXi, 2*nx*nodes*sizeof(real_t), cudaMemcpyDeviceToDevice));
 		_CUDA( cudaMemcpy(devVecPrevPsi, devVecPsi, nu*nodes*sizeof(real_t), cudaMemcpyDeviceToDevice));
@@ -860,13 +874,9 @@ void SmpcController::dualUpdate(){
 		_CUDA( cudaMemcpy(devVecPsi, devVecAcceleratedPsi, nu*nodes*sizeof(real_t), cudaMemcpyDeviceToDevice));
 		_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), 2*nx*nodes, &stepSize, devVecFixedPointResidualXi, 1, devVecXi, 1) );
 		_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), nu*nodes, &stepSize, devVecFixedPointResidualPsi, 1, devVecPsi, 1) );
-
-	}else{
-		// y = w + \lambda(Hx - z)
-		_CUDA( cudaMemcpy(devVecUpdateXi, devVecAcceleratedXi, 2*nx*nodes*sizeof(real_t), cudaMemcpyDeviceToDevice));
-		_CUDA( cudaMemcpy(devVecUpdatePsi, devVecAcceleratedPsi, nu*nodes*sizeof(real_t), cudaMemcpyDeviceToDevice));
-		_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), 2*nx*nodes, &stepSize, devVecFixedPointResidualXi, 1, devVecUpdateXi, 1) );
-		_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), nu*nodes, &stepSize, devVecFixedPointResidualPsi, 1, devVecUpdatePsi, 1) );
+		// y_{update} = y_{k}
+		_CUDA(cudaMemcpy(devVecAcceleratedXi, devVecXi, 2*nx*nodes*sizeof(real_t), cudaMemcpyDeviceToDevice));
+		_CUDA(cudaMemcpy(devVecAcceleratedPsi, devVecPsi, nu*nodes*sizeof(real_t), cudaMemcpyDeviceToDevice));
 	}
 }
 
@@ -1044,6 +1054,21 @@ void SmpcController::computeHessianOracalGlobalFbe(){
 	devLv = NULL;
 }
 
+
+void SmpcController::updateFixedPointResidualNamaAlgorithm(){
+	uint_t nx = ptrMyEngine->getDwnNetwork()->getNumTanks();
+	uint_t nu = ptrMyEngine->getDwnNetwork()->getNumControls();
+	uint_t nodes = ptrMyEngine->getScenarioTree()->getNumNodes();
+	real_t negAlpha = -1;
+
+	_CUDA(cudaMemcpy(devVecCurrentFixedPointResidualXi, devVecFixedPointResidualXi, 2*nx*nodes*sizeof(real_t),
+			cudaMemcpyDeviceToDevice));
+	_CUDA(cudaMemcpy(devVecCurrentFixedPointResidualPsi, devVecFixedPointResidualPsi, nu*nodes*sizeof(real_t),
+			cudaMemcpyDeviceToDevice));
+	_CUBLAS( cublasSscal_v2(ptrMyEngine->getCublasHandle(), 2*nx*nodes, &negAlpha, devVecCurrentFixedPointResidualXi, 1));
+	_CUBLAS( cublasSscal_v2(ptrMyEngine->getCublasHandle(), nu*nodes, &negAlpha, devVecCurrentFixedPointResidualPsi, 1));
+}
+
 /**
  * compute the gradient of the FBE
  */
@@ -1107,32 +1132,7 @@ void SmpcController::updateLbfgsBuffer(){
 	_CUBLAS(cublasSnrm2_v2(ptrMyEngine->getCublasHandle(), nDualXi, ptrLbfgsCurrentYvecXi[0], 1, &lbfgsScale) );
 	_CUBLAS(cublasSnrm2_v2(ptrMyEngine->getCublasHandle(), nDualPsi, ptrLbfgsCurrentYvecPsi[0], 1, &normGrad) );
 	normGrad = sqrt(lbfgsScale*lbfgsScale + normGrad*normGrad);
-	/*
-	if (ptrMyEngine->getGlobalFbeFlag()){
-		// vecY = grad - gradOld
-		_CUDA( cudaMemcpy(devVecY, devVecGradientFbeXi, nDualXi*sizeof(real_t), cudaMemcpyDeviceToDevice) );
-		_CUDA( cudaMemcpy(&devVecY[nDualXi], devVecGradientFbePsi, nDualPsi*sizeof(real_t), cudaMemcpyDeviceToDevice) );
-		_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), nDualXi, &negAlpha, devVecPrevGradientFbeXi, 1, devVecY, 1));
-		_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), nDualPsi, &negAlpha, devVecPrevGradientFbePsi, 1, &devVecY[nDualXi], 1));
-		// normGrad = norm(fbeGradient)
-		_CUBLAS(cublasSnrm2_v2(ptrMyEngine->getCublasHandle(), nDualXi, devVecGradientFbeXi, 1, &lbfgsScale) );
-		_CUBLAS(cublasSnrm2_v2(ptrMyEngine->getCublasHandle(), nDualPsi, devVecGradientFbePsi, 1, &normGrad) );
-		normGrad = sqrt(lbfgsScale*lbfgsScale + normGrad*normGrad);
-	}
 
-	if (ptrMyEngine->getNamaFlag()){
-		// vecY = fixedPoint - fixedPointOld
-		_CUDA( cudaMemcpy(devVecY, devVecFixedPointResidualXi, nDualXi*sizeof(real_t), cudaMemcpyDeviceToDevice) );
-		_CUDA( cudaMemcpy(&devVecY[nDualXi], devVecFixedPointResidualPsi, nDualPsi*sizeof(real_t), cudaMemcpyDeviceToDevice) );
-		_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), nDualXi, &negAlpha, devVecPrevFixedPointResidualXi, 1, devVecY, 1));
-		_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), nDualPsi, &negAlpha, devVecPrevGradientFbePsi, 1, &devVecY[nDualXi], 1));
-		// normGrad = norm(fixedPointResidual)
-		_CUBLAS(cublasSnrm2_v2(ptrMyEngine->getCublasHandle(), nDualXi, devVecFixedPointResidualXi, 1, &lbfgsScale) );
-		_CUBLAS(cublasSnrm2_v2(ptrMyEngine->getCublasHandle(), nDualPsi, devVecFixedPointResidualPsi, 1, &normGrad) );
-		normGrad = sqrt(lbfgsScale*lbfgsScale + normGrad*normGrad);
-
-	}
-	*/
 	// invRho = vecS'vecY
 	_CUBLAS(cublasSdot_v2(ptrMyEngine->getCublasHandle(), nDualXi + nDualPsi, devVecS, 1, devVecY, 1, &invRhoVar) );
 	// normMatYk = sqrt(vecY[:, lbfgsBufferCol]*vecY[:, lbfgsBufferCol])
@@ -1164,19 +1164,6 @@ void SmpcController::updateLbfgsBuffer(){
 		lbfgsBufferHessian = gammaH;
 	}
 
-	/*
-	if( ptrMyEngine->getGlobalFbeFlag() ){
-		// lbfgsDir = -gradFbe
-		_CUDA( cudaMemcpy(devVecLbfgsDirXi, devVecGradientFbeXi, nDualXi*sizeof(real_t), cudaMemcpyDeviceToDevice));
-		_CUDA( cudaMemcpy(devVecLbfgsDirPsi, devVecGradientFbePsi, nDualPsi*sizeof(real_t), cudaMemcpyDeviceToDevice));
-	}
-
-	if( ptrMyEngine->getNamaFlag() ){
-		// lbfgsDir = -fixedPointResidual
-		_CUDA( cudaMemcpy(devVecLbfgsDirXi, devVecFixedPointResidualXi, nDualXi*sizeof(real_t), cudaMemcpyDeviceToDevice));
-		_CUDA( cudaMemcpy(devVecLbfgsDirPsi, devVecFixedPointResidualPsi, nDualPsi*sizeof(real_t), cudaMemcpyDeviceToDevice));
-	}
-	 */
 	// lbfgsDir = -gradFbe or -fixedPointResidual
 	_CUDA( cudaMemcpy(devVecLbfgsDirXi, ptrLbfgsCurrentYvecXi[0], nDualXi*sizeof(real_t), cudaMemcpyDeviceToDevice));
 	_CUDA( cudaMemcpy(devVecLbfgsDirPsi, ptrLbfgsCurrentYvecPsi[0], nDualPsi*sizeof(real_t), cudaMemcpyDeviceToDevice));
@@ -1332,6 +1319,99 @@ real_t SmpcController::computeLineSearchLbfgsUpdate(real_t valueFbeYvar){
 	return abs(tau);
 }
 
+/**
+ * function that compute the line search as a combination of the
+ *    lbfgs direction and fixed point residual
+ */
+real_t SmpcController::computeLineSearchAmeLbfgsUpdate(real_t valueAmeYvar){
+	uint_t nodes = ptrMyEngine->getScenarioTree()->getNumNodes();
+	uint_t nx = ptrMyEngine->getDwnNetwork()->getNumTanks();
+	uint_t nu = ptrMyEngine->getDwnNetwork()->getNumControls();
+	real_t tau = 1;
+	real_t TOLERANCE = 1e-4;
+	real_t alpha = stepSize;
+
+	real_t valueAmeWvar, valueDirection;
+	uint_t maxLineSearchStep = 10;
+	uint_t iStep = 0;
+	real_t normValue;
+
+
+	// fixedPointResidual'lbfgDir,
+	_CUBLAS( cublasSdot_v2(ptrMyEngine->getCublasHandle(), 2*nx*nodes, devVecFixedPointResidualXi, 1, devVecLbfgsDirXi,
+			1, &valueAmeWvar));
+	_CUBLAS( cublasSdot_v2(ptrMyEngine->getCublasHandle(), nu*nodes, devVecFixedPointResidualPsi, 1, devVecLbfgsDirPsi,
+			1, &valueDirection));
+	valueDirection = -(valueDirection + valueAmeWvar);
+	//cout << valueDirection << endl;
+
+	// direction with respect to the fixed point residual
+	computeHessianOracalGlobalFbe();
+	// y = y + gamma*FPR
+	_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), 2*nx*nodes, &alpha, devVecFixedPointResidualXi, 1, ptrProximalXi[0], 1));
+	_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), nu*nodes, &alpha, devVecFixedPointResidualPsi, 1, ptrProximalPsi[0], 1));
+	// x = x + xDir
+	_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), nx*nodes, &alpha, devVecXdir, 1, devVecX, 1));
+	_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), nu*nodes, &alpha, devVecUdir, 1, devVecU, 1));
+	// primalXi = primalXi + primalXiDir
+	_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), 2*nx*nodes, &alpha, devVecPrimalXiDir, 1, devVecPrimalXi, 1));
+	_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), nu*nodes, &alpha, devVecPrimalPsiDir, 1, devVecPrimalPsi, 1));
+
+	// lbfgsDir = lbfgsDir - stepSize*fixedPointResidual
+	alpha = -stepSize;
+	_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), 2*nx*nodes, &alpha, devVecFixedPointResidualXi, 1, devVecLbfgsDirXi, 1));
+	_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), nu*nodes, &alpha, devVecFixedPointResidualPsi, 1, devVecLbfgsDirPsi, 1));
+	// swap fixedPointResidual and lbfgsDir
+	_CUBLAS( cublasSswap_v2(ptrMyEngine->getCublasHandle(), 2*nx*nodes, devVecFixedPointResidualXi, 1, devVecLbfgsDirXi, 1));
+	_CUBLAS( cublasSswap_v2(ptrMyEngine->getCublasHandle(), nu*nodes, devVecFixedPointResidualPsi, 1, devVecLbfgsDirPsi, 1));
+	// direction with respect to the lbfgsDir
+	computeHessianOracalGlobalFbe();
+	// swap fixedPointResidual and lbfgsDir
+	_CUBLAS( cublasSswap_v2(ptrMyEngine->getCublasHandle(), 2*nx*nodes, devVecFixedPointResidualXi, 1, devVecLbfgsDirXi, 1));
+	_CUBLAS( cublasSswap_v2(ptrMyEngine->getCublasHandle(), nu*nodes, devVecFixedPointResidualPsi, 1, devVecLbfgsDirPsi, 1));
+
+	if( valueDirection > 0){
+		cout<< "LBFGS direction is positive " << valueDirection << endl;
+	}else{
+		if(abs(valueDirection) < TOLERANCE){
+			tau = 0;
+		}else{
+			while( iStep < maxLineSearchStep + 1){
+				// x = x + tau*xDir, u = u +tau*uDir
+				_CUBLAS( cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), nx*nodes, &tau, devVecXdir, 1, devVecX, 1));
+				_CUBLAS( cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), nu*nodes, &tau, devVecUdir, 1, devVecU, 1));
+				// accXi = accxi(xi) + tau*lbfgsDirXi, accPsi = accpsi(psi) + tau*lbfgsDirPsi
+				_CUBLAS( cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), 2*nx*nodes, &tau, devVecLbfgsDirXi, 1,
+						ptrProximalXi[0], 1));
+				_CUBLAS( cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), nu*nodes, &tau, devVecLbfgsDirPsi, 1,
+						ptrProximalPsi[0], 1));
+				// primalXi and primalPsi update Hz + tau Hzdir
+				_CUBLAS( cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), 2*nx*nodes, &tau, devVecPrimalXiDir, 1,
+						devVecPrimalXi, 1));
+				_CUBLAS( cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), nu*nodes, &tau, devVecPrimalPsiDir, 1,
+						devVecPrimalPsi, 1));
+
+				proximalFunG();
+				computeFixedPointResidual();
+
+				valueAmeWvar = computeValueFbe();
+				//cout << "iStep " << iStep << " " << tau << " " << valueFbeWvar - valueFbeYvar << endl;
+				if( valueAmeWvar <= valueAmeYvar){
+					iStep = iStep + 1;
+					if (iStep < maxLineSearchStep){
+						if (iStep == 1)
+							tau = -1;
+						tau = tau  + 1/pow(2, iStep);
+					}
+				}else{
+					iStep = maxLineSearchStep + 1;
+				}
+			}
+		}
+	}
+
+	return abs(tau);
+}
 
 
 real_t SmpcController::computeValueFbe(){
@@ -1458,7 +1538,6 @@ uint_t SmpcController::algorithmGlobalFbe(){
 	initialiseAlgorithmSpecificData();
 
 	for (uint_t iter = 0; iter < ptrMySmpcConfig->getMaxIterations(); iter++){
-		dualExtrapolationStep(0);
 		solveStep();
 		proximalFunG();
 		computeFixedPointResidual();
@@ -1489,17 +1568,15 @@ uint_t SmpcController::algorithmNama(){
 	initialiseAlgorithmSpecificData();
 
 	for (uint_t iter = 0; iter < ptrMySmpcConfig->getMaxIterations(); iter++){
-		//_CUDA( cudaMemcpy(devVecAcceleratedXi, devVecXi, 2*nx*nodes*sizeof(real_t), cudaMemcpyDeviceToDevice));
-		//_CUDA( cudaMemcpy(devVecAcceleratedPsi, devVecPsi, nu*nodes*sizeof(real_t), cudaMemcpyDeviceToDevice));
-		dualExtrapolationStep(0);
 		solveStep();
 		proximalFunG();
 		computeFixedPointResidual();
-		computeGradientFbe();
+		updateFixedPointResidualNamaAlgorithm();
+
 		if( iter > 0){
 			vecValueFbe[iter - 1] = computeValueFbe();
 			computeLbfgsDirection();
-			vecTau[iter - 1] = computeLineSearchLbfgsUpdate( vecValueFbe[iter - 1] );
+			vecTau[iter - 1] = computeLineSearchAmeLbfgsUpdate( vecValueFbe[iter - 1] );
 		}
 		dualUpdate();
 		vecPrimalInfs[iter] = updatePrimalInfeasibity();
@@ -1906,16 +1983,10 @@ void SmpcController::deallocateGlobalFbeAlgorithm(){
 	_CUDA( cudaFree(devVecPrevGradientFbePsi) );
 
 
-	_CUDA( cudaFree(devPtrVecGradFbeXi) );
-	_CUDA( cudaFree(devPtrVecGradFbePsi) );
-
 	devVecGradientFbeXi = NULL;
 	devVecGradientFbePsi = NULL;
 	devVecPrevGradientFbeXi = NULL;
 	devVecPrevGradientFbePsi = NULL;
-
-	devPtrVecGradFbeXi = NULL;
-	devPtrVecGradFbePsi = NULL;
 }
 
 /**
@@ -1927,13 +1998,13 @@ void SmpcController::deallocateNamaAlgorithm(){
 	_CUDA( cudaFree(devVecPrevFixedPointResidualXi) );
 	_CUDA( cudaFree(devVecPrevFixedPointResidualPsi) );
 
-	_CUDA( cudaFree(devPtrVecFixedPointResidualXi) );
-	_CUDA( cudaFree(devPtrVecFixedPointResidualPsi) );
+	_CUDA( cudaFree(devVecCurrentFixedPointResidualXi) );
+	_CUDA( cudaFree(devVecCurrentFixedPointResidualPsi) );
 
 	devVecPrevFixedPointResidualXi = NULL;
 	devVecPrevFixedPointResidualPsi = NULL;
-	devPtrVecFixedPointResidualXi = NULL;
-	devPtrVecFixedPointResidualPsi = NULL;
+	devVecCurrentFixedPointResidualXi = NULL;
+	devVecCurrentFixedPointResidualPsi = NULL;
 }
 
 /**

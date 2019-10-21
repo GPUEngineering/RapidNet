@@ -62,6 +62,7 @@ public:
 	uint_t testSmpcController();
 	uint_t testNewEngineTesting();
 	uint_t testSmpcFbeController();
+	uint_t testSmpcNamaController();
 	~Testing();
 private:
 	template<typename T> uint_t compareArray(T* arrayA);
@@ -74,6 +75,7 @@ private:
 	string pathToFileControllerConfig;
 	string pathToFileEnigne;
 	string pathToFileControllerFbeConfig;
+	string pathToFileControllerNamaConfig;
 	rapidjson::Value a;
 };
 

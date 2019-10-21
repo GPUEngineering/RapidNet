@@ -95,6 +95,7 @@ TestSmpcController::TestSmpcController(Forecaster *myForecaster, Engine *myEngin
 		SmpcConfiguration *mySmpcConfig): SmpcController( myForecaster, myEngine, mySmpcConfig){
 	pathToFileSmpc = "../test/testDataFiles/smpcTest.json";
 	pathToFileGlobalFbeSmpc = "../test/testDataFiles/smpcFbeTest.json";
+	pathToFileNamaSmpc = "../test/testDataFiles/smpcNamaTest.json";
 }
 
 /**
@@ -105,6 +106,7 @@ TestSmpcController::TestSmpcController(Forecaster *myForecaster, Engine *myEngin
 TestSmpcController::TestSmpcController( string pathToConfigFile ): SmpcController( pathToConfigFile ){
 	pathToFileSmpc = "../test/testDataFiles/smpcTest.json";
 	pathToFileGlobalFbeSmpc = "../test/testDataFiles/smpcFbeTest.json";
+	pathToFileNamaSmpc = "../test/testDataFiles/smpcNamaTest.json";
 }
 /**
  * Function to test the dualExtrapolation function
@@ -178,21 +180,6 @@ uint_t TestSmpcController::testSoveStep(){
 	uint_t nv = ptrMySmpcConfig->getNV();
 	uint_t nodes = ptrMyScenarioTree->getNumNodes();
 
-	// implement the factor step, elimination of the control-disturbance constraints and updating the
-	// nominal forecasts and prices
-	real_t *currentX = ptrMySmpcConfig->getCurrentX();
-	real_t *prevU = ptrMySmpcConfig->getPrevU();
-	real_t *prevDemand = ptrMySmpcConfig->getPrevDemand();
-
-	/*uint_t timeInst = 1;
-	ptrMyForecaster->predictDemand( timeInst );
-	ptrMyForecaster->predictPrices( timeInst );
-
-	this->ptrMyEngine->factorStep();
-	this->ptrMyEngine->updateStateControl(currentX, prevU, prevDemand);
-	this->ptrMyEngine->eliminateInputDistubanceCoupling( ptrMyForecaster->getNominalDemand(),
-			ptrMyForecaster->getNominalPrices());*/
-
 	rapidjson::Document jsonDocument;
 	FILE* infile = fopen(fileName, "r");
 	if(infile == NULL){
@@ -217,17 +204,12 @@ uint_t TestSmpcController::testSoveStep(){
 		a = jsonDocument[VARNAME_TEST_U];
 		_ASSERT(a.IsArray());
 		_ASSERT( compareDeviceArray<real_t>(devVecU ) );
-		/*a = jsonDocument[VARNAME_TEST_TEMP_V];
-		_ASSERT(a.IsArray());
-		_ASSERT( compareDeviceArray<real_t>(devVecV ) );*/
+
 		delete [] readBuffer;
 		readBuffer = NULL;
 	}
 	fclose(infile);
 	infile = NULL;
-	currentX = NULL;
-	prevU = NULL;
-	prevDemand = NULL;
 	ptrDwnNetwork = NULL;
 	ptrMyScenarioTree = NULL;
 	return 1;
@@ -264,10 +246,10 @@ uint_t TestSmpcController::testProximalStep(){
 		setDeviceArray<real_t>(devVecU, nu*nodes);
 		a = jsonDocument[VARNAME_TEST_ACCELE_XI];
 		_ASSERT(a.IsArray());
-		setDeviceArray<real_t>(devVecAcceleratedXi, 2*nx*nodes);
+		setDeviceArray<real_t>(ptrProximalXi[0], 2*nx*nodes);
 		a = jsonDocument[VARNAME_TEST_ACCELE_PSI];
 		_ASSERT(a.IsArray());
-		setDeviceArray<real_t>(devVecAcceleratedPsi, nu*nodes);
+		setDeviceArray<real_t>(ptrProximalPsi[0], nu*nodes);
 		this->proximalFunG();
 		/*real_t *y = new real_t[nu*nu*nodes];
 		real_t **ptrY = new real_t*[nodes];
@@ -328,23 +310,17 @@ uint_t TestSmpcController::testDualUpdate(){
 
 		a = jsonDocument[VARNAME_TEST_ACCELE_XI];
 		_ASSERT(a.IsArray());
-		setDeviceArray<real_t>(devVecAcceleratedXi, 2*nx*nodes);
+		//devVecAcceleratedXi
+		setDeviceArray<real_t>(ptrProximalXi[0], 2*nx*nodes);
 		a = jsonDocument[VARNAME_TEST_ACCELE_PSI];
 		_ASSERT(a.IsArray());
-		setDeviceArray<real_t>(devVecAcceleratedPsi, nu*nodes);
-		a = jsonDocument[VARNAME_TEST_PRIMALX];
+		setDeviceArray<real_t>(ptrProximalPsi[0], nu*nodes);
+		a = jsonDocument[VARNAME_TEST_FIXED_POINT_RESIDUAL_XI];
 		_ASSERT(a.IsArray());
-		setDeviceArray<real_t>(devVecPrimalXi, 2*nx*nodes);
-		a = jsonDocument[VARNAME_TEST_PRIMALU];
+		setDeviceArray<real_t>(devVecFixedPointResidualXi, 2*nx*nodes);
+		a = jsonDocument[VARNAME_TEST_FIXED_POINT_RESIDUAL_PSI];
 		_ASSERT(a.IsArray());
-		setDeviceArray<real_t>(devVecPrimalPsi, nu*nodes);
-		a = jsonDocument[VARNAME_TEST_DUALX];
-		_ASSERT(a.IsArray());
-		setDeviceArray<real_t>(devVecDualXi, 2*nx*nodes);
-		a = jsonDocument[VARNAME_TEST_DUALU];
-		_ASSERT(a.IsArray());
-		setDeviceArray<real_t>(devVecDualPsi, nu*nodes);
-		this->computeFixedPointResidual();
+		setDeviceArray<real_t>(devVecFixedPointResidualPsi, nu*nodes);
 		this->dualUpdate();
 		a = jsonDocument[VARNAME_TEST_FINAL_UPDATE_XI];
 		_ASSERT(a.IsArray());
@@ -352,14 +328,7 @@ uint_t TestSmpcController::testDualUpdate(){
 		a = jsonDocument[VARNAME_TEST_FINAL_UPDATE_PSI];
 		_ASSERT(a.IsArray());
 		_ASSERT( compareDeviceArray<real_t>(devVecUpdatePsi ) );
-		a = jsonDocument[VARNAME_TEST_PRIMAL_INFS_XI];
-		_ASSERT(a.IsArray());
-		//_ASSERT( compareDeviceArray<real_t>(devVecResidual ) );
-		_ASSERT( compareDeviceArray<real_t>(devVecFixedPointResidualXi ) );
-		a = jsonDocument[VARNAME_TEST_PRIMAL_INFS_PSI];
-		_ASSERT(a.IsArray());
-		//_ASSERT( compareDeviceArray<real_t>(&devVecResidual[2*nx*nodes] ) );
-		_ASSERT( compareDeviceArray<real_t>(devVecFixedPointResidualPsi ) );
+
 		delete [] readBuffer;
 		readBuffer = NULL;
 	}
@@ -373,8 +342,9 @@ uint_t TestSmpcController::testDualUpdate(){
 /**
  * Function to test the fixed point residual
  */
-uint_t TestSmpcController::testFbeFixedPointResidual(){
-	const char* fileName = pathToFileGlobalFbeSmpc.c_str();
+uint_t TestSmpcController::testFixedPointResidual(){
+	//const char* fileName = pathToFileGlobalFbeSmpc.c_str();
+	const char* fileName = pathToFileSmpc.c_str();
 	ScenarioTree *ptrMyScenarioTree = this->getScenarioTree();
 	DwnNetwork *ptrDwnNetwork = this->getDwnNetwork();
 	uint_t nx = ptrDwnNetwork->getNumTanks();
@@ -385,7 +355,8 @@ uint_t TestSmpcController::testFbeFixedPointResidual(){
 	rapidjson::Document jsonDocument;
 	FILE* infile = fopen(fileName, "r");
 	if(infile == NULL){
-		cout << pathToFileGlobalFbeSmpc << infile << endl;
+		//cout << pathToFileGlobalFbeSmpc << infile << endl;
+		cout << pathToFileSmpc << infile << endl;
 		cerr << "Error in opening the file " <<__LINE__ << endl;
 		exit(100);
 	}else{
@@ -408,11 +379,11 @@ uint_t TestSmpcController::testFbeFixedPointResidual(){
 
 		this->computeFixedPointResidual();
 
-		a = jsonDocument[VARNAME_TEST_PRIMAL_INFS_XI];
+		a = jsonDocument[VARNAME_TEST_FIXED_POINT_RESIDUAL_XI];
 		_ASSERT(a.IsArray());
 		//_ASSERT( compareDeviceArray<real_t>(devVecResidual ) );
 		_ASSERT( compareDeviceArray<real_t>(devVecFixedPointResidualXi ) );
-		a = jsonDocument[VARNAME_TEST_PRIMAL_INFS_PSI];
+		 a = jsonDocument[VARNAME_TEST_FIXED_POINT_RESIDUAL_PSI];
 		_ASSERT(a.IsArray());
 		//_ASSERT( compareDeviceArray<real_t>(&devVecResidual[2*nx*nodes]) );
 		_ASSERT( compareDeviceArray<real_t>(devVecFixedPointResidualPsi ) );
@@ -437,24 +408,31 @@ uint_t TestSmpcController::testHessianOracalGlobalFbe(){
 	uint_t nu = ptrDwnNetwork->getNumControls();
 	uint_t nv = this->ptrMySmpcConfig->getNV();
 	uint_t nodes = ptrMyScenarioTree->getNumNodes();
+	real_t* ptrVecHessianOracleXi[1];
+	real_t* ptrVecHessianOraclePsi[1];
 
 	rapidjson::Document jsonDocument;
 	FILE* infile = fopen(fileName, "r");
 	if(infile == NULL){
-		cout << pathToFileGlobalFbeSmpc << infile << endl;
+		cout << fileName << infile << endl;
 		cerr << "Error in opening the file " <<__LINE__ << endl;
 		exit(100);
 	}else{
+		_CUDA( cudaMemcpy(ptrVecHessianOracleXi, devPtrVecHessianOracleXi, sizeof(real_t*), cudaMemcpyDeviceToHost) );
+		_CUDA( cudaMemcpy(ptrVecHessianOraclePsi, devPtrVecHessianOraclePsi, sizeof(real_t*), cudaMemcpyDeviceToHost) );
+
 		char* readBuffer = new char[65536];
 		rapidjson::FileReadStream smpcJsonStream(infile, readBuffer, sizeof(readBuffer));
 		jsonDocument.ParseStream(smpcJsonStream);
 
-		a = jsonDocument[VARNAME_TEST_PRIMAL_INFS_XI];
+
+		a = jsonDocument[VARNAME_TEST_FIXED_POINT_RESIDUAL_XI];
 		_ASSERT(a.IsArray());
-		setDeviceArray<real_t>(devVecGradientFbeXi, 2*nx*nodes);
-		a = jsonDocument[VARNAME_TEST_PRIMAL_INFS_PSI];
+		setDeviceArray<real_t>(ptrVecHessianOracleXi[0], 2*nx*nodes);
+		a = jsonDocument[VARNAME_TEST_FIXED_POINT_RESIDUAL_PSI];
 		_ASSERT(a.IsArray());
-		setDeviceArray<real_t>(devVecGradientFbePsi, nu*nodes);
+
+		setDeviceArray<real_t>(ptrVecHessianOraclePsi[0], nu*nodes);
 
 		this->computeHessianOracalGlobalFbe();
 
@@ -498,13 +476,11 @@ uint_t TestSmpcController::testFbeGradient(){
 		rapidjson::FileReadStream smpcJsonStream(infile, readBuffer, sizeof(readBuffer));
 		jsonDocument.ParseStream(smpcJsonStream);
 
-		a = jsonDocument[VARNAME_TEST_PRIMAL_INFS_XI];
+		a = jsonDocument[VARNAME_TEST_FIXED_POINT_RESIDUAL_XI];
 		_ASSERT(a.IsArray());
-		//setDeviceArray<real_t>(devVecResidual, 2*nx*nodes);
 		setDeviceArray<real_t>(devVecFixedPointResidualXi, 2*nx*nodes);
-		a = jsonDocument[VARNAME_TEST_PRIMAL_INFS_PSI];
+		a = jsonDocument[VARNAME_TEST_FIXED_POINT_RESIDUAL_PSI];
 		_ASSERT(a.IsArray());
-		//setDeviceArray<real_t>(&devVecResidual[2*nx*nodes], nu*nodes);
 		setDeviceArray<real_t>(devVecFixedPointResidualPsi, nu*nodes);
 
 		computeGradientFbe();
@@ -529,7 +505,12 @@ uint_t TestSmpcController::testFbeGradient(){
  * function to test the lbfgs direction
  */
 uint_t TestSmpcController::testLbfgsDirection(){
-	const char* fileName = pathToFileGlobalFbeSmpc.c_str();
+	const char* fileName;
+	if (ptrMyEngine->getGlobalFbeFlag())
+		fileName = pathToFileGlobalFbeSmpc.c_str();
+	else
+		fileName = pathToFileNamaSmpc.c_str();
+
 	ScenarioTree *ptrMyScenarioTree = this->getScenarioTree();
 	DwnNetwork *ptrDwnNetwork = this->getDwnNetwork();
 	uint_t nx = ptrDwnNetwork->getNumTanks();
@@ -540,7 +521,7 @@ uint_t TestSmpcController::testLbfgsDirection(){
 	rapidjson::Document jsonDocument;
 	FILE* infile = fopen(fileName, "r");
 	if(infile == NULL){
-		cout << pathToFileGlobalFbeSmpc << infile << endl;
+		cout << fileName << infile << endl;
 		cerr << "Error in opening the file " <<__LINE__ << endl;
 		exit(100);
 	}else{
@@ -564,18 +545,18 @@ uint_t TestSmpcController::testLbfgsDirection(){
 		a = jsonDocument[VARNAME_TEST_ACCELE_PSI];
 		_ASSERT(a.IsArray());
 		setDeviceArray<real_t>(devVecPsi, nu*nodes);
-		a = jsonDocument[VARNAME_TEST_GRAD_FBE_XI];
+		a = jsonDocument[VARNAME_TEST_LBFGS_CURRENT_YVEC_XI];
 		_ASSERT(a.IsArray());
-		setDeviceArray<real_t>(devVecGradientFbeXi, 2*nx*nodes);
-		a = jsonDocument[VARNAME_TEST_GRAD_FBE_PSI];
+		setDeviceArray<real_t>(ptrLbfgsCurrentYvecXi[0], 2*nx*nodes);
+		a = jsonDocument[VARNAME_TEST_LBFGS_CURRENT_YVEC_PSI];
 		_ASSERT(a.IsArray());
-		setDeviceArray<real_t>(devVecGradientFbePsi, nu*nodes);
-		a = jsonDocument[VARNAME_TEST_PREV_GRAD_FBE_XI];
+		setDeviceArray<real_t>(ptrLbfgsCurrentYvecPsi[0], nu*nodes);
+		a = jsonDocument[VARNAME_TEST_LBFGS_PREVIOUS_YVEC_XI];
 		_ASSERT(a.IsArray());
-		setDeviceArray<real_t>(devVecPrevGradientFbeXi, 2*nx*nodes);
-		a = jsonDocument[VARNAME_TEST_PREV_GRAD_FBE_PSI];
+		setDeviceArray<real_t>(ptrLbfgsPreviousYvecXi[0], 2*nx*nodes);
+		a = jsonDocument[VARNAME_TEST_LBFGS_PREVIOUS_YVEC_PSI];
 		_ASSERT(a.IsArray());
-		setDeviceArray<real_t>(devVecPrevGradientFbePsi, nu*nodes);
+		setDeviceArray<real_t>(ptrLbfgsPreviousYvecPsi[0], nu*nodes);
 		a = jsonDocument[VARNAME_TEST_LBFGS_MAT_S];
 		_ASSERT(a.IsArray());
 		setDeviceArray<real_t>(devLbfgsBufferMatS, (2*nx + nu)*nodes*bufferSize);
@@ -643,28 +624,17 @@ uint_t TestSmpcController::testLbfgsDirection(){
 	return 1;
 }
 
+
 /**
  * function to test the value FBE
  */
-uint_t TestSmpcController::testValueFbe(){
-	const char* fileName = pathToFileGlobalFbeSmpc.c_str();
+uint_t TestSmpcController::testUpdateFixedPointResidualNamaAlgorithm(){
+	const char* fileName = pathToFileNamaSmpc.c_str();
 	ScenarioTree *ptrMyScenarioTree = this->getScenarioTree();
 	DwnNetwork *ptrDwnNetwork = this->getDwnNetwork();
 	uint_t nx = ptrDwnNetwork->getNumTanks();
 	uint_t nu = ptrDwnNetwork->getNumControls();
-	uint_t nv = this->ptrMySmpcConfig->getNV();
 	uint_t nodes = ptrMyScenarioTree->getNumNodes();
-	real_t costFbeDualY, variable;
-	real_t TOLERANCE = 1e-1;
-
-	real_t *currentX = ptrMySmpcConfig->getCurrentX();
-	real_t *prevU = ptrMySmpcConfig->getPrevU();
-	real_t *prevDemand = ptrMySmpcConfig->getPrevDemand();
-
-	ptrMyEngine->factorStep();
-	ptrMyEngine->updateStateControl(currentX, prevU, prevDemand);
-	ptrMyEngine->eliminateInputDistubanceCoupling( ptrMyForecaster->getNominalDemand(),
-			ptrMyForecaster->getNominalPrices());
 
 	rapidjson::Document jsonDocument;
 	FILE* infile = fopen(fileName, "r");
@@ -677,20 +647,81 @@ uint_t TestSmpcController::testValueFbe(){
 		rapidjson::FileReadStream smpcJsonStream(infile, readBuffer, sizeof(readBuffer));
 		jsonDocument.ParseStream(smpcJsonStream);
 
-		a = jsonDocument[VARNAME_TEST_PRIMAL_INFS_XI];
+		a = jsonDocument[VARNAME_TEST_FIXED_POINT_RESIDUAL_XI];
 		_ASSERT(a.IsArray());
-		//setDeviceArray<real_t>(devVecResidual, 2*nx*nodes);
 		setDeviceArray<real_t>(devVecFixedPointResidualXi, 2*nx*nodes);
-		a = jsonDocument[VARNAME_TEST_PRIMAL_INFS_PSI];
+		a = jsonDocument[VARNAME_TEST_FIXED_POINT_RESIDUAL_PSI];
 		_ASSERT(a.IsArray());
-		//setDeviceArray<real_t>(&devVecResidual[2*nx*nodes], nu*nodes);
+		setDeviceArray<real_t>(devVecFixedPointResidualPsi, nu*nodes);
+
+		updateFixedPointResidualNamaAlgorithm();
+
+		a = jsonDocument[VARNAME_TEST_LBFGS_CURRENT_YVEC_XI];
+		_ASSERT(a.IsArray());
+		_ASSERT( compareDeviceArray<real_t>(ptrLbfgsCurrentYvecXi[0] ) );
+		a = jsonDocument[VARNAME_TEST_LBFGS_CURRENT_YVEC_PSI];
+		_ASSERT(a.IsArray());
+		_ASSERT( compareDeviceArray<real_t>(ptrLbfgsCurrentYvecPsi[0] ) );
+
+		delete [] readBuffer;
+		readBuffer = NULL;
+	}
+	fclose(infile);
+	infile = NULL;
+	ptrDwnNetwork = NULL;
+	ptrMyScenarioTree = NULL;
+	return 1;
+}
+
+/**
+ * function to test the value FBE
+ */
+uint_t TestSmpcController::testValueFbe(){
+	const char* fileName;
+	if (ptrMyEngine->getGlobalFbeFlag())
+		fileName = pathToFileGlobalFbeSmpc.c_str();
+	else
+		fileName = pathToFileNamaSmpc.c_str();
+
+	//const char* fileName = pathToFileGlobalFbeSmpc.c_str();
+	ScenarioTree *ptrMyScenarioTree = this->getScenarioTree();
+	DwnNetwork *ptrDwnNetwork = this->getDwnNetwork();
+	uint_t nx = ptrDwnNetwork->getNumTanks();
+	uint_t nu = ptrDwnNetwork->getNumControls();
+	uint_t nv = this->ptrMySmpcConfig->getNV();
+	uint_t nodes = ptrMyScenarioTree->getNumNodes();
+	real_t costFbeDualY, variable;
+	real_t TOLERANCE = 1e-1;
+
+	if( factorStepFlag == false ){
+		initialiseSmpcController();
+	}
+
+	rapidjson::Document jsonDocument;
+	FILE* infile = fopen(fileName, "r");
+	if(infile == NULL){
+		cout << pathToFileGlobalFbeSmpc << infile << endl;
+		cerr << "Error in opening the file " <<__LINE__ << endl;
+		exit(100);
+	}else{
+		char* readBuffer = new char[65536];
+		rapidjson::FileReadStream smpcJsonStream(infile, readBuffer, sizeof(readBuffer));
+		jsonDocument.ParseStream(smpcJsonStream);
+
+		a = jsonDocument[VARNAME_TEST_FIXED_POINT_RESIDUAL_XI];
+		_ASSERT(a.IsArray());
+		setDeviceArray<real_t>(devVecFixedPointResidualXi, 2*nx*nodes);
+		a = jsonDocument[VARNAME_TEST_FIXED_POINT_RESIDUAL_PSI];
+		_ASSERT(a.IsArray());
 		setDeviceArray<real_t>(devVecFixedPointResidualPsi, nu*nodes);
 		a = jsonDocument[VARNAME_TEST_ACCELE_XI];
 		_ASSERT(a.IsArray());
-		setDeviceArray<real_t>(devVecAcceleratedXi, 2*nx*nodes);
+		//setDeviceArray<real_t>(devVecAcceleratedXi, 2*nx*nodes);
+		setDeviceArray<real_t>(ptrProximalXi[0], 2*nx*nodes);
 		a = jsonDocument[VARNAME_TEST_ACCELE_PSI];
 		_ASSERT(a.IsArray());
-		setDeviceArray<real_t>(devVecAcceleratedPsi, nu*nodes);
+		//setDeviceArray<real_t>(devVecAcceleratedPsi, nu*nodes);
+		setDeviceArray<real_t>(ptrProximalPsi[0], nu*nodes);
 		a = jsonDocument[VARNAME_TEST_U];
 		_ASSERT(a.IsArray());
 		setDeviceArray<real_t>(devVecU, nu*nodes);
@@ -713,8 +744,9 @@ uint_t TestSmpcController::testValueFbe(){
 	return 1;
 }
 
-uint_t TestSmpcController::testFbeLineSearch(){
-	const char* fileName = pathToFileGlobalFbeSmpc.c_str();
+
+uint_t TestSmpcController::testAmeLineSearch(){
+	const char* fileName = pathToFileNamaSmpc.c_str();
 	ScenarioTree *ptrMyScenarioTree = this->getScenarioTree();
 	DwnNetwork *ptrDwnNetwork = this->getDwnNetwork();
 	uint_t nx = ptrDwnNetwork->getNumTanks();
@@ -725,14 +757,9 @@ uint_t TestSmpcController::testFbeLineSearch(){
 	real_t TOLERANCE = 1e-1;
 	real_t linesearchTau;
 
-	real_t *currentX = ptrMySmpcConfig->getCurrentX();
-	real_t *prevU = ptrMySmpcConfig->getPrevU();
-	real_t *prevDemand = ptrMySmpcConfig->getPrevDemand();
-
-	ptrMyEngine->factorStep();
-	ptrMyEngine->updateStateControl(currentX, prevU, prevDemand);
-	ptrMyEngine->eliminateInputDistubanceCoupling( ptrMyForecaster->getNominalDemand(),
-			ptrMyForecaster->getNominalPrices());
+	if( factorStepFlag == false ){
+		initialiseSmpcController();
+	}
 
 	rapidjson::Document jsonDocument;
 	FILE* infile = fopen(fileName, "r");
@@ -745,11 +772,115 @@ uint_t TestSmpcController::testFbeLineSearch(){
 		rapidjson::FileReadStream smpcJsonStream(infile, readBuffer, sizeof(readBuffer));
 		jsonDocument.ParseStream(smpcJsonStream);
 
-		a = jsonDocument[VARNAME_TEST_PRIMAL_INFS_XI];
+
+		a = jsonDocument[VARNAME_TEST_ACCELE_XI];
+		_ASSERT(a.IsArray());
+		//setDeviceArray<real_t>(devVecAcceleratedXi, 2*nx*nodes);
+		setDeviceArray<real_t>(ptrProximalXi[0], 2*nx*nodes);
+		a = jsonDocument[VARNAME_TEST_ACCELE_PSI];
+		_ASSERT(a.IsArray());
+		//setDeviceArray<real_t>(devVecAcceleratedPsi, nu*nodes);
+		setDeviceArray<real_t>(ptrProximalPsi[0], nu*nodes);
+		a = jsonDocument[VARNAME_TEST_FIXED_POINT_RESIDUAL_XI];
+		_ASSERT(a.IsArray());
+		setDeviceArray<real_t>(devVecFixedPointResidualXi, 2*nx*nodes);
+		a = jsonDocument[VARNAME_TEST_FIXED_POINT_RESIDUAL_PSI];
+		_ASSERT(a.IsArray());
+		setDeviceArray<real_t>(devVecFixedPointResidualPsi, nu*nodes);
+		a = jsonDocument[VARNAME_TEST_LBFGS_DIR_XI];
+		_ASSERT(a.IsArray());
+		setDeviceArray<real_t>(devVecLbfgsDirXi, 2*nx*nodes);
+		a = jsonDocument[VARNAME_TEST_LBFGS_DIR_PSI];
+		_ASSERT(a.IsArray());
+		setDeviceArray<real_t>(devVecLbfgsDirPsi, nu*nodes);
+		a = jsonDocument[VARNAME_TEST_X];
+		_ASSERT(a.IsArray());
+		setDeviceArray<real_t>(devVecX, nx*nodes);
+		a = jsonDocument[VARNAME_TEST_U];
+		_ASSERT(a.IsArray());
+		setDeviceArray<real_t>(devVecU, nu*nodes);
+		a = jsonDocument[VARNAME_TEST_PRIMALX];
+		_ASSERT(a.IsArray());
+		setDeviceArray<real_t>(devVecPrimalXi, 2*nx*nodes);
+		a = jsonDocument[VARNAME_TEST_PRIMALU];
+		_ASSERT(a.IsArray());
+		setDeviceArray<real_t>(devVecPrimalPsi, nu*nodes);
+
+		costFbeDualY = this->computeValueFbe();
+		//linesearchTau = computeLineSearchLbfgsUpdate( costFbeDualY );
+		linesearchTau = computeLineSearchAmeLbfgsUpdate( costFbeDualY );
+
+		a = jsonDocument[VARNAME_TEST_FBE_COST];
+		_ASSERT(a.IsArray());
+		variable = costFbeDualY - a[0].GetFloat();
+		variable = variable/a[0].GetFloat()*100;
+		//cout<< variable << " " << costFbeDualY << " " << a[0].GetFloat() << endl;
+		_ASSERT(abs(variable) < TOLERANCE);
+
+		a = jsonDocument[VARNAME_TEST_UPDATE_XI];
+		_ASSERT(a.IsArray());
+		_ASSERT( compareDeviceArray<real_t>(devVecAcceleratedXi ) );
+		a = jsonDocument[VARNAME_TEST_UPDATE_PSI];
+		_ASSERT(a.IsArray());
+		_ASSERT( compareDeviceArray<real_t>(devVecAcceleratedPsi ) );
+		a = jsonDocument[VARNAME_TEST_TAU];
+		_ASSERT(a.IsArray());
+		variable = linesearchTau - a[0].GetFloat();
+		_ASSERT(abs(variable) < TOLERANCE);
+		a = jsonDocument[VARNAME_TEST_UPDATE_RESIDUAL_XI];
+		_ASSERT(a.IsArray());
+		//_ASSERT( compareDeviceArray<real_t>(devVecResidual ) );
+		_ASSERT( compareDeviceArray<real_t>(devVecFixedPointResidualXi ) );
+		a = jsonDocument[VARNAME_TEST_UPDATE_RESIDUAL_PSI];
+		_ASSERT(a.IsArray());
+		//_ASSERT( compareDeviceArray<real_t>(&devVecResidual[2*nx*nodes] ) );
+		_ASSERT( compareDeviceArray<real_t>(devVecFixedPointResidualPsi ) );
+
+		delete [] readBuffer;
+		readBuffer = NULL;
+	}
+	fclose(infile);
+	infile = NULL;
+	ptrDwnNetwork = NULL;
+	ptrMyScenarioTree = NULL;
+	return 1;
+}
+
+
+
+uint_t TestSmpcController::testFbeLineSearch(){
+	const char* fileName = pathToFileGlobalFbeSmpc.c_str();
+	ScenarioTree *ptrMyScenarioTree = this->getScenarioTree();
+	DwnNetwork *ptrDwnNetwork = this->getDwnNetwork();
+	uint_t nx = ptrDwnNetwork->getNumTanks();
+	uint_t nu = ptrDwnNetwork->getNumControls();
+	uint_t nv = this->ptrMySmpcConfig->getNV();
+	uint_t nodes = ptrMyScenarioTree->getNumNodes();
+	real_t costFbeDualY, variable;
+	real_t TOLERANCE = 1e-1;
+	real_t linesearchTau;
+
+	if( factorStepFlag == false ){
+		initialiseSmpcController();
+	}
+
+	rapidjson::Document jsonDocument;
+	FILE* infile = fopen(fileName, "r");
+	if(infile == NULL){
+		cout << pathToFileGlobalFbeSmpc << infile << endl;
+		cerr << "Error in opening the file " <<__LINE__ << endl;
+		exit(100);
+	}else{
+		char* readBuffer = new char[65536];
+		rapidjson::FileReadStream smpcJsonStream(infile, readBuffer, sizeof(readBuffer));
+		jsonDocument.ParseStream(smpcJsonStream);
+
+
+		a = jsonDocument[VARNAME_TEST_FIXED_POINT_RESIDUAL_XI];
 		_ASSERT(a.IsArray());
 		//setDeviceArray<real_t>(devVecResidual, 2*nx*nodes);
 		setDeviceArray<real_t>(devVecFixedPointResidualXi, 2*nx*nodes);
-		a = jsonDocument[VARNAME_TEST_PRIMAL_INFS_PSI];
+		a = jsonDocument[VARNAME_TEST_FIXED_POINT_RESIDUAL_PSI];
 		_ASSERT(a.IsArray());
 		//setDeviceArray<real_t>(&devVecResidual[2*nx*nodes], nu*nodes);
 		setDeviceArray<real_t>(devVecFixedPointResidualPsi, nu*nodes);
@@ -823,31 +954,35 @@ uint_t TestSmpcController::testFbeLineSearch(){
 	return 1;
 }
 
+
 uint_t TestSmpcController::testFbeDualUpdate(){
-	const char* fileName = pathToFileGlobalFbeSmpc.c_str();
+	const char* fileName;
+	if (ptrMyEngine->getGlobalFbeFlag())
+		fileName = pathToFileGlobalFbeSmpc.c_str();
+	else
+		fileName = pathToFileNamaSmpc.c_str();
+	//const char* fileName = pathToFileGlobalFbeSmpc.c_str();
 	ScenarioTree *ptrMyScenarioTree = this->getScenarioTree();
 	DwnNetwork *ptrDwnNetwork = this->getDwnNetwork();
 	uint_t nx = ptrDwnNetwork->getNumTanks();
 	uint_t nu = ptrDwnNetwork->getNumControls();
 	uint_t nodes = ptrMyScenarioTree->getNumNodes();
 
-	real_t *currentX = ptrMySmpcConfig->getCurrentX();
-	real_t *prevU = ptrMySmpcConfig->getPrevU();
-	real_t *prevDemand = ptrMySmpcConfig->getPrevDemand();
 	real_t *hostPrevXi = new real_t[2*nx*nodes];
 	real_t *hostPrevPsi = new real_t[nu*nodes];
-	real_t *hostPrevGradFbeXi = new real_t[2*nx*nodes];
-	real_t *hostPrevGradFbePsi = new real_t[nu*nodes];
+	real_t *hostAcceleratedXi = new real_t[2*nx*nodes];
+	real_t *hostAcceleratedPsi = new real_t[nu*nodes];
+	real_t *hostPrevYvecXi = new real_t[2*nx*nodes];
+	real_t *hostPrevYvecPsi = new real_t[nu*nodes];
 
-	ptrMyEngine->factorStep();
-	ptrMyEngine->updateStateControl(currentX, prevU, prevDemand);
-	ptrMyEngine->eliminateInputDistubanceCoupling( ptrMyForecaster->getNominalDemand(),
-			ptrMyForecaster->getNominalPrices());
+	if( factorStepFlag == false ){
+		initialiseSmpcController();
+	}
 
 	rapidjson::Document jsonDocument;
 	FILE* infile = fopen(fileName, "r");
 	if(infile == NULL){
-		cout << pathToFileGlobalFbeSmpc << infile << endl;
+		cout << fileName << infile << endl;
 		cerr << "Error in opening the file " <<__LINE__ << endl;
 		exit(100);
 	}else{
@@ -871,20 +1006,18 @@ uint_t TestSmpcController::testFbeDualUpdate(){
 		setDeviceArray<real_t>(devVecAcceleratedPsi, nu*nodes);
 		a = jsonDocument[VARNAME_TEST_UPDATE_RESIDUAL_XI];
 		_ASSERT(a.IsArray());
-		//setDeviceArray<real_t>(devVecResidual, 2*nx*nodes);
 		setDeviceArray<real_t>(devVecFixedPointResidualXi, 2*nx*nodes);
 		a = jsonDocument[VARNAME_TEST_UPDATE_RESIDUAL_PSI];
 		_ASSERT(a.IsArray());
-		//setDeviceArray<real_t>(&devVecResidual[2*nx*nodes], nu*nodes);
 		setDeviceArray<real_t>(devVecFixedPointResidualPsi, nu*nodes);
-		a = jsonDocument[VARNAME_TEST_GRAD_FBE_XI];
+		a = jsonDocument[VARNAME_TEST_LBFGS_CURRENT_YVEC_XI];
 		_ASSERT(a.IsArray());
-		setDeviceArray<real_t>(devVecGradientFbeXi, 2*nx*nodes);
-		_CUDA( cudaMemcpy( hostPrevGradFbeXi, devVecGradientFbeXi, 2*nx*nodes*sizeof(real_t), cudaMemcpyDeviceToHost) );
-		a = jsonDocument[VARNAME_TEST_GRAD_FBE_PSI];
+		setDeviceArray<real_t>(ptrLbfgsCurrentYvecXi[0], 2*nx*nodes);
+		_CUDA( cudaMemcpy( hostPrevYvecXi, ptrLbfgsCurrentYvecXi[0], 2*nx*nodes*sizeof(real_t), cudaMemcpyDeviceToHost) );
+		a = jsonDocument[VARNAME_TEST_LBFGS_CURRENT_YVEC_PSI];
 		_ASSERT(a.IsArray());
-		setDeviceArray<real_t>(devVecGradientFbePsi, nu*nodes);
-		_CUDA( cudaMemcpy( hostPrevGradFbePsi, devVecGradientFbePsi, nu*nodes*sizeof(real_t), cudaMemcpyDeviceToHost) );
+		setDeviceArray<real_t>(ptrLbfgsCurrentYvecPsi[0], nu*nodes);
+		_CUDA( cudaMemcpy( hostPrevYvecPsi, ptrLbfgsCurrentYvecPsi[0], nu*nodes*sizeof(real_t), cudaMemcpyDeviceToHost) );
 
 		dualUpdate();
 
@@ -895,17 +1028,28 @@ uint_t TestSmpcController::testFbeDualUpdate(){
 		_ASSERT(a.IsArray());
 		_ASSERT( compareDeviceArray<real_t>(devVecPsi ) );
 
-		_ASSERT( compareDeviceArray<real_t>(devVecPrevGradientFbeXi, hostPrevGradFbeXi, 2*nx*nodes) );
-		_ASSERT( compareDeviceArray<real_t>(devVecPrevGradientFbePsi, hostPrevGradFbePsi, nu*nodes) );
+		_CUDA( cudaMemcpy( hostAcceleratedXi, devVecXi, 2*nx*nodes*sizeof(real_t), cudaMemcpyDeviceToHost) );
+		_CUDA( cudaMemcpy( hostAcceleratedPsi, devVecPsi, nu*nodes*sizeof(real_t), cudaMemcpyDeviceToHost) );
+
+
+		_ASSERT( compareDeviceArray<real_t>(ptrLbfgsPreviousYvecXi[0], hostPrevYvecXi, 2*nx*nodes) );
+		_ASSERT( compareDeviceArray<real_t>(ptrLbfgsPreviousYvecPsi[0], hostPrevYvecPsi, nu*nodes) );
 
 		_ASSERT( compareDeviceArray<real_t>(devVecPrevXi, hostPrevXi, 2*nx*nodes) );
 		_ASSERT( compareDeviceArray<real_t>(devVecPrevPsi, hostPrevPsi, nu*nodes) );
 
+		_ASSERT( compareDeviceArray<real_t>(devVecAcceleratedXi, hostAcceleratedXi, 2*nx*nodes) );
+		_ASSERT( compareDeviceArray<real_t>(devVecAcceleratedPsi, hostAcceleratedPsi, nu*nodes) );
+
+
+
 		delete [] readBuffer;
 		delete [] hostPrevXi;
 		delete [] hostPrevPsi;
-		delete [] hostPrevGradFbeXi;
-		delete [] hostPrevGradFbePsi;
+		delete [] hostPrevYvecXi;
+		delete [] hostPrevYvecPsi;
+		delete [] hostAcceleratedXi;
+		delete [] hostAcceleratedPsi;
 		readBuffer = NULL;
 	}
 	fclose(infile);

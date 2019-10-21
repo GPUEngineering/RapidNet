@@ -53,7 +53,7 @@ public:
 	 *
 	 * @param network
 	 * @param forecaster
-	 * @todo remove `SmpcConfig` from here
+	 * TODO remove `SmpcConfig` from here
 	 */
 	Engine( DwnNetwork *network,
 			ScenarioTree *scenarioTree,

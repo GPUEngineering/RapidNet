@@ -21,6 +21,7 @@ int main(void){
 		//Testing *otherTesting = new Testing();
 		//_ASSERT( otherTesting->testSmpcFbeController() );
 		_ASSERT( myTesting->testSmpcFbeController() );
+		_ASSERT( myTesting->testSmpcNamaController() );
 		//myTesting->testNewEngineTesting();
 	}else{
 		startTicToc();

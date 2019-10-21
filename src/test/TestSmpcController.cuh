@@ -45,13 +45,17 @@
 #define VARNAME_TEST_FINAL_PSI "finalPsi"
 #define VARNAME_TEST_PRIMAL_INFS_XI "primalInfsXi"
 #define VARNAME_TEST_PRIMAL_INFS_PSI "primalInfsPsi"
+#define VARNAME_TEST_FIXED_POINT_RESIDUAL_XI "fixedPointResidualXi"
+#define VARNAME_TEST_FIXED_POINT_RESIDUAL_PSI "fixedPointResidualPsi"
 #define VARNAME_TEST_TEMP_V  "tempV"
 #define VARNAME_TEST_X_DIR "fbeHessianDirXdir"
 #define VARNAME_TEST_U_DIR "fbeHessianDirUdir"
 #define VARNAME_TEST_GRAD_FBE_XI "fbeGradXi"
 #define VARNAME_TEST_GRAD_FBE_PSI "fbeGradPsi"
-#define VARNAME_TEST_PREV_GRAD_FBE_XI "fbeGradOldXi"
-#define VARNAME_TEST_PREV_GRAD_FBE_PSI "fbeGradOldPsi"
+#define VARNAME_TEST_LBFGS_CURRENT_YVEC_XI "lbfgsCurrentYvecXi"
+#define VARNAME_TEST_LBFGS_CURRENT_YVEC_PSI "lbfgsCurrentYvecPsi"
+#define VARNAME_TEST_LBFGS_PREVIOUS_YVEC_XI "lbfgsPreviousYvecXi"
+#define VARNAME_TEST_LBFGS_PREVIOUS_YVEC_PSI "lbfgsPreviousYvecPsi"
 #define VARNAME_TEST_LBFGS_MAT_S "matS"
 #define VARNAME_TEST_LBFGS_MAT_Y "matY"
 #define VARNAME_TEST_LBFGS_COL "colLbfgs"
@@ -113,7 +117,7 @@ public :
 	/**
 	 * Function of test the fixed point residual
 	 */
-	uint_t testFbeFixedPointResidual();
+	uint_t testFixedPointResidual();
 
 	/**
 	 * Function to test the lbfgs direction
@@ -135,7 +139,6 @@ public :
 	 * function to test the value FBE
 	 */
 	uint_t testValueFbe();
-
 	/**
 	 * function to test the line search update in
 	 * the FBE
@@ -145,6 +148,16 @@ public :
 	 * function to test the dual update in the global FBE algorithm
 	 */
 	uint_t testFbeDualUpdate();
+	/**
+	 * function that update the current fixed point residual for calculating
+	 * LBFSG direction
+	 */
+	uint_t testUpdateFixedPointResidualNamaAlgorithm();
+	/**
+	 * function to test the line search update in
+	 * the AME
+	 */
+	uint_t testAmeLineSearch();
 	/**
 	 * Destructor
 	 */
@@ -181,6 +194,11 @@ private:
 	 * smpc for the globalFbe algorithm
 	 */
 	string pathToFileGlobalFbeSmpc;
+	/*
+	 * path to the json file which contain the test parameters
+	 * smpc for the NAMA algorithm
+	 */
+	string pathToFileNamaSmpc;
 	/**
 	 * Object to retrive the information from the json file
 	 */

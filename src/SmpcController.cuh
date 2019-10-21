@@ -231,6 +231,13 @@ protected:
 	 * @param   real_t          step-size in the direction of the lbfgs direction
 	 */
 	real_t computeLineSearchLbfgsUpdate(real_t valueFbeYvar);
+	/*
+	 * compute the line search update of the tau for the AME
+	 * @param  valueAmeYvar     the value of the AME at the current dual variable Y
+	 *
+	 * @param  real_t           step-size of the lbfgs direction and fixed point residual
+	 */
+	real_t computeLineSearchAmeLbfgsUpdate(real_t valueAmeYvar);
 	/**
 	 * This method executes the APG algorithm and returns the primal infeasibility.
 	 * @return primalInfeasibilty;
@@ -283,6 +290,11 @@ protected:
 	 * intialise the dual vectors in the optimisation algorithm
 	 */
 	void initialiseAlgorithm();
+	/*
+	 * update the current and the previous fixed-point residual
+	 * for NAMA algorithm
+	 */
+	void updateFixedPointResidualNamaAlgorithm();
 	/*
 	 * deallocate the memory of the APG in the device
 	 */
@@ -487,11 +499,12 @@ protected:
 	/*
 	 * pointer array to the previous fixed point residual
 	 */
-	real_t **devPtrVecFixedPointResidualXi;
+	real_t *devVecCurrentFixedPointResidualXi;
 	/*
-	 * pointer array to the previous fixed point residual
+	 * pointer to the previous fixed point residual
 	 */
-	real_t **devPtrVecFixedPointResidualPsi;
+	real_t *devVecCurrentFixedPointResidualPsi;
+
 	/* ----- quasi-newton direction ----- */
 	/**
 	 * Pointer array for the vector required for solve step Xi
@@ -534,6 +547,22 @@ protected:
 	 * pointer to the direction from the LBFGS psi in the device
 	 */
 	real_t *devVecLbfgsDirPsi;
+	/*
+	 * Hessian oracle with respect to fixed point residual x
+	 */
+	real_t *devVecFixedPointXdir;
+	/*
+	 * Hessian oracle with respect to fixed point residual x
+	 */
+	real_t *devVecFixedPointUdir;
+	/*
+	 * Hessian oracle with respect to fixed point residual x
+	 */
+	real_t *devVecFixedPointPrimalXiDir;
+	/*
+	 * Hessian oracle with respect to fixed point residual x
+	 */
+	real_t *devVecFixedPointPrimalPsiDir;
 	/*
 	 * pointer array to the device pointer of Hessian-direction in X
 	 */
@@ -580,19 +609,33 @@ protected:
 	 * vector rho in the lbfgs-buffer rho_k = 1/(y_k*s_k)
 	 */
 	real_t *lbfgsBufferRho;
-
+	/*
+	 * current col of the lbfgs buffer
+	 */
 	uint_t lbfgsBufferCol;
-
+	/*
+	 * memory of the lbfgs buffer
+	 */
 	uint_t lbfgsBufferMemory;
-
+	/*
+	 * skip count of the lbfgs buffer
+	 */
 	uint_t lbfgsSkipCount;
-
+	/*
+	 * inverse Hessian with the lbfgs
+	 */
 	real_t lbfgsBufferHessian;
-
+	/*
+	 * value of the proximal function of g with state box
+	 */
 	real_t valueFunGxBox;
-
+	/*
+	 * value of the proximal function of g with state safe volume
+	 */
 	real_t valueFunGxSafe;
-
+	/*
+	 * value of the proximal function of g with control box
+	 */
 	real_t valueFunGuBox;
 
 	/**

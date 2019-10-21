@@ -27,6 +27,7 @@ Testing::Testing(){
 	pathToFileControllerConfig = "../test/testDataFiles/controllerConfig.json";
 	pathToFileEnigne = "../test/testDataFiles/engineTest.json";
 	pathToFileControllerFbeConfig = "../test/testDataFiles/controllerFbeConfig.json";
+	pathToFileControllerNamaConfig = "../test/testDataFiles/controllerNamaConfig.json";
 }
 
 template<typename T>
@@ -507,6 +508,7 @@ uint_t Testing::testSmpcController(){
 	_ASSERT( ptrMyTestSmpc->testExtrapolation() );
 	_ASSERT( ptrMyTestSmpc->testSoveStep() );
 	_ASSERT( ptrMyTestSmpc->testProximalStep());
+	_ASSERT( ptrMyTestSmpc->testFixedPointResidual());
 	_ASSERT( ptrMyTestSmpc->testDualUpdate() );
 
 	cout << "completed testing of the APG controller" << endl;
@@ -541,7 +543,7 @@ uint_t Testing::testSmpcFbeController(){
 
 	_ASSERT( ptrMyTestSmpc->testSoveStep() );
 	_ASSERT( ptrMyTestSmpc->testProximalStep());
-	_ASSERT( ptrMyTestSmpc->testFbeFixedPointResidual() );
+	_ASSERT( ptrMyTestSmpc->testFixedPointResidual() );
 	_ASSERT( ptrMyTestSmpc->testHessianOracalGlobalFbe() );
 	_ASSERT( ptrMyTestSmpc->testFbeGradient() );
 	_ASSERT( ptrMyTestSmpc->testValueFbe() );
@@ -550,6 +552,40 @@ uint_t Testing::testSmpcFbeController(){
 	_ASSERT( ptrMyTestSmpc->testFbeDualUpdate() );
 
 	cout << "completed testing global FBE algorithm in smpc" << endl;
+	delete ptrMyForecaster;
+	delete ptrMyTestSmpc;
+	ptrMyTestSmpc = NULL;
+	ptrMyForecaster = NULL;
+
+	return 1;
+}
+
+
+/**
+ * testing the smpc controller with global FBE
+ */
+uint_t Testing::testSmpcNamaController(){
+	TestSmpcController *ptrMyTestSmpc = new TestSmpcController( pathToFileControllerNamaConfig );
+	Forecaster *ptrMyForecaster = ptrMyTestSmpc->getForecaster();
+
+	uint_t timeInst = 1;
+	ptrMyForecaster->predictDemand( timeInst );
+	ptrMyForecaster->predictPrices( timeInst );
+
+	_ASSERT( ptrMyTestSmpc->testSoveStep() );
+	_ASSERT( ptrMyTestSmpc->testProximalStep());
+	_ASSERT( ptrMyTestSmpc->testFixedPointResidual() );
+	_ASSERT( ptrMyTestSmpc->testHessianOracalGlobalFbe() );
+	_ASSERT( ptrMyTestSmpc->testValueFbe() );
+	_ASSERT( ptrMyTestSmpc->testUpdateFixedPointResidualNamaAlgorithm() );
+	_ASSERT( ptrMyTestSmpc->testLbfgsDirection() );
+	_ASSERT( ptrMyTestSmpc->testAmeLineSearch() );
+	_ASSERT( ptrMyTestSmpc->testFbeDualUpdate() );
+
+	//_ASSERT( ptrMyTestSmpc->testFbeLineSearch() );
+	//_ASSERT( ptrMyTestSmpc->testFbeDualUpdate() );
+
+	cout << "completed NAMA algorithm in smpc" << endl;
 	delete ptrMyForecaster;
 	delete ptrMyTestSmpc;
 	ptrMyTestSmpc = NULL;
