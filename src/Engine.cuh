@@ -342,20 +342,31 @@ public:
 	 * nama algorithm 1 or true
 	*/
 	bool getNamaFlag();
-
+	/**
+	 * bool to indicate parallel Hessian style for NAMA
+	 * default 0 or false
+	 */
+	bool getNamaParallelHessianOracleSyle();
 	/*  SETTER'S IN THE ENGINE  */
 	/*
 	 * Option for uncertainty in price
 	 * @param    priceUncertaintyFlag    true to include uncertainty (default)
-	 *                                   false to include uncertainty (default)
+	 *                                   false to include uncertainty
 	 */
 	void setPriceUncertaintyFlag(bool inputFlag);
 	/*
 	 * Option for uncertainty in demand
 	 * @param    demandUncertaintyFlag    true to include uncertainty (default)
-	 *                                    false to include uncertainty (default)
+	 *                                    false to include uncertainty
 	 */
 	void setDemandUncertaintyFlag(bool inputFlag);
+	/*
+	 * Option for setting parallel Hessian calculation in NAMA algorithm
+	 * @param    styleParallelHessianOracleFlag    true to enable parallel hessian oracle
+	 *                                             false to disable parallel hessian oracle ( default )
+	 */
+	void setNamaParallelHessianOracleSyle(bool inputFlag);
+
 	/**
 	 * Destructor
 	 */
@@ -667,6 +678,10 @@ private:
 	 * algorithm)
 	*/
 	bool namaFlag;
+	/**
+	 * Flag for the parallel calculation of hessian Oracle in NAMA algorithm
+	 */
+	bool styleParallelHessianOracleFlag;
 	/**
 	 * cublas handler
 	 */

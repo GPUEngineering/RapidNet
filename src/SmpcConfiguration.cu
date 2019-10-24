@@ -114,6 +114,9 @@ SmpcConfiguration::SmpcConfiguration(string pathToFile){
 		a = jsonDocument[ALGORITHM_CONTROL];
 		_ASSERT(a.IsString());
 		algorithmName = a.GetString();
+		a = jsonDocument[STYLE_HESSIAN_ORACAL];
+		_ASSERT(a.IsString());
+		styleHessianOracle = a.GetString();
 		a = jsonDocument[VARNAME_LBFGS_BUFFER_SIZE];
 		_ASSERT(a.IsArray());
 		lbfgsBufferSize = (uint_t) a[0].GetFloat();
@@ -197,6 +200,10 @@ string SmpcConfiguration::getPathToForecaster(){
 
 string SmpcConfiguration::getOptimisationAlgorithm(){
 	return algorithmName;
+}
+
+string SmpcConfiguration::getHessianOracleNamaAlgorithm(){
+	return styleHessianOracle;
 }
 
 real_t SmpcConfiguration::getWeightEconomical(){

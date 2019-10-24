@@ -261,6 +261,38 @@ __global__ void scaleVecProbalitity(
 		uint_t numBlock);
 
 /**
+ * @param devDstVec          destination vector [x1 y1 x2 y2]
+ * @param devcSrcFirstVec    first source vector [x1 x2]
+ * @param devcSrcSecondVec   second source vector [y1 y2]
+ * @param dimFirstSrcBlock   dimension of the first src vector block
+ * @param dimSecondSrcBlock  dimension of the second src vector block
+ * @param numBlock           number of block
+ */
+__global__ void combineVectorAlternativeBlock(
+		real_t* devDstVec,
+		real_t* devSrcFirstVec,
+		real_t* devSrcSecondVec,
+		uint_t dimFirstSrcBlock,
+		uint_t dimSecondSrcBlock,
+		uint_t numBlock);
+
+/**
+ * @param devSrcVec          source vector [x1 y1 x2 y2]
+ * @param devcDstFirstVec    first destination vector [x1 x2]
+ * @param devcDstSecondVec   second source vector [y1 y2]
+ * @param dimFirstSrcBlock   dimension of the first src vector block
+ * @param dimSecondSrcBlock  dimension of the second src vector block
+ * @param numBlock           number of block (preferred the size of srcVector)
+ */
+__global__ void separateVectorAlternativeBlock(
+		real_t* devSrcVec,
+		real_t* devDstFirstVec,
+		real_t* devDstSecondVec,
+		uint_t dimFirstSrcBlock,
+		uint_t dimSecondSrcBlock,
+		uint_t numBlock);
+
+/**
  * Sets up the timer.
  *
  * Must be called before any invocation to

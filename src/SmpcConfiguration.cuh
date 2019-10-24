@@ -44,6 +44,8 @@
 #define PATH_SCENARIO_TREE_FILE "pathToScenarioTree"
 #define PATH_FORECASTER_FILE "pathToForecaster"
 #define ALGORITHM_CONTROL "algorithmName"
+#define STYLE_HESSIAN_ORACAL "styleHessianOracal"
+#define PARALLEL_HESSIAN_ORACLE "parallel"
 #define VARNAME_LBFGS_BUFFER_SIZE "lbfgsBufferSize"
 
 class SmpcConfiguration{
@@ -148,6 +150,11 @@ public:
 	 * Get the algorithm to solve the SMPC optimisation
 	 */
 	string getOptimisationAlgorithm();
+	/*
+	 * Get the algorithm to solve the SMPC optimisation
+	 */
+	string getHessianOracleNamaAlgorithm();
+
 	/** SETTER'S FOR THE CONTROLLER CONFIGURATION OBJECT**/
 	/*
 	 * update the current state from the controller
@@ -273,6 +280,10 @@ private:
 	 * algorithm used to solve the SMPC
 	 */
 	string algorithmName;
+	/*
+	 * style for calculating hessian Oracle in NAMA algorithm
+	 */
+	string styleHessianOracle;
 	/**
 	 *
 	 */

@@ -379,42 +379,119 @@ void SmpcController::allocateNamaAlgorithm(){
 	_CUDA( cudaMalloc((void**)&devVecCurrentFixedPointResidualXi, 2*nx*nodes*sizeof(real_t)));
 	_CUDA( cudaMalloc((void**)&devVecCurrentFixedPointResidualPsi, nu*nodes*sizeof(real_t)));
 
-	//_CUDA( cudaMalloc((void**)&devVecFixedPointXdir, nx*nodes*sizeof(real_t)));
-	//_CUDA( cudaMalloc((void**)&devVecFixedPointUdir, nu*nodes*sizeof(real_t)));
-	//_CUDA( cudaMalloc((void**)&devVecFixedPointPrimalXiDir, 2*nx*nodes*sizeof(real_t)));
-	//_CUDA( cudaMalloc((void**)&devVecFixedPointPrimalPsiDir, nu*nodes*sizeof(real_t)));
-
-
-	//_CUDA( cudaMalloc((void**)&devPtrVecFixedPointResidualXi, nodes*sizeof(real_t*)) );
-	//_CUDA( cudaMalloc((void**)&devPtrVecFixedPointResidualPsi, nodes*sizeof(real_t*)) );
-
-	real_t** ptrVecFixedPointResidualXi = new real_t*[nodes];
-	real_t** ptrVecFixedPointResidualPsi = new real_t*[nodes];
-
-	for(uint_t iNode = 0; iNode < nodes; iNode++){
-		ptrVecFixedPointResidualXi[iNode] = &devVecFixedPointResidualXi[2*iNode*nx];
-		ptrVecFixedPointResidualPsi[iNode] = &devVecFixedPointResidualPsi[iNode*nu];
-	}
-
 	_CUDA( cudaMemset(devVecPrevFixedPointResidualXi, 0, 2*nx*nodes*sizeof(real_t)) );
 	_CUDA( cudaMemset(devVecPrevFixedPointResidualPsi, 0, nu*nodes*sizeof(real_t)) );
 	_CUDA( cudaMemset(devVecCurrentFixedPointResidualXi, 0, 2*nx*nodes*sizeof(real_t)) );
 	_CUDA( cudaMemset(devVecCurrentFixedPointResidualPsi, 0, nu*nodes*sizeof(real_t)) );
-	//_CUDA( cudaMemset(devVecFixedPointXdir, 0, nx*nodes*sizeof(real_t)) );
-	//_CUDA( cudaMemset(devVecFixedPointUdir, 0, nu*nodes*sizeof(real_t)) );
-	//_CUDA( cudaMemset(devVecFixedPointPrimalXiDir, 0, 2*nx*nodes*sizeof(real_t)) );
-	//_CUDA( cudaMemset(devVecFixedPointPrimalPsiDir, 0, nu*nodes*sizeof(real_t)) );
 
+
+	if (ptrMyEngine->getNamaParallelHessianOracleSyle()){
+		allocateMemoryParallelHessianNamaAlgorithm();
+	}else{
+		real_t** ptrVecFixedPointResidualXi = new real_t*[nodes];
+		real_t** ptrVecFixedPointResidualPsi = new real_t*[nodes];
+
+		for(uint_t iNode = 0; iNode < nodes; iNode++){
+			ptrVecFixedPointResidualXi[iNode] = &devVecFixedPointResidualXi[2*iNode*nx];
+			ptrVecFixedPointResidualPsi[iNode] = &devVecFixedPointResidualPsi[iNode*nu];
+		}
+
+		_CUDA( cudaMemcpy(devPtrVecHessianOracleXi, ptrVecFixedPointResidualXi, nodes*sizeof(real_t*), cudaMemcpyHostToDevice) );
+		_CUDA( cudaMemcpy(devPtrVecHessianOraclePsi, ptrVecFixedPointResidualPsi, nodes*sizeof(real_t*), cudaMemcpyHostToDevice) );
+
+		delete [] ptrVecFixedPointResidualXi;
+		delete [] ptrVecFixedPointResidualPsi;
+
+		ptrVecFixedPointResidualXi = NULL;
+		ptrVecFixedPointResidualPsi = NULL;
+	}
+}
+
+
+
+void SmpcController::allocateMemoryParallelHessianNamaAlgorithm(){
+	uint_t nx = ptrMyEngine->getDwnNetwork()->getNumTanks();
+	uint_t nu = ptrMyEngine->getDwnNetwork()->getNumControls();
+	uint_t nv = ptrMySmpcConfig->getNV();
+	uint_t ns = ptrMyEngine->getScenarioTree()->getNumScenarios();
+	uint_t nodes = ptrMyEngine->getScenarioTree()->getNumNodes();
+	uint_t nDualXi = 2*nx;
+	uint_t nDualPsi = nu;
+	uint_t sizeHessianComputation = 2;
+
+	_CUDA( cudaMalloc((void**)&devVecV, sizeHessianComputation*nv*nodes*sizeof(real_t)) );
+	_CUDA( cudaMalloc((void**)&devVecQ, sizeHessianComputation*ns*nx*sizeof(real_t)) );
+	_CUDA( cudaMalloc((void**)&devVecR, sizeHessianComputation*ns*nv*sizeof(real_t)) );
+	_CUDA( cudaMalloc((void**)&devVecXdir, sizeHessianComputation*nx*nodes*sizeof(real_t)) );
+	_CUDA( cudaMalloc((void**)&devVecUdir, sizeHessianComputation*nu*nodes*sizeof(real_t)) );
+	_CUDA( cudaMalloc((void**)&devVecPrimalXiDir, sizeHessianComputation*nDualXi*nodes*sizeof(real_t)) );
+	_CUDA( cudaMalloc((void**)&devVecPrimalPsiDir, sizeHessianComputation*nDualPsi*nodes*sizeof(real_t)) );
+	_CUDA( cudaMalloc((void**)&devVecParallelHessianOracleXi, sizeHessianComputation*nDualXi*nodes*sizeof(real_t)) );
+	_CUDA( cudaMalloc((void**)&devVecParallelHessianOraclePsi, sizeHessianComputation*nDualPsi*nodes*sizeof(real_t)) );
+	//_CUDA( cudaMalloc((void**)&devPtrVecQ, ns*sizeof(real_t*)) );
+	//_CUDA( cudaMalloc((void**)&devPtrVecR, ns*sizeof(real_t*)) );
+
+	real_t** ptrVecV = new real_t*[nodes];
+	real_t** ptrVecQ = new real_t*[ns];
+	real_t** ptrVecR = new real_t*[ns];
+	real_t** ptrVecXdir = new real_t*[nodes];
+	real_t** ptrVecUdir = new real_t*[nodes];
+	real_t** ptrVecPrimalXiDir = new real_t*[nodes];
+	real_t** ptrVecPrimalPsiDir = new real_t*[nodes];
+	real_t** ptrVecFixedPointResidualXi = new real_t*[nodes];
+	real_t** ptrVecFixedPointResidualPsi = new real_t*[nodes];
+
+	for(uint_t iScenario = 0; iScenario < ns; iScenario++){
+		ptrVecQ[iScenario] = &devVecQ[sizeHessianComputation*iScenario*nx];
+		ptrVecR[iScenario] = &devVecR[sizeHessianComputation*iScenario*nv];
+	}
+	for(uint_t iNode = 0; iNode < nodes; iNode++){
+		ptrVecV[iNode] = &devVecV[sizeHessianComputation*iNode*nv];
+		ptrVecXdir[iNode] = &devVecXdir[sizeHessianComputation*iNode*nx];
+		ptrVecUdir[iNode] = &devVecUdir[sizeHessianComputation*iNode*nu];
+		ptrVecPrimalXiDir[iNode] = &devVecPrimalXiDir[sizeHessianComputation*nDualXi*iNode];
+		ptrVecPrimalPsiDir[iNode] = &devVecPrimalPsiDir[sizeHessianComputation*nDualPsi*iNode];
+		ptrVecFixedPointResidualXi[iNode] = &devVecParallelHessianOracleXi[sizeHessianComputation*iNode*nDualXi];
+		ptrVecFixedPointResidualPsi[iNode] = &devVecParallelHessianOraclePsi[sizeHessianComputation*iNode*nDualPsi];
+	}
+
+	_CUDA( cudaMemset(devVecV, 0, sizeHessianComputation*nv*nodes*sizeof(real_t)) );
+	_CUDA( cudaMemset(devVecQ, 0, sizeHessianComputation*ns*nx*sizeof(real_t)) );
+	_CUDA( cudaMemset(devVecR, 0, sizeHessianComputation*ns*nv*sizeof(real_t)) );
+	_CUDA( cudaMemset(devVecXdir, 0, sizeHessianComputation*nx*nodes*sizeof(real_t)) );
+	_CUDA( cudaMemset(devVecUdir, 0, sizeHessianComputation*nu*nodes*sizeof(real_t)) );
+	_CUDA( cudaMemset(devVecPrimalXiDir, 0, sizeHessianComputation*nDualXi*nodes*sizeof(real_t)) );
+	_CUDA( cudaMemset(devVecPrimalPsiDir, 0, sizeHessianComputation*nDualPsi*nodes*sizeof(real_t)) );
+	_CUDA( cudaMemcpy(devPtrVecQ, ptrVecQ, ns*sizeof(real_t*), cudaMemcpyHostToDevice));
+	_CUDA( cudaMemcpy(devPtrVecR, ptrVecR, ns*sizeof(real_t*), cudaMemcpyHostToDevice));
+	_CUDA( cudaMemcpy(devPtrVecV, ptrVecV, nodes*sizeof(real_t*), cudaMemcpyHostToDevice));
+	_CUDA( cudaMemcpy(devPtrVecXdir, ptrVecXdir, nodes*sizeof(real_t*), cudaMemcpyHostToDevice) );
+	_CUDA( cudaMemcpy(devPtrVecUdir, ptrVecUdir, nodes*sizeof(real_t*), cudaMemcpyHostToDevice) );
 	_CUDA( cudaMemcpy(devPtrVecHessianOracleXi, ptrVecFixedPointResidualXi, nodes*sizeof(real_t*), cudaMemcpyHostToDevice) );
 	_CUDA( cudaMemcpy(devPtrVecHessianOraclePsi, ptrVecFixedPointResidualPsi, nodes*sizeof(real_t*), cudaMemcpyHostToDevice) );
+	_CUDA( cudaMemcpy(devPtrVecPrimalXiDir, ptrVecPrimalXiDir, nodes*sizeof(real_t*), cudaMemcpyHostToDevice) );
+	_CUDA( cudaMemcpy(devPtrVecPrimalPsiDir, ptrVecPrimalPsiDir, nodes*sizeof(real_t*), cudaMemcpyHostToDevice) );
 
+
+	delete [] ptrVecQ;
+	delete [] ptrVecR;
+	delete [] ptrVecV;
+	delete [] ptrVecXdir;
+	delete [] ptrVecUdir;
+	delete [] ptrVecPrimalXiDir;
+	delete [] ptrVecPrimalPsiDir;
 	delete [] ptrVecFixedPointResidualXi;
 	delete [] ptrVecFixedPointResidualPsi;
 
+	ptrVecQ = NULL;
+	ptrVecR = NULL;
+	ptrVecV = NULL;
+	ptrVecXdir = NULL;
+	ptrVecUdir = NULL;
 	ptrVecFixedPointResidualXi = NULL;
 	ptrVecFixedPointResidualPsi = NULL;
-}
 
+}
 
 
 void SmpcController::initialiseAlgorithm(){
@@ -527,6 +604,13 @@ void SmpcController::initialiseAlgorithmSpecificData(){
 
 }
 
+
+void SmpcController::setParallelHessianOracleNamaAlgorithm(bool inputFlag){
+
+	ptrMyEngine->setNamaParallelHessianOracleSyle(inputFlag);
+	allocateNamaAlgorithm();
+	initialiseAlgorithmSpecificData();
+}
 
 /**
  * Performs the dual extrapolation step with given parameter.
@@ -881,7 +965,8 @@ void SmpcController::dualUpdate(){
 }
 
 
-void SmpcController::computeHessianOracalGlobalFbe(){
+
+void SmpcController::computeHessianOracleGlobalFbe(){
 	real_t *devTempVecR, *devTempVecQ, *devLv;
 	uint_t nx = ptrMyEngine->getDwnNetwork()->getNumTanks();
 	uint_t nu = ptrMyEngine->getDwnNetwork()->getNumControls();
@@ -1055,6 +1140,206 @@ void SmpcController::computeHessianOracalGlobalFbe(){
 }
 
 
+
+void SmpcController::computeParallelHessianOracleEnvelop(){
+	real_t *devTempVecR, *devTempVecQ, *devLv;
+	uint_t nx = ptrMyEngine->getDwnNetwork()->getNumTanks();
+	uint_t nu = ptrMyEngine->getDwnNetwork()->getNumControls();
+	uint_t nv = ptrMySmpcConfig->getNV();
+	uint_t ns = ptrMyEngine->getScenarioTree()->getNumScenarios();
+	uint_t N =  ptrMyEngine->getScenarioTree()->getPredHorizon();
+	uint_t nodes = ptrMyEngine->getScenarioTree()->getNumNodes();
+	uint_t *nodesPerStage = ptrMyEngine->getScenarioTree()->getNodesPerStage();
+	uint_t *nodesPerStageCumul = ptrMyEngine->getScenarioTree()->getNodesPerStageCumul();
+	uint_t iStageCumulNodes, iStageNodes, prevStageNodes, prevStageCumulNodes;
+	real_t scale[3] = {-0.5, 1, -1};
+	real_t alpha = 1;
+	real_t beta = 0;
+	uint_t sizeHessianComputation = 1;
+
+	if(ptrMyEngine->getNamaParallelHessianOracleSyle()){
+		sizeHessianComputation = 2;
+	}
+
+	//cout << "computation " << sizeHessianComputation << endl;
+
+	if(factorStepFlag == false){
+		initialiseSmpcController();
+		factorStepFlag = true;
+	}
+
+	_CUDA( cudaMalloc((void**)&devTempVecQ, sizeHessianComputation*ns*nx*sizeof(real_t)) );
+	_CUDA( cudaMalloc((void**)&devTempVecR, sizeHessianComputation*ns*nv*sizeof(real_t)) );
+	_CUDA( cudaMalloc((void**)&devLv, sizeHessianComputation*ns*nu*sizeof(real_t)) );
+	// sigma = 0
+	_CUDA( cudaMemset(devVecR, 0, sizeHessianComputation*nv*ns*sizeof(real_t)) );
+
+
+	//Backward substitution
+	for(uint_t iStage = N-1;iStage > -1;iStage--){
+		iStageCumulNodes = nodesPerStageCumul[iStage];
+		iStageNodes = nodesPerStage[iStage];
+
+		// v=Omega*r
+		_CUBLAS(cublasSgemmBatched(ptrMyEngine->getCublasHandle(), CUBLAS_OP_N, CUBLAS_OP_N, nv, sizeHessianComputation,
+				nv, &scale[0], (const real_t**)&ptrMyEngine->getPtrMatOmega()[iStageCumulNodes], nv,
+				(const real_t**)devPtrVecR, nv, &beta, &devPtrVecV[iStageCumulNodes], nv, iStageNodes));
+
+		if(iStage < N-1){
+			// v=Theta*q+v
+			_CUBLAS(cublasSgemmBatched(ptrMyEngine->getCublasHandle(), CUBLAS_OP_N, CUBLAS_OP_N, nv, sizeHessianComputation,
+					nx, &alpha, (const real_t**)&ptrMyEngine->getPtrMatTheta()[iStageCumulNodes], nv,
+					(const real_t**)devPtrVecQ, nx, &alpha, &devPtrVecV[iStageCumulNodes], nv, iStageNodes));
+		}
+
+		// v=Psi*psi+v
+		_CUBLAS(cublasSgemmBatched(ptrMyEngine->getCublasHandle(), CUBLAS_OP_N, CUBLAS_OP_N, nv, sizeHessianComputation,
+				nu, &alpha, (const real_t**)&ptrMyEngine->getPtrMatPsi()[iStageCumulNodes], nv,
+				(const real_t**)&devPtrVecHessianOraclePsi[iStageCumulNodes], nu, &alpha, &devPtrVecV
+				[iStageCumulNodes], nv, iStageNodes));
+
+		// v=Phi*xi+v
+		_CUBLAS(cublasSgemmBatched(ptrMyEngine->getCublasHandle(), CUBLAS_OP_N, CUBLAS_OP_N, nv, sizeHessianComputation,
+				2*nx, &alpha, (const real_t**)&ptrMyEngine->getPtrMatPhi()[iStageCumulNodes], nv, (const real_t**)
+				&devPtrVecHessianOracleXi[iStageCumulNodes], 2*nx, &alpha, &devPtrVecV[iStageCumulNodes],
+				nv, iStageNodes));
+
+		// r=D*xi+r
+		_CUBLAS(cublasSgemmBatched(ptrMyEngine->getCublasHandle(), CUBLAS_OP_N, CUBLAS_OP_N, nv, sizeHessianComputation,
+				2*nx, &alpha, (const real_t**)&ptrMyEngine->getPtrMatD()[iStageCumulNodes], nv, (const real_t**)
+				&devPtrVecHessianOracleXi[iStageCumulNodes], 2*nx, &alpha, devPtrVecR, nv, iStageNodes));
+
+		// r=f*psi+r
+		_CUBLAS(cublasSgemmBatched(ptrMyEngine->getCublasHandle(), CUBLAS_OP_N, CUBLAS_OP_N, nv, sizeHessianComputation,
+				nu, &alpha, (const real_t**)&ptrMyEngine->getPtrMatF()[iStageCumulNodes], nv, (const real_t**)
+				&devPtrVecHessianOraclePsi[iStageCumulNodes], nu, &alpha, devPtrVecR, nv, iStageNodes));
+
+		if(iStage < N-1){
+			// r=g*q+r
+			_CUBLAS(cublasSgemmBatched(ptrMyEngine->getCublasHandle(), CUBLAS_OP_N, CUBLAS_OP_N, nv, sizeHessianComputation,
+					nx, &alpha, (const real_t**)&ptrMyEngine->getPtrMatG()[0], nv, (const real_t**)devPtrVecQ,
+					nx, &alpha, devPtrVecR, nv, iStageNodes));
+		}
+
+		if(iStage < N-1){
+			// q=F'xi+q
+			_CUBLAS(cublasSgemmBatched(ptrMyEngine->getCublasHandle(), CUBLAS_OP_T, CUBLAS_OP_N, nx, sizeHessianComputation,
+					2*nx, &alpha, (const real_t**)&ptrMyEngine->getPtrSysMatF()[iStageCumulNodes], 2*nx, (const real_t**)
+					&devPtrVecHessianOracleXi[iStageCumulNodes], 2*nx, &alpha, devPtrVecQ, nx, iStageNodes));
+		}else{
+			// q=F'xi
+			_CUBLAS(cublasSgemmBatched(ptrMyEngine->getCublasHandle(), CUBLAS_OP_T, CUBLAS_OP_N, nx, sizeHessianComputation,
+					2*nx, &alpha, (const real_t**)&ptrMyEngine->getPtrSysMatF()[iStageCumulNodes], 2*nx, (const real_t**)
+					&devPtrVecHessianOracleXi[iStageCumulNodes], 2*nx, &beta, devPtrVecQ, nx, iStageNodes));
+		}
+
+		if(iStage > 0){
+			prevStageNodes = nodesPerStage[iStage - 1];
+			prevStageCumulNodes = nodesPerStageCumul[iStage - 1];
+			if( (iStageNodes - prevStageNodes) > 0 ){
+				solveSumChildren<<<prevStageNodes, sizeHessianComputation*nx>>>(devVecQ, devTempVecQ, ptrMyEngine->getTreeNumChildren(),
+						ptrMyEngine->getTreeNumChildrenCumul(), prevStageCumulNodes, prevStageNodes, iStage - 1, sizeHessianComputation*nx);
+				solveSumChildren<<<prevStageNodes, sizeHessianComputation*nv>>>(devVecR, devTempVecR, ptrMyEngine->getTreeNumChildren(),
+						ptrMyEngine->getTreeNumChildrenCumul(), prevStageCumulNodes, prevStageNodes, iStage - 1 , sizeHessianComputation*nv);
+				_CUDA(cudaMemcpy(devVecR, devTempVecR, sizeHessianComputation*prevStageNodes*nv*sizeof(real_t), cudaMemcpyDeviceToDevice));
+				_CUDA(cudaMemcpy(devVecQ, devTempVecQ, sizeHessianComputation*prevStageNodes*nx*sizeof(real_t), cudaMemcpyDeviceToDevice));
+			}
+		}
+	}
+
+	// Forward substitution
+	for(uint_t iStage = 0;iStage < N;iStage++){
+		iStageNodes = nodesPerStage[iStage];
+		iStageCumulNodes = nodesPerStageCumul[iStage];
+		if(iStage == 0){
+			// x = 0
+			_CUDA( cudaMemset(devVecXdir, 0, sizeHessianComputation*nx*sizeof(real_t)) );
+			// u = Lv
+			_CUBLAS(cublasSgemm_v2(ptrMyEngine->getCublasHandle(), CUBLAS_OP_N, CUBLAS_OP_N, nu, sizeHessianComputation,
+					nv, &alpha, ptrMyEngine->getSysMatL(), nu, devVecV, nv, &beta, devVecUdir, nu) );
+			// x = x + Bu
+			_CUBLAS(cublasSgemm_v2(ptrMyEngine->getCublasHandle(), CUBLAS_OP_N, CUBLAS_OP_N, nx, sizeHessianComputation,
+					nu, &alpha, ptrMyEngine->getSysMatB(), nx, devVecUdir, nu, &beta, devVecXdir, nx) );
+
+		}else{
+			prevStageCumulNodes = nodesPerStageCumul[iStage - 1];
+			if((nodesPerStage[iStage] - nodesPerStage[iStage-1]) > 0){
+				// u_k = Lv_k
+				_CUBLAS(cublasSgemm_v2(ptrMyEngine->getCublasHandle(), CUBLAS_OP_N, CUBLAS_OP_N, nu, sizeHessianComputation*iStageNodes,
+						nv, &alpha, ptrMyEngine->getSysMatL(), nu, &devVecV[sizeHessianComputation*iStageCumulNodes*nv],
+						nv, &beta, &devVecUdir[sizeHessianComputation*iStageCumulNodes*nu], nu));
+				// prevLv = u_{k-1}
+				_CUDA( cudaMemcpy(devLv, &devVecUdir[sizeHessianComputation*prevStageCumulNodes*nu],
+						sizeHessianComputation*nu*nodesPerStage[iStage-1]*sizeof(real_t), cudaMemcpyDeviceToDevice));
+				// u_{k} = u_{k} + prevLu
+				solveChildNodesUpdate<<<iStageNodes, sizeHessianComputation*nu>>>(devLv, &devVecUdir[sizeHessianComputation*iStageCumulNodes*nu],
+						ptrMyEngine->getTreeAncestor(), iStageCumulNodes, sizeHessianComputation*nu);
+				// x = Bu
+				_CUBLAS(cublasSgemm_v2(ptrMyEngine->getCublasHandle(), CUBLAS_OP_N, CUBLAS_OP_N, nx, sizeHessianComputation*iStageNodes, nu,
+						&alpha, ptrMyEngine->getSysMatB(), nx, &devVecUdir[sizeHessianComputation*iStageCumulNodes*nu], nu,
+						&beta, &devVecXdir[sizeHessianComputation*iStageCumulNodes*nx], nx));
+				// x_{k+1} = x_k
+				solveChildNodesUpdate<<<iStageNodes, sizeHessianComputation*nx>>>(&devVecXdir[sizeHessianComputation*prevStageCumulNodes*nx],
+						&devVecXdir[sizeHessianComputation*iStageCumulNodes*nx], ptrMyEngine->getTreeAncestor(),
+						iStageCumulNodes, sizeHessianComputation*nx);
+			}else{
+				// u_k = Lv_k
+				_CUBLAS(cublasSgemm_v2(ptrMyEngine->getCublasHandle(), CUBLAS_OP_N, CUBLAS_OP_N, nu, sizeHessianComputation*iStageNodes,
+						nv, &alpha, ptrMyEngine->getSysMatL(), nu, &devVecV[sizeHessianComputation*iStageCumulNodes*nv], nv,
+						&beta, &devVecUdir[sizeHessianComputation*iStageCumulNodes*nu], nu));
+				// u_k = u_{k} + u_{k-1}^{anc}
+				_CUBLAS( cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), sizeHessianComputation*nu*iStageNodes ,&alpha,
+						&devVecUdir[sizeHessianComputation*prevStageCumulNodes*nu], 1, &devVecUdir[sizeHessianComputation*iStageCumulNodes*nu], 1));
+				// x_{k+1} = x_{k}
+				_CUDA(cudaMemcpy(&devVecXdir[sizeHessianComputation*iStageCumulNodes*nx], &devVecXdir[sizeHessianComputation*prevStageCumulNodes*nx],
+						sizeHessianComputation*nx*iStageNodes*sizeof(real_t), cudaMemcpyDeviceToDevice));
+				// x = x+Bu
+				_CUBLAS(cublasSgemm_v2(ptrMyEngine->getCublasHandle(), CUBLAS_OP_N, CUBLAS_OP_N, nx, sizeHessianComputation*iStageNodes, nu, &alpha,
+						ptrMyEngine->getSysMatB(), nx, &devVecUdir[sizeHessianComputation*iStageCumulNodes*nu], nu, &alpha,
+						&devVecXdir[sizeHessianComputation*iStageCumulNodes*nx], nx));
+			}
+
+		}
+	}
+
+	// primalX = HxDir
+	_CUBLAS(cublasSgemmBatched(ptrMyEngine->getCublasHandle(), CUBLAS_OP_N, CUBLAS_OP_N, 2*nx, sizeHessianComputation, nx, &alpha,
+			(const real_t**)ptrMyEngine->getPtrSysMatF(), 2*nx, (const real_t**)devPtrVecXdir, nx, &beta, devPtrVecPrimalXiDir, 2*nx, nodes) );
+	_CUBLAS(cublasSgemmBatched(ptrMyEngine->getCublasHandle(), CUBLAS_OP_N, CUBLAS_OP_N, nu, sizeHessianComputation, nu, &alpha,
+			(const real_t**)ptrMyEngine->getPtrSysMatG(), nu, (const real_t**)devPtrVecUdir, nu, &beta, devPtrVecPrimalPsiDir, nu, nodes) );
+
+
+	/*
+	real_t* hostX = new real_t[2*sizeHessianComputation*nu*nodes];
+	_CUDA(cudaMemcpy( hostX, devVecPrimalXiDir, sizeHessianComputation*2*nx*nodes*sizeof(real_t), cudaMemcpyDeviceToHost) );
+	if( sizeHessianComputation == 1){
+		for ( int index = 0; index < 2*nx*nodes; index++){
+			cout << hostX[index] << " ";
+		}
+		cout<< endl;
+	}else{
+		for ( int index = 0; index < nodes; index++){
+			for (int indexEle = 0; indexEle < 2*nx; indexEle++)
+				cout << hostX[index*2*nx*2 + indexEle] << " ";
+		}
+		cout<< endl;
+		for ( int index = 0; index < nodes; index++){
+			for (int indexEle = 0; indexEle < 2*nx; indexEle++)
+				cout << hostX[index*2*nx*2 + 2*nx + indexEle] << " ";
+		}
+		cout<< endl;
+
+	}*/
+
+	_CUDA(cudaFree(devTempVecQ));
+	_CUDA(cudaFree(devTempVecR));
+	_CUDA(cudaFree(devLv) );
+	devTempVecQ = NULL;
+	devTempVecR = NULL;
+	devLv = NULL;
+
+}
+
 void SmpcController::updateFixedPointResidualNamaAlgorithm(){
 	uint_t nx = ptrMyEngine->getDwnNetwork()->getNumTanks();
 	uint_t nu = ptrMyEngine->getDwnNetwork()->getNumControls();
@@ -1088,7 +1373,8 @@ void SmpcController::computeGradientFbe(){
 	_CUBLAS( cublasSscal_v2(ptrMyEngine->getCublasHandle(), nu*nodes, &negAlpha, devVecGradientFbePsi, 1));
 
 	// hessianDirection(gradFbe)
-	computeHessianOracalGlobalFbe();
+	computeHessianOracleGlobalFbe();
+	//computeParallelHessianOracleEnvelop();
 
 	// gradFbeXi = gradFbe + lambda primalXidir and gradFbePsi = gradFbe + lambda primalPsidir
 	_CUBLAS( cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), 2*nx*nodes, &stepSize, devVecPrimalXiDir, 1, devVecGradientFbeXi, 1));
@@ -1261,7 +1547,7 @@ real_t SmpcController::computeLineSearchLbfgsUpdate(real_t valueFbeYvar){
 	// swap fbeGrad and lbfgsDir
 	_CUBLAS( cublasSswap_v2(ptrMyEngine->getCublasHandle(), 2*nx*nodes, devVecGradientFbeXi, 1, devVecLbfgsDirXi, 1));
 	_CUBLAS( cublasSswap_v2(ptrMyEngine->getCublasHandle(), nu*nodes, devVecGradientFbePsi, 1, devVecLbfgsDirPsi, 1));
-	computeHessianOracalGlobalFbe();
+	computeHessianOracleGlobalFbe();
 	// swap fbeGrad and lbfgsDir
 	_CUBLAS( cublasSswap_v2(ptrMyEngine->getCublasHandle(), 2*nx*nodes, devVecGradientFbeXi, 1, devVecLbfgsDirXi, 1));
 	_CUBLAS( cublasSswap_v2(ptrMyEngine->getCublasHandle(), nu*nodes, devVecGradientFbePsi, 1, devVecLbfgsDirPsi, 1));
@@ -1301,7 +1587,6 @@ real_t SmpcController::computeLineSearchLbfgsUpdate(real_t valueFbeYvar){
 
 				valueFbeWvar = computeValueFbe();
 
-				//cout << "iStep " << iStep << " " << tau << " " << valueFbeWvar - valueFbeYvar << endl;
 				if( valueFbeWvar <= valueFbeYvar){
 					iStep = iStep + 1;
 					if (iStep < maxLineSearchStep){
@@ -1319,6 +1604,109 @@ real_t SmpcController::computeLineSearchLbfgsUpdate(real_t valueFbeYvar){
 	return abs(tau);
 }
 
+
+/**
+ * compute the line search direction for the NAMA algorithm
+ */
+real_t SmpcController::computeLineSearchAmeDirection(){
+	uint_t nodes = ptrMyEngine->getScenarioTree()->getNumNodes();
+	uint_t nx = ptrMyEngine->getDwnNetwork()->getNumTanks();
+	uint_t nu = ptrMyEngine->getDwnNetwork()->getNumControls();
+	uint_t nDualXi = 2*nx;
+	uint_t nDualPsi = nu;
+	real_t alpha = stepSize;
+
+	if( ptrMyEngine->getNamaParallelHessianOracleSyle()){
+		uint_t sizeParallelHessian = 2;
+		//devVecParallelHessianOracleXi
+		/*
+		_CUDA( cudaMemcpy(devVecParallelHessianOracleXi,  devVecFixedPointResidualXi, sizeParallelHessian*nDualXi*nodes*sizeof(real_t),
+				cudaMemcpyDeviceToDevice) );
+		_CUDA( cudaMemcpy(devVecParallelHessianOraclePsi,  devVecFixedPointResidualPsi, sizeParallelHessian*nDualPsi*nodes*sizeof(real_t),
+				cudaMemcpyDeviceToDevice) );
+		alpha = -stepSize;
+		_CUDA( cudaMemcpy(&devVecParallelHessianOracleXi[sizeParallelHessian*nDualXi*nodes],  devVecLbfgsDirXi,
+				sizeParallelHessian*nDualXi*nodes*sizeof(real_t), cudaMemcpyDeviceToDevice) );
+		_CUDA( cudaMemcpy(&devVecParallelHessianOraclePsi[sizeParallelHessian*nDualPsi*nodes],  devVecLbfgsDirPsi,
+				sizeParallelHessian*nDualPsi*nodes*sizeof(real_t), cudaMemcpyDeviceToDevice) );
+		_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), 2*nx*nodes, &alpha, devVecFixedPointResidualXi, 1,
+				&devVecParallelHessianOracleXi[sizeParallelHessian*nDualXi*nodes], 1));
+		_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), nu*nodes, &alpha, devVecFixedPointResidualPsi, 1,
+				&devVecParallelHessianOraclePsi[sizeParallelHessian*nDualPsi*nodes], 1));
+				*/
+
+		alpha = -stepSize;
+		_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), nDualXi*nodes, &alpha, devVecFixedPointResidualXi, 1, devVecLbfgsDirXi, 1));
+		_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), nDualPsi*nodes, &alpha, devVecFixedPointResidualPsi, 1, devVecLbfgsDirPsi, 1));
+
+		combineVectorAlternativeBlock<<<nodes, 2*nDualXi>>>( devVecParallelHessianOracleXi, devVecLbfgsDirXi,
+				devVecFixedPointResidualXi, nDualXi, nDualXi, nodes);
+		combineVectorAlternativeBlock<<<nodes, 2*nDualPsi>>>( devVecParallelHessianOraclePsi, devVecLbfgsDirPsi,
+				devVecFixedPointResidualPsi, nDualPsi, nDualPsi, nodes);
+
+		computeParallelHessianOracleEnvelop();
+
+		_CUDA( cudaMemcpy(devVecParallelHessianOracleXi, devVecXdir, sizeParallelHessian*nx*nodes*sizeof(real_t), cudaMemcpyDeviceToDevice) );
+		_CUDA( cudaMemcpy(devVecParallelHessianOraclePsi, devVecUdir, sizeParallelHessian*nu*nodes*sizeof(real_t), cudaMemcpyDeviceToDevice) );
+
+		separateVectorAlternativeBlock<<<nodes, 2*nx>>>(devVecParallelHessianOracleXi, devVecXdir, &devVecXdir[nx*nodes], nx, nx, nodes);
+		separateVectorAlternativeBlock<<<nodes, 2*nu>>>(devVecParallelHessianOraclePsi, devVecUdir, &devVecUdir[nu*nodes], nu, nu, nodes);
+
+
+		_CUDA( cudaMemcpy(devVecParallelHessianOracleXi, devVecPrimalXiDir, sizeParallelHessian*nDualXi*nodes*sizeof(real_t),
+				cudaMemcpyDeviceToDevice) );
+		_CUDA( cudaMemcpy(devVecParallelHessianOraclePsi, devVecPrimalPsiDir, sizeParallelHessian*nDualPsi*nodes*sizeof(real_t),
+				cudaMemcpyDeviceToDevice) );
+
+		separateVectorAlternativeBlock<<<nodes, 2*nDualXi>>>(devVecParallelHessianOracleXi, devVecPrimalXiDir, &devVecPrimalXiDir[nDualXi*nodes],
+				nDualXi, nDualXi, nodes);
+		separateVectorAlternativeBlock<<<nodes, 2*nDualPsi>>>(devVecParallelHessianOraclePsi, devVecPrimalPsiDir, &devVecPrimalPsiDir[nDualPsi*nodes],
+				nDualPsi, nDualPsi, nodes);
+
+		alpha = stepSize;
+		// y = y + gamma*FPR
+		_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), 2*nx*nodes, &alpha, devVecFixedPointResidualXi, 1, ptrProximalXi[0], 1));
+		_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), nu*nodes, &alpha, devVecFixedPointResidualPsi, 1, ptrProximalPsi[0], 1));
+		// x = x + xDir
+		_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), nx*nodes, &alpha, &devVecXdir[nx*nodes], 1, devVecX, 1));
+		_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), nu*nodes, &alpha, &devVecUdir[nu*nodes], 1, devVecU, 1));
+
+		// primalXi = primalXi + primalXiDir
+		_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), 2*nx*nodes, &alpha, &devVecPrimalXiDir[nDualXi*nodes], 1, devVecPrimalXi, 1));
+		_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), nu*nodes, &alpha, &devVecPrimalPsiDir[nDualPsi*nodes], 1, devVecPrimalPsi, 1));
+
+	}else{
+		// direction with respect to the fixed point residual
+		//computeHessianOracleGlobalFbe();
+		computeParallelHessianOracleEnvelop();
+
+		// y = y + gamma*FPR
+		_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), 2*nx*nodes, &alpha, devVecFixedPointResidualXi, 1, ptrProximalXi[0], 1));
+		_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), nu*nodes, &alpha, devVecFixedPointResidualPsi, 1, ptrProximalPsi[0], 1));
+		// x = x + xDir
+		_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), nx*nodes, &alpha, devVecXdir, 1, devVecX, 1));
+		_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), nu*nodes, &alpha, devVecUdir, 1, devVecU, 1));
+
+		// primalXi = primalXi + primalXiDir
+		_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), 2*nx*nodes, &alpha, devVecPrimalXiDir, 1, devVecPrimalXi, 1));
+		_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), nu*nodes, &alpha, devVecPrimalPsiDir, 1, devVecPrimalPsi, 1));
+
+		// lbfgsDir = lbfgsDir - stepSize*fixedPointResidual
+		alpha = -stepSize;
+		_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), 2*nx*nodes, &alpha, devVecFixedPointResidualXi, 1, devVecLbfgsDirXi, 1));
+		_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), nu*nodes, &alpha, devVecFixedPointResidualPsi, 1, devVecLbfgsDirPsi, 1));
+		// swap fixedPointResidual and lbfgsDir
+		_CUBLAS( cublasSswap_v2(ptrMyEngine->getCublasHandle(), 2*nx*nodes, devVecFixedPointResidualXi, 1, devVecLbfgsDirXi, 1));
+		_CUBLAS( cublasSswap_v2(ptrMyEngine->getCublasHandle(), nu*nodes, devVecFixedPointResidualPsi, 1, devVecLbfgsDirPsi, 1));
+		// direction with respect to the lbfgsDir
+		//computeHessianOracleGlobalFbe();
+		computeParallelHessianOracleEnvelop();
+		// swap fixedPointResidual and lbfgsDir
+		_CUBLAS( cublasSswap_v2(ptrMyEngine->getCublasHandle(), 2*nx*nodes, devVecFixedPointResidualXi, 1, devVecLbfgsDirXi, 1));
+		_CUBLAS( cublasSswap_v2(ptrMyEngine->getCublasHandle(), nu*nodes, devVecFixedPointResidualPsi, 1, devVecLbfgsDirPsi, 1));
+	}
+}
+
 /**
  * function that compute the line search as a combination of the
  *    lbfgs direction and fixed point residual
@@ -1329,7 +1717,6 @@ real_t SmpcController::computeLineSearchAmeLbfgsUpdate(real_t valueAmeYvar){
 	uint_t nu = ptrMyEngine->getDwnNetwork()->getNumControls();
 	real_t tau = 1;
 	real_t TOLERANCE = 1e-4;
-	real_t alpha = stepSize;
 
 	real_t valueAmeWvar, valueDirection;
 	uint_t maxLineSearchStep = 10;
@@ -1345,8 +1732,9 @@ real_t SmpcController::computeLineSearchAmeLbfgsUpdate(real_t valueAmeYvar){
 	valueDirection = -(valueDirection + valueAmeWvar);
 	//cout << valueDirection << endl;
 
+	/*
 	// direction with respect to the fixed point residual
-	computeHessianOracalGlobalFbe();
+	computeHessianOracleGlobalFbe();
 	// y = y + gamma*FPR
 	_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), 2*nx*nodes, &alpha, devVecFixedPointResidualXi, 1, ptrProximalXi[0], 1));
 	_CUBLAS(cublasSaxpy_v2(ptrMyEngine->getCublasHandle(), nu*nodes, &alpha, devVecFixedPointResidualPsi, 1, ptrProximalPsi[0], 1));
@@ -1365,10 +1753,13 @@ real_t SmpcController::computeLineSearchAmeLbfgsUpdate(real_t valueAmeYvar){
 	_CUBLAS( cublasSswap_v2(ptrMyEngine->getCublasHandle(), 2*nx*nodes, devVecFixedPointResidualXi, 1, devVecLbfgsDirXi, 1));
 	_CUBLAS( cublasSswap_v2(ptrMyEngine->getCublasHandle(), nu*nodes, devVecFixedPointResidualPsi, 1, devVecLbfgsDirPsi, 1));
 	// direction with respect to the lbfgsDir
-	computeHessianOracalGlobalFbe();
+	computeHessianOracleGlobalFbe();
 	// swap fixedPointResidual and lbfgsDir
 	_CUBLAS( cublasSswap_v2(ptrMyEngine->getCublasHandle(), 2*nx*nodes, devVecFixedPointResidualXi, 1, devVecLbfgsDirXi, 1));
 	_CUBLAS( cublasSswap_v2(ptrMyEngine->getCublasHandle(), nu*nodes, devVecFixedPointResidualPsi, 1, devVecLbfgsDirPsi, 1));
+	*/
+
+	computeLineSearchAmeDirection();
 
 	if( valueDirection > 0){
 		cout<< "LBFGS direction is positive " << valueDirection << endl;
@@ -2000,6 +2391,13 @@ void SmpcController::deallocateNamaAlgorithm(){
 
 	_CUDA( cudaFree(devVecCurrentFixedPointResidualXi) );
 	_CUDA( cudaFree(devVecCurrentFixedPointResidualPsi) );
+
+	if (ptrMyEngine->getNamaParallelHessianOracleSyle()){
+		_CUDA( cudaFree(devVecParallelHessianOracleXi) );
+		_CUDA( cudaFree(devVecParallelHessianOraclePsi) );
+		devVecParallelHessianOracleXi = NULL;
+		devVecParallelHessianOraclePsi = NULL;
+	}
 
 	devVecPrevFixedPointResidualXi = NULL;
 	devVecPrevFixedPointResidualPsi = NULL;

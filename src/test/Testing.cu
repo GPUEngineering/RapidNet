@@ -544,7 +544,7 @@ uint_t Testing::testSmpcFbeController(){
 	_ASSERT( ptrMyTestSmpc->testSoveStep() );
 	_ASSERT( ptrMyTestSmpc->testProximalStep());
 	_ASSERT( ptrMyTestSmpc->testFixedPointResidual() );
-	_ASSERT( ptrMyTestSmpc->testHessianOracalGlobalFbe() );
+	_ASSERT( ptrMyTestSmpc->testHessianOracleGlobalFbe() );
 	_ASSERT( ptrMyTestSmpc->testFbeGradient() );
 	_ASSERT( ptrMyTestSmpc->testValueFbe() );
 	_ASSERT( ptrMyTestSmpc->testLbfgsDirection() );
@@ -575,12 +575,13 @@ uint_t Testing::testSmpcNamaController(){
 	_ASSERT( ptrMyTestSmpc->testSoveStep() );
 	_ASSERT( ptrMyTestSmpc->testProximalStep());
 	_ASSERT( ptrMyTestSmpc->testFixedPointResidual() );
-	_ASSERT( ptrMyTestSmpc->testHessianOracalGlobalFbe() );
+	_ASSERT( ptrMyTestSmpc->testHessianOracleGlobalFbe() );
 	_ASSERT( ptrMyTestSmpc->testValueFbe() );
 	_ASSERT( ptrMyTestSmpc->testUpdateFixedPointResidualNamaAlgorithm() );
 	_ASSERT( ptrMyTestSmpc->testLbfgsDirection() );
 	_ASSERT( ptrMyTestSmpc->testAmeLineSearch() );
 	_ASSERT( ptrMyTestSmpc->testFbeDualUpdate() );
+	_ASSERT( ptrMyTestSmpc->testParallelHessianNamaAlgorithm());
 
 	//_ASSERT( ptrMyTestSmpc->testFbeLineSearch() );
 	//_ASSERT( ptrMyTestSmpc->testFbeDualUpdate() );
@@ -594,6 +595,85 @@ uint_t Testing::testSmpcNamaController(){
 	return 1;
 }
 
+
+uint_t Testing::testCombineAndSeparateVectorAlternative(){
+
+	uint_t numBlock = 4;
+	uint_t dimFirstBlock = 3;
+	uint_t dimSecondBlock = 5;
+	uint_t dimDstVec = dimFirstBlock + dimSecondBlock;
+	real_t *srcFirstVec = new real_t[numBlock*dimFirstBlock];
+	real_t *srcSecondVec = new real_t[numBlock*dimSecondBlock];
+	real_t *dstVec = new real_t[ numBlock*(dimFirstBlock + dimSecondBlock)];
+	real_t *dstFirstVec = new real_t[numBlock*dimFirstBlock];
+	real_t *dstSecondVec = new real_t[numBlock*dimSecondBlock];
+
+	real_t *devSrcFirstVec, *devSrcSecondVec, *devDstVec;
+	real_t *devSrcVec, *devDstFirstVec, *devDstSecondVec;
+
+	_CUDA( cudaMalloc((void**)&devSrcFirstVec, numBlock*dimFirstBlock*sizeof(real_t)) );
+	_CUDA( cudaMalloc((void**)&devSrcSecondVec, numBlock*dimSecondBlock*sizeof(real_t)) );
+	_CUDA( cudaMalloc((void**)&devDstVec, numBlock*dimDstVec*sizeof(real_t)) );
+
+	_CUDA( cudaMalloc((void**)&devSrcVec, numBlock*dimDstVec*sizeof(real_t)) );
+	_CUDA( cudaMalloc((void**)&devDstFirstVec, numBlock*dimFirstBlock*sizeof(real_t)) );
+	_CUDA( cudaMalloc((void**)&devDstSecondVec, numBlock*dimSecondBlock*sizeof(real_t)) );
+
+	for( int index = 0; index < numBlock*dimFirstBlock; index++){
+		srcFirstVec[index] = index;
+	}
+	for( int index = 0; index < numBlock*dimSecondBlock; index++){
+		srcSecondVec[index] = -index;
+	}
+
+	_CUDA( cudaMemcpy(devSrcFirstVec, srcFirstVec, numBlock*dimFirstBlock*sizeof(real_t), cudaMemcpyHostToDevice) );
+	_CUDA( cudaMemcpy(devSrcSecondVec, srcSecondVec, numBlock*dimSecondBlock*sizeof(real_t), cudaMemcpyHostToDevice) );
+
+	combineVectorAlternativeBlock<<<numBlock*(dimDstVec + 1), 2>>>(devDstVec, devSrcFirstVec, devSrcSecondVec,
+			dimFirstBlock, dimSecondBlock, numBlock);
+
+	_CUDA( cudaMemcpy(dstVec, devDstVec, numBlock*dimDstVec*sizeof(real_t), cudaMemcpyDeviceToHost) );
+
+	for (int iBlock = 0; iBlock < numBlock; iBlock++){
+		for (int index = 0; index < dimFirstBlock; index++){
+			_ASSERT(dstVec[ iBlock*dimDstVec + index] == srcFirstVec[iBlock*dimFirstBlock + index]);
+		}
+		for (int index = dimFirstBlock; index < dimDstVec; index++){
+			_ASSERT(dstVec[ iBlock*dimDstVec + index] == srcSecondVec[iBlock*dimSecondBlock + index - dimFirstBlock]);
+		}
+
+	}
+
+	_CUDA( cudaMemcpy(devSrcVec, devDstVec, numBlock*dimDstVec*sizeof(real_t), cudaMemcpyDeviceToDevice) );
+	separateVectorAlternativeBlock<<<numBlock*(dimDstVec + 1), 2>>>(devSrcVec, devDstFirstVec, devDstSecondVec,
+			dimFirstBlock, dimSecondBlock, numBlock);
+
+	_CUDA( cudaMemcpy(dstFirstVec, devDstFirstVec, numBlock*dimFirstBlock*sizeof(real_t), cudaMemcpyDeviceToHost) );
+	_CUDA( cudaMemcpy(dstSecondVec, devDstSecondVec, numBlock*dimSecondBlock*sizeof(real_t), cudaMemcpyDeviceToHost) );
+
+	for( int index = 0; index < numBlock*dimFirstBlock; index++){
+		_ASSERT( srcFirstVec[index] == dstFirstVec[index]);
+	}
+	for( int index = 0; index < numBlock*dimSecondBlock; index++){
+		_ASSERT( srcSecondVec[index] == dstSecondVec[index]);
+	}
+
+	delete [] srcFirstVec;
+	delete [] srcSecondVec;
+	delete [] dstVec;
+	delete [] dstFirstVec;
+	delete [] dstSecondVec;
+
+	_CUDA( cudaFree(devSrcFirstVec) );
+	_CUDA( cudaFree(devSrcSecondVec) );
+	_CUDA( cudaFree(devDstVec) );
+	_CUDA( cudaFree(devSrcVec) );
+	_CUDA( cudaFree(devDstFirstVec) );
+	_CUDA( cudaFree(devDstSecondVec) );
+
+	return 1;
+
+}
 /*
 uint_t Testing::testNewEngineTesting(){
 	SmpcConfiguration *ptrMySmpcConfig = new SmpcConfiguration( pathToFileControllerConfig );

@@ -47,7 +47,7 @@ uint_t TestSmpcController::compareDeviceArray(T* deviceArrayA){
 }
 
 /**
- * Function to compare the deviceArray with the input from the json file
+ * Function to compare the deviceArray with  host array B
  */
 template<typename T>
 uint_t TestSmpcController::compareDeviceArray(T* deviceArrayA, T* hostArrayB, uint_t dim){
@@ -398,9 +398,9 @@ uint_t TestSmpcController::testFixedPointResidual(){
 }
 
 /**
- * function to test the FBE hessian oracal
+ * function to test the FBE hessian Oracle
  */
-uint_t TestSmpcController::testHessianOracalGlobalFbe(){
+uint_t TestSmpcController::testHessianOracleGlobalFbe(){
 	const char* fileName = pathToFileGlobalFbeSmpc.c_str();
 	ScenarioTree *ptrMyScenarioTree = this->getScenarioTree();
 	DwnNetwork *ptrDwnNetwork = this->getDwnNetwork();
@@ -434,7 +434,7 @@ uint_t TestSmpcController::testHessianOracalGlobalFbe(){
 
 		setDeviceArray<real_t>(ptrVecHessianOraclePsi[0], nu*nodes);
 
-		this->computeHessianOracalGlobalFbe();
+		this->computeHessianOracleGlobalFbe();
 
 		a = jsonDocument[VARNAME_TEST_U_DIR];
 		_ASSERT(a.IsArray());
@@ -745,6 +745,202 @@ uint_t TestSmpcController::testValueFbe(){
 }
 
 
+/**
+ * function to test parallel Hessian Oracle for NAMA algorithm
+ */
+uint_t TestSmpcController::testParallelHessianNamaAlgorithm(){
+	const char* fileName = pathToFileNamaSmpc.c_str();
+	ScenarioTree *ptrMyScenarioTree = this->getScenarioTree();
+	DwnNetwork *ptrDwnNetwork = this->getDwnNetwork();
+	uint_t nx = ptrDwnNetwork->getNumTanks();
+	uint_t nu = ptrDwnNetwork->getNumControls();
+	uint_t nv = this->ptrMySmpcConfig->getNV();
+	uint_t nDualXi = 2*nx;
+	uint_t nDualPsi = nu;
+	uint_t nodes = ptrMyScenarioTree->getNumNodes();
+	real_t costFbeDualY, variable;
+	real_t TOLERANCE = 1e-1;
+	real_t linesearchTau;
+	real_t* hostX = new real_t[nx*nodes];
+	real_t* hostU = new real_t[nu*nodes];
+	real_t* hostXdir = new real_t[nx*nodes];
+	real_t* hostUdir = new real_t[nu*nodes];
+	real_t* hostPrimalXi = new real_t[nDualXi*nodes];
+	real_t* hostPrimalPsi = new real_t[nDualPsi*nodes];
+	real_t* hostPrimalXiDir = new real_t[nDualXi*nodes];
+	real_t* hostPrimalPsiDir = new real_t[nDualPsi*nodes];
+	real_t* hostXi = new real_t[nDualXi*nodes];
+	real_t* hostPsi = new real_t[nDualPsi*nodes];
+	real_t* hostFixedPointResidualXi = new real_t[nDualXi*nodes];
+	real_t* hostFixedPointResidualPsi = new real_t[nDualPsi*nodes];
+	real_t* hostLbfgsDirXi = new real_t[nDualXi*nodes];
+	real_t* hostLbfgsDirPsi = new real_t[nDualPsi*nodes];
+
+	real_t time;
+
+	if( factorStepFlag == false ){
+		initialiseSmpcController();
+	}
+
+	rapidjson::Document jsonDocument;
+	rapidjson::Document jsonDocumentParallel;
+	rapidjson::Value b;
+	FILE* infile = fopen(fileName, "r");
+	FILE* infileParallel = fopen(fileName, "r");
+	if(infile == NULL){
+		cout << pathToFileGlobalFbeSmpc << infile << endl;
+		cerr << "Error in opening the file " <<__LINE__ << endl;
+		exit(100);
+	}else{
+		char* readBuffer = new char[65536];
+		rapidjson::FileReadStream smpcJsonStream(infile, readBuffer, sizeof(readBuffer));
+		jsonDocument.ParseStream(smpcJsonStream);
+
+		a = jsonDocument[VARNAME_TEST_ACCELE_XI];
+		_ASSERT(a.IsArray());
+		//setDeviceArray<real_t>(devVecAcceleratedXi, 2*nx*nodes);
+		setDeviceArray<real_t>(ptrProximalXi[0], 2*nx*nodes);
+		a = jsonDocument[VARNAME_TEST_ACCELE_PSI];
+		_ASSERT(a.IsArray());
+		//setDeviceArray<real_t>(devVecAcceleratedPsi, nu*nodes);
+		setDeviceArray<real_t>(ptrProximalPsi[0], nu*nodes);
+		a = jsonDocument[VARNAME_TEST_FIXED_POINT_RESIDUAL_XI];
+		_ASSERT(a.IsArray());
+		setDeviceArray<real_t>(devVecFixedPointResidualXi, 2*nx*nodes);
+		a = jsonDocument[VARNAME_TEST_FIXED_POINT_RESIDUAL_PSI];
+		_ASSERT(a.IsArray());
+		setDeviceArray<real_t>(devVecFixedPointResidualPsi, nu*nodes);
+		a = jsonDocument[VARNAME_TEST_LBFGS_DIR_XI];
+		_ASSERT(a.IsArray());
+		setDeviceArray<real_t>(devVecLbfgsDirXi, 2*nx*nodes);
+		a = jsonDocument[VARNAME_TEST_LBFGS_DIR_PSI];
+		_ASSERT(a.IsArray());
+		setDeviceArray<real_t>(devVecLbfgsDirPsi, nu*nodes);
+		a = jsonDocument[VARNAME_TEST_X];
+		_ASSERT(a.IsArray());
+		setDeviceArray<real_t>(devVecX, nx*nodes);
+		a = jsonDocument[VARNAME_TEST_U];
+		_ASSERT(a.IsArray());
+		setDeviceArray<real_t>(devVecU, nu*nodes);
+		a = jsonDocument[VARNAME_TEST_PRIMALX];
+		_ASSERT(a.IsArray());
+		setDeviceArray<real_t>(devVecPrimalXi, 2*nx*nodes);
+		a = jsonDocument[VARNAME_TEST_PRIMALU];
+		_ASSERT(a.IsArray());
+		setDeviceArray<real_t>(devVecPrimalPsi, nu*nodes);
+
+		startTicToc();
+		tic();
+		computeLineSearchAmeDirection();
+		time = toc();
+		cout << "time lapsed " << time << " milliseconds" << endl;
+
+		_CUDA(cudaMemcpy( hostX, devVecX, nx*nodes*sizeof(real_t), cudaMemcpyDeviceToHost) );
+		_CUDA(cudaMemcpy( hostU, devVecU, nu*nodes*sizeof(real_t), cudaMemcpyDeviceToHost) );
+		_CUDA(cudaMemcpy( hostXdir, devVecXdir, nx*nodes*sizeof(real_t), cudaMemcpyDeviceToHost) );
+		_CUDA(cudaMemcpy( hostUdir, devVecUdir, nu*nodes*sizeof(real_t), cudaMemcpyDeviceToHost) );
+		_CUDA(cudaMemcpy( hostPrimalXi, devVecPrimalXi, nDualXi*nodes*sizeof(real_t), cudaMemcpyDeviceToHost) );
+		_CUDA(cudaMemcpy( hostPrimalPsi, devVecPrimalPsi, nDualPsi*nodes*sizeof(real_t), cudaMemcpyDeviceToHost) );
+		_CUDA(cudaMemcpy( hostPrimalXiDir, devVecPrimalXiDir, nDualXi*nodes*sizeof(real_t), cudaMemcpyDeviceToHost) );
+		_CUDA(cudaMemcpy( hostPrimalPsiDir, devVecPrimalPsiDir, nDualPsi*nodes*sizeof(real_t), cudaMemcpyDeviceToHost) );
+		_CUDA(cudaMemcpy( hostXi, ptrProximalXi[0], nDualXi*nodes*sizeof(real_t), cudaMemcpyDeviceToHost) );
+		_CUDA(cudaMemcpy( hostPsi, ptrProximalPsi[0], nDualPsi*nodes*sizeof(real_t), cudaMemcpyDeviceToHost) );
+
+
+		setParallelHessianOracleNamaAlgorithm( true );
+
+		char* readBufferParallel = new char[65536];
+		rapidjson::FileReadStream smpcJsonStreamParallel(infileParallel, readBufferParallel, sizeof(readBufferParallel));
+		jsonDocumentParallel.ParseStream(smpcJsonStreamParallel);
+
+		a = jsonDocumentParallel[VARNAME_TEST_ACCELE_XI];
+		_ASSERT(a.IsArray());
+		setDeviceArray<real_t>(ptrProximalXi[0], nDualXi*nodes);
+		a = jsonDocumentParallel[VARNAME_TEST_ACCELE_PSI];
+		_ASSERT(a.IsArray());
+		setDeviceArray<real_t>(ptrProximalPsi[0], nDualPsi*nodes);
+		a = jsonDocumentParallel[VARNAME_TEST_FIXED_POINT_RESIDUAL_XI];
+		_ASSERT(a.IsArray());
+		setDeviceArray<real_t>(devVecFixedPointResidualXi, 2*nx*nodes);
+		_CUDA(cudaMemcpy( hostFixedPointResidualXi, devVecFixedPointResidualXi, nDualXi*nodes*sizeof(real_t), cudaMemcpyDeviceToHost) );
+		a = jsonDocumentParallel[VARNAME_TEST_FIXED_POINT_RESIDUAL_PSI];
+		_ASSERT(a.IsArray());
+		setDeviceArray<real_t>(devVecFixedPointResidualPsi, nu*nodes);
+		_CUDA(cudaMemcpy( hostFixedPointResidualPsi, devVecFixedPointResidualPsi, nDualPsi*nodes*sizeof(real_t), cudaMemcpyDeviceToHost) );
+		a = jsonDocumentParallel[VARNAME_TEST_LBFGS_DIR_XI];
+		_ASSERT(a.IsArray());
+		setDeviceArray<real_t>(devVecLbfgsDirXi, nDualXi*nodes);
+		_CUDA(cudaMemcpy( hostLbfgsDirXi, devVecLbfgsDirXi, nDualXi*nodes*sizeof(real_t), cudaMemcpyDeviceToHost) );
+		a = jsonDocumentParallel[VARNAME_TEST_LBFGS_DIR_PSI];
+		_ASSERT(a.IsArray());
+		setDeviceArray<real_t>(devVecLbfgsDirPsi, nDualPsi*nodes);
+		_CUDA(cudaMemcpy( hostLbfgsDirPsi, devVecLbfgsDirPsi, nDualPsi*nodes*sizeof(real_t), cudaMemcpyDeviceToHost) );
+		a = jsonDocumentParallel[VARNAME_TEST_X];
+		_ASSERT(a.IsArray());
+		setDeviceArray<real_t>(devVecX, nx*nodes);
+		a = jsonDocumentParallel[VARNAME_TEST_U];
+		_ASSERT(a.IsArray());
+		setDeviceArray<real_t>(devVecU, nu*nodes);
+		a = jsonDocumentParallel[VARNAME_TEST_PRIMALX];
+		_ASSERT(a.IsArray());
+		setDeviceArray<real_t>(devVecPrimalXi, 2*nx*nodes);
+		a = jsonDocumentParallel[VARNAME_TEST_PRIMALU];
+		_ASSERT(a.IsArray());
+		setDeviceArray<real_t>(devVecPrimalPsi, nu*nodes);
+
+		tic();
+		computeLineSearchAmeDirection();
+		time = toc();
+		cout << "time lapsed " << time << " milliseconds" << endl;
+
+		_ASSERT( compareDeviceArray<real_t>( devVecX, hostX, nx*nodes) );
+		_ASSERT( compareDeviceArray<real_t>( devVecU, hostU, nu*nodes) );
+ 		_ASSERT( compareDeviceArray<real_t>( devVecXdir, hostXdir, nx*nodes) );
+		_ASSERT( compareDeviceArray<real_t>( devVecUdir, hostUdir, nu*nodes) );
+		_ASSERT( compareDeviceArray<real_t>( ptrProximalXi[0], hostXi, nDualXi*nodes) );
+		_ASSERT( compareDeviceArray<real_t>( ptrProximalPsi[0], hostPsi, nDualPsi*nodes) );
+		_ASSERT( compareDeviceArray<real_t>( devVecPrimalXi, hostPrimalXi, nDualXi*nodes) );
+		_ASSERT( compareDeviceArray<real_t>( devVecPrimalPsi, hostPrimalPsi, nDualPsi*nodes) );
+		_ASSERT( compareDeviceArray<real_t>( devVecPrimalXiDir, hostPrimalXiDir, nDualXi*nodes) );
+		_ASSERT( compareDeviceArray<real_t>( devVecPrimalPsiDir, hostPrimalPsiDir, nDualPsi*nodes) );
+
+		delete [] readBuffer;
+		delete [] readBufferParallel;
+		readBuffer = NULL;
+		readBufferParallel = NULL;
+	}
+	fclose(infile);
+	delete [] hostX;
+	delete [] hostU;
+	delete [] hostXdir;
+	delete [] hostUdir;
+	delete [] hostXi;
+	delete [] hostPsi;
+	delete [] hostPrimalXi;
+	delete [] hostPrimalPsi;
+	delete [] hostPrimalXiDir;
+	delete [] hostPrimalPsiDir;
+
+	infile = NULL;
+	infileParallel = NULL;
+	ptrDwnNetwork = NULL;
+	ptrMyScenarioTree = NULL;
+	hostX = NULL;
+	hostU = NULL;
+	hostXdir = NULL;
+	hostUdir = NULL;
+	hostXi = NULL;
+	hostPsi = NULL;
+	hostPrimalXi = NULL;
+	hostPrimalPsi = NULL;
+	hostPrimalXiDir = NULL;
+	hostPrimalPsiDir = NULL;
+
+	return 1;
+
+}
+
+
 uint_t TestSmpcController::testAmeLineSearch(){
 	const char* fileName = pathToFileNamaSmpc.c_str();
 	ScenarioTree *ptrMyScenarioTree = this->getScenarioTree();
@@ -756,10 +952,13 @@ uint_t TestSmpcController::testAmeLineSearch(){
 	real_t costFbeDualY, variable;
 	real_t TOLERANCE = 1e-1;
 	real_t linesearchTau;
+	real_t time;
 
 	if( factorStepFlag == false ){
 		initialiseSmpcController();
 	}
+
+	//setParallelHessianOracleNamaAlgorithm( true);
 
 	rapidjson::Document jsonDocument;
 	FILE* infile = fopen(fileName, "r");
@@ -806,9 +1005,13 @@ uint_t TestSmpcController::testAmeLineSearch(){
 		_ASSERT(a.IsArray());
 		setDeviceArray<real_t>(devVecPrimalPsi, nu*nodes);
 
+		startTicToc();
+		tic();
 		costFbeDualY = this->computeValueFbe();
 		//linesearchTau = computeLineSearchLbfgsUpdate( costFbeDualY );
 		linesearchTau = computeLineSearchAmeLbfgsUpdate( costFbeDualY );
+		time = toc();
+		cout << "time lapsed " << time << " milliseconds" << endl;
 
 		a = jsonDocument[VARNAME_TEST_FBE_COST];
 		_ASSERT(a.IsArray());

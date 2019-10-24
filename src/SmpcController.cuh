@@ -204,7 +204,7 @@ protected:
 	/**
 	 * compute the hessian-oracle
 	 */
-	void computeHessianOracalGlobalFbe();
+	void computeHessianOracleGlobalFbe();
 	/**
 	 * compute the gradient of the Fbe
 	 */
@@ -231,6 +231,10 @@ protected:
 	 * @param   real_t          step-size in the direction of the lbfgs direction
 	 */
 	real_t computeLineSearchLbfgsUpdate(real_t valueFbeYvar);
+	/**
+	 * compute the line search direction for the NAMA algorithm
+	 */
+	real_t computeLineSearchAmeDirection();
 	/*
 	 * compute the line search update of the tau for the AME
 	 * @param  valueAmeYvar     the value of the AME at the current dual variable Y
@@ -253,6 +257,11 @@ protected:
 	 * @return primalInfeasibility
 	 */
 	real_t computeValueFbe();
+	/*
+	 * set flag for parallel Hessian computation. This method also allocate the additional memory
+	 * @param  inputFlag
+	 */
+	void setParallelHessianOracleNamaAlgorithm(bool inputFlag);
 	/**
 	 * calculate primal infeasibility (Hx - Z) at each iteration
 	 */
@@ -295,6 +304,15 @@ protected:
 	 * for NAMA algorithm
 	 */
 	void updateFixedPointResidualNamaAlgorithm();
+	/*
+	 * allocate the memory for the parallel implementation of the
+	 * Hessian Oracle
+	 */
+	void allocateMemoryParallelHessianNamaAlgorithm();
+	/**
+	 * compute the parallel hessian-oracle
+	 */
+	void computeParallelHessianOracleEnvelop();
 	/*
 	 * deallocate the memory of the APG in the device
 	 */
@@ -638,6 +656,15 @@ protected:
 	 */
 	real_t valueFunGuBox;
 
+	/* ---- parallel hessian Oracle ----- */
+	/**
+	 * Pointer for Parallel Hessian Oracle  xi
+	 */
+	real_t *devVecParallelHessianOracleXi;
+	/**
+	 * Pointer for fixed-point residual xi
+	 */
+	real_t *devVecParallelHessianOraclePsi;
 	/**
 	 * Flag Factor step
 	 */

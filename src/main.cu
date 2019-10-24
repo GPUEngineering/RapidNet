@@ -20,6 +20,7 @@ int main(void){
 		_ASSERT( myTesting->testSmpcController() );
 		//Testing *otherTesting = new Testing();
 		//_ASSERT( otherTesting->testSmpcFbeController() );
+		//_ASSERT( myTesting->testCombineAndSeparateVectorAlternative() );
 		_ASSERT( myTesting->testSmpcFbeController() );
 		_ASSERT( myTesting->testSmpcNamaController() );
 		//myTesting->testNewEngineTesting();

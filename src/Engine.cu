@@ -40,12 +40,17 @@ Engine::Engine(DwnNetwork *myNetwork, ScenarioTree *myScenarioTree, SmpcConfigur
 	cublasCreate(&handle);
 	priceUncertaintyFlag = true;
 	demandUncertaintyFlag = true;
+	styleParallelHessianOracleFlag = false;
 
 	if( algorithmName.compare("globalFbeAlgorithm") == 0){
 		globalFbeFlag = true;
 		namaFlag = false;
 		apgFlag = false;
 	}else if(algorithmName.compare("namaAlgorithm") == 0){
+		string hessianOracleStyle = ptrMySmpcConfig->getHessianOracleNamaAlgorithm();
+		if ( hessianOracleStyle.compare(PARALLEL_HESSIAN_ORACLE) == 0){
+			styleParallelHessianOracleFlag = true;
+		}
 		namaFlag = true;
 		globalFbeFlag = false;
 		apgFlag = false;
@@ -147,12 +152,17 @@ Engine::Engine(SmpcConfiguration *smpcConfig){
 	cublasCreate(&handle);
 	priceUncertaintyFlag = true;
 	demandUncertaintyFlag = true;
+	styleParallelHessianOracleFlag = false;
 
 	if( algorithmName.compare("globalFbeAlgorithm") == 0){
 		globalFbeFlag = true;
 		namaFlag = false;
 		apgFlag = false;
 	}else if(algorithmName.compare("namaAlgorithm") == 0){
+		string hessianOracleStyle = ptrMySmpcConfig->getHessianOracleNamaAlgorithm();
+		if ( hessianOracleStyle.compare(PARALLEL_HESSIAN_ORACLE) == 0){
+			styleParallelHessianOracleFlag = true;
+		}
 		namaFlag = true;
 		globalFbeFlag = false;
 		apgFlag = false;
@@ -1126,6 +1136,13 @@ bool Engine::getNamaFlag(){
 	return namaFlag;
 }
 
+/*
+ * Flag to indicate status for Parallel Hessian Oracle NAMA algorithm
+ */
+bool Engine::getNamaParallelHessianOracleSyle(){
+	return styleParallelHessianOracleFlag;
+}
+
 /*  SETTER'S IN THE ENGINE  */
 /*
  * Option for uncertainty in price
@@ -1142,6 +1159,16 @@ void Engine::setPriceUncertaintyFlag(bool inputFlag){
  */
 void Engine::setDemandUncertaintyFlag(bool inputFlag){
 	demandUncertaintyFlag = inputFlag;
+}
+
+
+/*
+ * Option for setting parallel Hessian calculation in NAMA algorithm
+ * @param    styleParallelHessianOracleFlag    true to enable parallel hessian oracle
+ *                                             false to disable parallel hessian oracle ( default )
+ */
+void Engine::setNamaParallelHessianOracleSyle(bool inputFlag){
+	styleParallelHessianOracleFlag = inputFlag;
 }
 
 void Engine::eliminateInputDistubanceCoupling(real_t* nominalDemand, real_t *nominalPrices){

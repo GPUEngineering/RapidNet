@@ -122,7 +122,7 @@ public :
 	/**
 	 * Function to test the lbfgs direction
 	 */
-	uint_t testHessianOracalGlobalFbe();
+	uint_t testHessianOracleGlobalFbe();
 
 	/**
 	 * Function to test the fbe gradient
@@ -158,6 +158,13 @@ public :
 	 * the AME
 	 */
 	uint_t testAmeLineSearch();
+	/**
+	 * function that compare the line search direction in NAMA algorithm in two
+	 * scenarios
+	 * - sequential update
+	 * - parallel update
+	 */
+	uint_t testParallelHessianNamaAlgorithm();
 	/**
 	 * Destructor
 	 */

@@ -63,6 +63,7 @@ public:
 	uint_t testNewEngineTesting();
 	uint_t testSmpcFbeController();
 	uint_t testSmpcNamaController();
+	uint_t testCombineAndSeparateVectorAlternative();
 	~Testing();
 private:
 	template<typename T> uint_t compareArray(T* arrayA);

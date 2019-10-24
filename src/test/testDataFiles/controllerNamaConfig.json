@@ -61,5 +61,6 @@
 "pathToScenarioTree" : "../test/testDataFiles/scenarioTree.json",
 "pathToForecaster" : "../test/testDataFiles/forecastor.json",
 "algorithmName" : "namaAlgorithm",
+"styleHessianOracal" : "sequential",
 "lbfgsBufferSize" : [5]
 }

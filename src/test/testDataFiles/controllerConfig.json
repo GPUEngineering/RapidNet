@@ -61,5 +61,6 @@
 "pathToScenarioTree" : "../test/testDataFiles/scenarioTree.json",
 "pathToForecaster" : "../test/testDataFiles/forecastor.json",
 "algorithmName" : "proximalAlgorithm",
+"styleHessianOracal" : "sequential",
 "lbfgsBufferSize" : [5]
 }

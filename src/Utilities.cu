@@ -423,6 +423,61 @@ __global__ void scaleVecProbalitity(
 	}
 }
 
+/**
+ * @param devDstVec          destination vector [x1 y1 x2 y2]
+ * @param devcSrcFirstVec    first source vector
+ * @param devcSrcSecondVec   second source vector
+ * @param dimFirstSrcBlock   dimension of the first src vector block
+ * @param dimSecondSrcBlock  dimension of the second src vector block
+ * @param numBlock           number of block
+ */
+__global__ void combineVectorAlternativeBlock(
+		real_t* devDstVec,
+		real_t* devSrcFirstVec,
+		real_t* devSrcSecondVec,
+		uint_t dimFirstSrcBlock,
+		uint_t dimSecondSrcBlock,
+		uint_t numBlock){
+	uint_t tid = blockIdx.x*blockDim.x + threadIdx.x;
+	uint_t sizeDstVec = numBlock*(dimFirstSrcBlock + dimSecondSrcBlock);
+	if (tid < sizeDstVec){
+		uint_t blockIdDstVec = tid/(dimFirstSrcBlock + dimSecondSrcBlock);
+		uint_t vecIdDst = tid - blockIdDstVec*(dimFirstSrcBlock + dimSecondSrcBlock);
+		if ( vecIdDst < dimFirstSrcBlock){
+			devDstVec[tid] = devSrcFirstVec[blockIdDstVec*dimFirstSrcBlock + vecIdDst];
+		}else{
+			devDstVec[tid] = devSrcSecondVec[blockIdDstVec*dimSecondSrcBlock + vecIdDst - dimFirstSrcBlock];
+		}
+	}
+}
+
+/**
+ * @param devSrcVec          source vector [x1 y1 x2 y2]
+ * @param devcDstFirstVec    first destination vector [x1 x2]
+ * @param devcDstSecondVec   second source vector [y1 y2]
+ * @param dimFirstSrcBlock   dimension of the first src vector block
+ * @param dimSecondSrcBlock  dimension of the second src vector block
+ * @param numBlock           number of block (preferred the size of srcVector)
+ */
+__global__ void separateVectorAlternativeBlock(
+		real_t* devSrcVec,
+		real_t* devDstFirstVec,
+		real_t* devDstSecondVec,
+		uint_t dimFirstDstBlock,
+		uint_t dimSecondDstBlock,
+		uint_t numBlock){
+	uint_t tid = blockIdx.x*blockDim.x + threadIdx.x;
+	uint_t sizeSrcVec = numBlock*(dimFirstDstBlock + dimSecondDstBlock);
+	if (tid < sizeSrcVec){
+		uint_t blockIdSrcVec = tid/(dimFirstDstBlock + dimSecondDstBlock);
+		uint_t vecIdDst = tid - blockIdSrcVec*(dimFirstDstBlock + dimSecondDstBlock);
+		if ( vecIdDst < dimFirstDstBlock){
+			devDstFirstVec[blockIdSrcVec*dimFirstDstBlock + vecIdDst] = devSrcVec[tid];
+		}else{
+			devDstSecondVec[blockIdSrcVec*dimSecondDstBlock + vecIdDst - dimFirstDstBlock] = devSrcVec[tid];
+		}
+	}
+}
 
 
 void startTicToc() {
