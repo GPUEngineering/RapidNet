@@ -1,7 +1,7 @@
 RapidNet
 ===
 
-[![Gitter](https://img.shields.io/gitter/room/nwjs/nw.js.svg)](https://gitter.im/GPUEngineering/Lobby)
+[![DOI](https://zenodo.org/badge/84549720.svg)](https://zenodo.org/badge/latestdoi/84549720) [![Gitter](https://img.shields.io/gitter/room/nwjs/nw.js.svg)](https://gitter.im/GPUEngineering/Lobby)
 
 About
 -------------
